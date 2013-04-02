@@ -1,0 +1,19 @@
+{
+  "name": "tequila",
+  "version": "0.0.1",
+  "author": "tgiCloud <support@tgicloud.com>",
+  "description": "tequila es muy bueno",
+  "contributors": [
+    {
+      "name": "Sean Smith",
+      "email": "dremoor@gmail.com"
+    }
+  ],
+  "dependencies" : {
+  },
+  "devDependencies": {
+  },
+  "engines": {
+    "node": ">=0.6.6"
+  }
+}
