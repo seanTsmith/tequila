@@ -1,9 +1,28 @@
 #!/usr/bin/env node
 
-console.log('have ddda shot!');
+// All stuff for command line kept here
+var tequilaCli = {}
 
+// For output
+tequilaCli.out = function(parm) {
+    console.log(parm);
+}
+
+tequilaCli.out('tequila 0.0.1');
+tequilaCli.command = process.argv[2] || "help"
+switch (tequilaCli.command) {
+default:
+    tequilaCli.out('unknown command: '+tequilaCli.command);
+case 'help':
+    tequilaCli.out('Commands: help test');
+    tequilaCli.out('');
+    tequilaCli.out('For details on a particular command type tequila help test for example.');
+}
+return;
+
+
+onsole.log('have ddda shot!');
 console.log(process.argv.length + ' args');
-
 process.argv.forEach(function (val, index, array) {
   console.log(index + ': ' + val);
 });
