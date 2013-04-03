@@ -6,7 +6,7 @@
 
 ## test syntax
 - **test.start(options)** Starts gathering test cases until stop hit.
--- options.verbose=true for debugging tests
+  - options.verbose=true for debugging tests
 - **test.heading(text,function)** Header for grouping
 - **test.paragraph(text)**  Additional Verbiage
 - **test.case(text, function)** Component to test
