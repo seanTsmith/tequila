@@ -1,3 +1,5 @@
 all:
-	@echo "tequila!"
+	@bin/tequila make
 
+test:
+	@bin/tequila test

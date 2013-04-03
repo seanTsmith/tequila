@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+console.log('have ddda shot!');
+
+console.log(process.argv.length + ' args');
+
+process.argv.forEach(function (val, index, array) {
+  console.log(index + ': ' + val);
+});
+
+// var fudge = 'packer';
+var temp = require('../lib/temp');
+
+console.log('that is what is up' + temp.shit)
+
+
