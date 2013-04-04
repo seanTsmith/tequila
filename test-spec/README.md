@@ -6,10 +6,9 @@
 
 ## test syntax
 - **test.start(options)** Starts gathering test cases until stop hit.
-  - options.verbose=true for debugging tests
+  - **options.verbose** = true for debugging tests
 - **test.heading(text,function)** Header for grouping
 - **test.paragraph(text)**  Additional Verbiage
-- **test.case(text, function)** Component to test
 - **test.example(text, test function, expect)** test with expected results
 - **test.exception(text, test function, Error)** test that expect exception to be thrown
 - **test.stop()** end of test specs

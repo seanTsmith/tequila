@@ -11,13 +11,20 @@ tequilaCli.out = function(parm) {
 tequilaCli.out('tequila 0.0.1');
 tequilaCli.command = process.argv[2] || "help"
 switch (tequilaCli.command) {
+case 'test':
+    var temp = require('../lib/temp');
+    break;
 default:
     tequilaCli.out('unknown command: '+tequilaCli.command);
 case 'help':
     tequilaCli.out('Commands: help test');
     tequilaCli.out('');
     tequilaCli.out('For details on a particular command type tequila help test for example.');
+    break;
 }
+
+
+
 return;
 
 
