@@ -1,6 +1,5 @@
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,
 td {
-    /*max-width: 1024px;*/
     margin: 0;
     padding: 0;
     border: 0;
@@ -66,7 +65,8 @@ h6 {
 }
 p {
     font-weight:normal;
-    margin: 0.25em;
+    margin-top: 0.25em;
+    margin-bottom: 0.5em;
 }
 li {
     margin-left: 2em;
@@ -90,18 +90,20 @@ pre {
     margin-left: 0.25em;
     margin-right: 0.25em;
 }
-pre.error {
-    width: 980px;
-    background: #fff0f0;
-    border: solid;
-    border-width:thin;
-    white-space: pre-wrap;
-    margin-top: 0em;
-    margin-bottom: 0.25em;
-    margin-left: 0.25em;
-    margin-right: 0.25em;
+pre.fail {
+    background: #fcc;
 }
-
+pre.pass {
+    background: #ccf;
+}
+pre.skip {
+    background: #fcf;
+}
+code {
+    font-weight: normal;
+    border: none;
+    font-family: "Bitstream Vera Sans Mono", "Courier", monospace;
+}
 caption {
     width: 980px;
     text-align: left;
@@ -111,19 +113,13 @@ caption {
     margin-bottom: 0em;
     margin-left: 0.25em;
     margin-right: 0.25em;
-    border: none;
-}
-code {
-    font-weight: normal;
-    border: none;
-    font-family: "Bitstream Vera Sans Mono", "Courier", monospace;
 }
 body {
     font: 14px/1.5 "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #F1F1D4;
-    padding-top: 24px;
-    padding-bottom: 48px;
-    padding-left: 12px;
-    padding-right: 12px;
+    background-color: #F8F8F0;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
