@@ -3,6 +3,7 @@
  * test-tequila
  */
 
+
 var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, expectException, expectedValue) {
   this.nodeType = nodeType; // nodeType 1 char string: H)eading P)aragraph E)xample E(X)eption
   this.level = level;
@@ -15,7 +16,9 @@ var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, 
   return this;
 };
 
+
 var test = {};
+test.converter = new Markdown.Converter();
 test.log = function (txt) {
 //  console.log(txt);
 };
@@ -75,13 +78,24 @@ test.render = function (options) {
     switch (test.nodes[i].nodeType) {
       case 'h':
         var p = document.createElement("h" + test.nodes[i].level);
-        p.innerHTML = test.nodes[i].levelText + ' ' + test.nodes[i].text;
+        var lt =  test.nodes[i].levelText;
+        if (lt=='1.') lt = '';
+        if (lt.length>2) lt = lt.substring(0,lt.length-1);
+        p.innerHTML = lt + ' ' + test.nodes[i].text;
         innerDiv.appendChild(p);
         break;
       case 'P':
         var p = document.createElement("p");
-        p.innerHTML = test.nodes[i].text;
+        p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
         innerDiv.appendChild(p);
+
+//   var text = "Markdown *rocks*.";
+//
+//
+//   var html = converter.makeHtml(text);
+//
+//   alert(html);
+
         break;
       case 'e':
         var caption = document.createElement("caption");
@@ -92,7 +106,7 @@ test.render = function (options) {
         if (test.nodes[i].func) {
           pre.innerHTML = '<code>' + test.formatCode(test.nodes[i].func) + '</code>';
         } else {
-          pre.innerHTML = '<code>TODO</code>';
+          pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
         }
         innerDiv.appendChild(pre);
         break;

@@ -65,15 +65,23 @@ h6 {
     line-height: 1;
 }
 p {
+    font-weight:normal;
     margin: 0.25em;
 }
+li {
+    margin-left: 2em;
+}
+em {
+    font-style: italic;
+}
+strong {
+    font-weight:bolder;
+}
 pre {
-    /*width: auto;*/
     max-width: 980px;
     min-width: 98px;
     overflow: hidden;
-    /*width: 980px;*/
-    background: #f0fff0;
+    background: #fff;
     border: solid;
     border-width:thin;
     white-space: pre-wrap;
@@ -112,9 +120,9 @@ code {
 }
 body {
     font: 14px/1.5 "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #ffffff;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    background-color: #F1F1D4;
+    padding-top: 24px;
+    padding-bottom: 48px;
     padding-left: 12px;
     padding-right: 12px;
 }
