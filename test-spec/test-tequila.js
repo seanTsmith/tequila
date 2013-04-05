@@ -23,7 +23,7 @@ test.start = function (options) {
   this.exampleNumber = 0;
   this.headingLevel = 0;
   this.levels = [0];
-  this.log('test.start')
+  this.log('test.start');
 };
 test.heading = function (text, func) {
   this.levels[this.headingLevel]++;
@@ -64,7 +64,7 @@ test.stop = function () {
 test.run = function (resultsCallback) {
   this.log('test.run')
 };
-test.render = function (options) {
+test.render = function (isBrowser) {
   this.log('test.render');
 
   test.countTests = 0;
@@ -72,34 +72,46 @@ test.render = function (options) {
   test.countFail = 0;
   test.countDefer = 0;
 
-  // Fixed Header Div
-  var headerDiv = document.createElement("div");
-  headerDiv.style.position = 'fixed';
-  headerDiv.style.top = '0px';
-  headerDiv.style.margin = 'auto';
-  headerDiv.style.zIndex = '100000';
-  headerDiv.style.width = '100%';
-  headerDiv.style.background = '#AA4'; // pass color
-//  headerDiv.style.background = '#6C7'; // pass color
-  var stats = document.createElement("p");
-  stats.id = "stats";
-  stats.innerHTML = test.converter.makeHtml('**tequila**');
-  stats.align = 'center';
-  stats.style.padding = '0px';
-  stats.style.margin = '0px';
-  headerDiv.appendChild(stats);
-  document.body.appendChild(headerDiv);
+  // Browser Dressing
+  if (isBrowser) {
+    // Fixed Header Div
+    var headerDiv = document.createElement("div");
+    headerDiv.style.position = 'fixed';
+    headerDiv.style.top = '0px';
+    headerDiv.style.margin = 'auto';
+    headerDiv.style.zIndex = '100000';
+    headerDiv.style.width = '100%';
+    headerDiv.style.background = '#AA4'; // yellow header to start
+    var stats = document.createElement("p");
+    stats.id = "stats";
+    stats.innerHTML = test.converter.makeHtml('**tequila**');
+    stats.align = 'center';
+    stats.style.padding = '0px';
+    stats.style.margin = '0px';
+    headerDiv.appendChild(stats);
+    document.body.appendChild(headerDiv);
+    // Outer & Inner Div to center content
+    var outerDiv = document.createElement("div");
+    outerDiv.style.width = "100%";
+    document.body.appendChild(outerDiv);
+    var innerDiv = document.createElement("div");
+    innerDiv.style.width = "1000px";
+    innerDiv.style.margin = "0 auto";
+    outerDiv.appendChild(innerDiv);
+  } else {
+    process.stdout.write('Testing 123...');
+  }
 
-  // Outer & Inner Div to center content
-  var outerDiv = document.createElement("div");
-  outerDiv.style.width = "100%";
-  document.body.appendChild(outerDiv);
-  var innerDiv = document.createElement("div");
-  innerDiv.style.width = "1000px";
-  innerDiv.style.margin = "0 auto";
-  outerDiv.appendChild(innerDiv);
   for (i in test.nodes) {
-    switch (test.nodes[i].nodeType) {
+    var testNode = test.nodes[i].nodeType;
+    if (!isBrowser) {
+      if (testNode=='e') {
+        testNode = '.';
+      } else {
+        testNode = '';
+      }
+    }
+    switch (testNode) {
       case 'h':
         var p = document.createElement("h" + test.nodes[i].level);
         var lt = test.nodes[i].levelText;
@@ -113,6 +125,23 @@ test.render = function (options) {
         var p = document.createElement("p");
         p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
         innerDiv.appendChild(p);
+        break;
+
+      case '.':
+        test.countTests++;
+        if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+          var test_Results = test.callTestCode(test.nodes[i].func);
+          if (test_Results.toString() !== test.nodes[i].expectedValue.toString()) {
+            test.countFail++;
+            console.log('\n' + colors.red('✘') + colors.white(' RETURNED: ' + test.expressionInfo(test_Results) + ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+          } else {
+            test.countPass++;
+            process.stdout.write(colors.green('✓'));
+          }
+        } else {
+          test.countDefer++;
+          process.stdout.write(colors.yellow('✍'));
+        }
         break;
 
       case 'e':
@@ -157,7 +186,15 @@ test.render = function (options) {
         break;
     }
   }
-  if (!test.countFail) headerDiv.style.background = '#6C7'; // pass color
+  if (isBrowser) {
+    if (!test.countFail) headerDiv.style.background = '#6C7'; // pass color
+  } else {
+    var results = '\n '+test.countTests+' pass('+test.countPass+') fail('+test.countFail+') defer('+test.countDefer+') ';
+    if (test.countFail)
+      console.log(colors.inverse(colors.red(results)));
+    else
+      console.log(colors.inverse(colors.green(results)));
+  }
 };
 test.updateStats = function () {
   var stats = document.getElementById("stats");
@@ -171,7 +208,7 @@ test.expressionInfo = function (expr) {
   }
   return expr;
 }
-  test.callTestCode = function (func) {
+test.callTestCode = function (func) {
   try {
     test.wasThrown = false;
     return func();

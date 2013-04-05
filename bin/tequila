@@ -12,7 +12,7 @@ tequilaCli.out('tequila 0.0.1');
 tequilaCli.command = process.argv[2] || "help"
 switch (tequilaCli.command) {
 case 'test':
-    var temp = require('../lib/temp');
+    var testRunner = require('../test-spec/node-test-runner.js');
     break;
 default:
     tequilaCli.out('unknown command: '+tequilaCli.command);
@@ -23,20 +23,4 @@ case 'help':
     break;
 }
 
-
-
 return;
-
-
-onsole.log('have ddda shot!');
-console.log(process.argv.length + ' args');
-process.argv.forEach(function (val, index, array) {
-  console.log(index + ': ' + val);
-});
-
-// var fudge = 'packer';
-var temp = require('../lib/temp');
-
-console.log('that is what is up' + temp.shit)
-
-
