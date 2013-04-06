@@ -1401,6 +1401,498 @@ else
 })();
 /**
  * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
+ * tequila-class.js
+ */
+var Tequila = (function () {
+  var singletonInstance;
+
+  function init() {
+    // Private methods and variables
+    var version = '0.0.1';
+//    function privateMethod() {
+//      console.log("I am private");
+//    }
+//    var privateVariable = "Im also private";
+    return    {
+      // Public methods and variables
+      getVersion: function () {
+        return version;
+      },
+      contains: function (a, obj) {
+        for (var i = 0; i < a.length; i++) {
+          if (a[i] === obj) return true;
+        }
+        return false;
+      },
+      getUnusedProperties: function (properties, allowedProperties) {
+        var props = [];
+        for (var property in properties) {
+          if (!this.contains(allowedProperties, property)) {
+            props.push(property);
+          }
+        }
+        return props;
+      }
+    };
+  };
+  return function () {
+    if (!singletonInstance) singletonInstance = init();
+    return singletonInstance;
+  };
+})();
+/**
+ * tequila
  * node-test-header
  */
 
@@ -1421,22 +1913,18 @@ var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, 
 };
 var test = {};
 test.converter = new Markdown.Converter();
-test.log = function (txt) {
-//  console.log(txt);
-};
+test.showWork = [];
 test.start = function (options) {
   this.nodes = [];
   this.exampleNumber = 0;
   this.headingLevel = 0;
   this.levels = [0];
-  this.log('test.start');
 };
 test.heading = function (text, func) {
   this.levels[this.headingLevel]++;
   this.outlineLabel = '';
   for (var i in this.levels) this.outlineLabel += this.levels[i].toString() + '.';
   this.nodes.push(new TestNode('h', this.headingLevel + 1, this.outlineLabel, text, func));
-  this.log('test.heading: ' + this.outlineLabel + ' ' + text)
   if (func) {
     this.headingLevel++;
     this.levels[this.headingLevel] = 0;
@@ -1447,31 +1935,32 @@ test.heading = function (text, func) {
 };
 test.paragraph = function (text) {
   this.nodes.push(new TestNode('P', this.headingLevel + 1, this.outlineLabel, text));
-  this.log('test.paragraph ' + text)
 };
 test.example = function (text, expect, func) {
   this.exampleNumber++;
-  this.log('test.example ' + this.outlineLabel + ' ' + text)
   this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, false, expect));
 };
 test.xexample = function (text, expect, func) {
   this.exampleNumber++;
-  this.log('xexample.example ' + this.outlineLabel + ' ' + text)
   this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
 };
-test.exception = function (text, func, Error) {
-  this.exampleNumber++;
-  this.log('test.exception ' + this.outlineLabel + ' ' + text)
-  if (func) func();
+test.show = function (value) {
+  if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function'  || value instanceof RegExp) {
+    test.showWork.push(value);
+    return;
+  }
+  if (value !== undefined) {
+    test.showWork.push(JSON.stringify(value));
+    return;
+  }
+  test.showWork.push(value);
 };
 test.stop = function () {
-  this.log('test.stop')
 };
 test.run = function (resultsCallback) {
-  this.log('test.run')
+
 };
 test.render = function (isBrowser) {
-  this.log('test.render');
 
   test.countTests = 0;
   test.countPass = 0;
@@ -1511,7 +2000,7 @@ test.render = function (isBrowser) {
   for (i in test.nodes) {
     var testNode = test.nodes[i].nodeType;
     if (!isBrowser) {
-      if (testNode=='e') {
+      if (testNode == 'e') {
         testNode = '.';
       } else {
         testNode = '';
@@ -1536,6 +2025,7 @@ test.render = function (isBrowser) {
       case '.':
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+          test.showWork = [];
           var test_Results = test.callTestCode(test.nodes[i].func);
           if (test_Results.toString() !== test.nodes[i].expectedValue.toString()) {
             test.countFail++;
@@ -1558,6 +2048,7 @@ test.render = function (isBrowser) {
         pre.className = "prettyprint";
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+          test.showWork = [];
           var test_Results = test.callTestCode(test.nodes[i].func);
           var exampleCode = '';
           exampleCode += test.formatCode(test.nodes[i].func);
@@ -1565,14 +2056,18 @@ test.render = function (isBrowser) {
             if (!test.countFail) headerDiv.style.background = '#F33'; // fail color color
             test.countFail++;
             pre.style.background = "#fcc"; // red
-            exampleCode += '✘ <b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+            if (test.wasThrown) {
+              exampleCode += '✘ <b>ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+            } else {
+              exampleCode += '✘ <b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+            }
           } else {
             test.countPass++;
             pre.style.background = "#cfc"; // green
             if (test.wasThrown) {
               exampleCode += '✓ <b>error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
-              exampleCode += '✓ <b>returns ' + test_Results + ' as expected</b>'; // ✘
+              exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
             }
           }
           pre.innerHTML = '<code>' + exampleCode + '</code>';
@@ -1595,7 +2090,7 @@ test.render = function (isBrowser) {
   if (isBrowser) {
     if (!test.countFail) headerDiv.style.background = '#6C7'; // pass color
   } else {
-    var results = '\n '+test.countTests+' pass('+test.countPass+') fail('+test.countFail+') defer('+test.countDefer+') ';
+    var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
     if (test.countFail)
       console.log(colors.inverse(colors.red(results)));
     else
@@ -1604,13 +2099,12 @@ test.render = function (isBrowser) {
 };
 test.updateStats = function () {
   var stats = document.getElementById("stats");
-  stats.innerHTML = test.converter.makeHtml('**tequila** tests: **'+test.countTests+'** pass: **'+test.countPass+'** fail: **'+test.countFail+'** defer: **'+test.countDefer+'**');
+  stats.innerHTML = test.converter.makeHtml('**tequila** tests: **' + test.countTests + '** pass: **' + test.countPass + '** fail: **' + test.countFail + '** defer: **' + test.countDefer + '**');
 }
 test.expressionInfo = function (expr) {
 
   if (typeof expr == 'string') {
     return '"' + expr.replace(/"/g, '\\\"') + '"';
-    //str = '"' + expr.replace(/"/g, '\"') + '"'
   }
   return expr;
 }
@@ -1630,9 +2124,23 @@ test.formatCode = function (txt) {
   var gotNonSpace = false;
   var line = '';
   var i, j;
+  var w = 0;
   var s = txt.toString();
   for (i = 0; i < s.length; i++) {
     if (s[i] == '\n') {
+      if (line.substring(0, 9) == 'test.show') {
+        if (w < test.showWork.length) {
+          var oldline = line.substring(10);
+          if (oldline.length>0) oldline = oldline.substring(0,oldline.length-1);
+          if (oldline.length>0) oldline = oldline.substring(0,oldline.length-1);
+          if (oldline)
+            line = '<b>// ' + oldline + ' is ' + test.showWork[w] + '</b>';
+          else
+            line = '<b>// i got nothing</b>';
+          console.log(line);
+          w++;
+        }
+      }
       lines.push(line);
       line = '';
       spaces.push(spaceCount);
@@ -1658,83 +2166,57 @@ test.formatCode = function (txt) {
   return output;
 };/**
  * tequila
+ * tequila-test
+ */
+test.classLibrary = function (func) {
+  test.heading('Tequila() Singleton', function (func) {
+    test.paragraph('The Tequila() manages the state of the library as a whole.');
+    test.example('multiple instances are deep equal', true, function () {
+      return (Tequila() === Tequila() && Tequila() === new Tequila());
+    });
+    test.example('getVersion() should return ', '0.0.1', function () {
+      return (Tequila().getVersion());
+    });
+    test.heading('contains(array,object)');
+    test.paragraph('This method returns true or false as to whether object is contained in array.');
+    test.example('tgi.contains(array,object) should check for existence of object in array', true, function () {
+      return Tequila().contains(['moe', 'larry', 'curley'], 'larry');
+    });
+    test.example('tgi.contains(array,object) should check for existence of object in array', false, function () {
+      return Tequila().contains(['moe', 'larry', 'curley'], 'shemp');
+    });
+  });
+//  it('tgi.contains(array,object) should check for existence of object in array', function () {
+//    tgi.contains(['moe', 'larry', 'curley'], 'larry').should.be.true;
+//    tgi.contains(['moe', 'larry', 'curley'], 'shemp').should.be.false;
+//  });
+//  it('tgi.getUnusedProperties(settings,allowedProperties) should ensure all properties in settings are contained in allowedProperties', function () {
+//    // got occupation and value backwards so occupation is an unknown property
+//    tgi.getUnusedProperties({name: 'name', occupation: 'value'}, ['name', 'value'])[0].should.equal('occupation');
+//    // no unknown properties
+//    tgi.getUnusedProperties({name: 'name', value: 'occupation'}, ['name', 'value']).length.should.equal(0);
+//  });
+//  it('tgi.inheritPrototype(p) should return a object that inherits properties from the prototype object p', function () {
+//    // for docs, tests covered in Model Usage
+//  });
+//  xit('tgi.isModel(m) should return true if m is a Model', function () {
+////          tgi.isModel(1)
+//  });
+
+
+}/**
+ * tequila
  * tequila-spec
  */
 
 test.start();
-//test.heading('TEQUILA TEST SPEC', function () {
-//
-//  test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//  test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//  test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//  test.example('Uno', function () {
-//    // First
-//    return 1;
-//  });
-//  test.example('Dos', function () {
-//    // Second
-//    return 2;
-//  });
-//  test.heading('HEADING LEVEL 2', function () {
-//    test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//    test.example('three', function () {
-//      // meh
-//    });
-//    test.heading('HEADING LEVEL 3', function () {
-//      test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//      test.heading('HEADING LEVEL 4', function () {
-//        test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//        test.heading('HEADING LEVEL 5', function () {
-//          test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//          test.heading('HEADING LEVEL 6', function () {
-//            test.paragraph("Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  Now is the good time for paragraphs.  ")
-//            test.example('bbb', function () {
-//              // this sample code here
-//              var something = 'asdasdasd';
-//              var nothing;
-//              if (something == nothing) {
-//                console.log("well isn't that special, ok listen this code is long enought to show what margin is needed at most ok???");
-//              }
-//            });
-//          });
-//        });
-//      });
-//    });
-//  });
-//  test.paragraph("This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.")
-//  test.heading('PEACE', function () {
-//    test.example('PIPE');
-//  });
-//  test.paragraph("This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.")
-//  test.example('aaa');
-//  test.paragraph("This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.  This is for real.")
-//  test.example('bbb', function () {
-//    // this example is a bb
-//    var x1 = 1;
-//    var x2 = 2;
-//    // cool
-//    x1 = x2/0;
-//  });
-//
-//
-//});
-test.heading('TEQUILA TEST SPEC', function () {
-  test.example('Rule the world');
-  test.example('return 1', 1, function () {
-    // Best test ever
-    return 1;
+  test.heading('CLASS LIBRARY', function () {
+    test.classLibrary();
   });
-  test.xexample('divide by zero', 'spanish inquisition', function () {
-    // Fail on purpose
-    return 1/0;
+  test.heading('MODELS', function () {
   });
-  test.xexample('answer to the universe', 'fix this someday', function () {
-//    return (6((1/0)-(1/0))^2)/(((1/0)^(1/0))/7);
+  test.heading('INTEGRATION TESTS', function () {
   });
-  test.example('expect nothing to be undefined', ReferenceError('nothing is not defined') , function () {
-    return nothing;
-  });
-});
 test.stop();
 /**
  * tequila

@@ -15,22 +15,18 @@ var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, 
 };
 var test = {};
 test.converter = new Markdown.Converter();
-test.log = function (txt) {
-//  console.log(txt);
-};
+test.showWork = [];
 test.start = function (options) {
   this.nodes = [];
   this.exampleNumber = 0;
   this.headingLevel = 0;
   this.levels = [0];
-  this.log('test.start');
 };
 test.heading = function (text, func) {
   this.levels[this.headingLevel]++;
   this.outlineLabel = '';
   for (var i in this.levels) this.outlineLabel += this.levels[i].toString() + '.';
   this.nodes.push(new TestNode('h', this.headingLevel + 1, this.outlineLabel, text, func));
-  this.log('test.heading: ' + this.outlineLabel + ' ' + text)
   if (func) {
     this.headingLevel++;
     this.levels[this.headingLevel] = 0;
@@ -41,31 +37,32 @@ test.heading = function (text, func) {
 };
 test.paragraph = function (text) {
   this.nodes.push(new TestNode('P', this.headingLevel + 1, this.outlineLabel, text));
-  this.log('test.paragraph ' + text)
 };
 test.example = function (text, expect, func) {
   this.exampleNumber++;
-  this.log('test.example ' + this.outlineLabel + ' ' + text)
   this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, false, expect));
 };
 test.xexample = function (text, expect, func) {
   this.exampleNumber++;
-  this.log('xexample.example ' + this.outlineLabel + ' ' + text)
   this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
 };
-test.exception = function (text, func, Error) {
-  this.exampleNumber++;
-  this.log('test.exception ' + this.outlineLabel + ' ' + text)
-  if (func) func();
+test.show = function (value) {
+  if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function'  || value instanceof RegExp) {
+    test.showWork.push(value);
+    return;
+  }
+  if (value !== undefined) {
+    test.showWork.push(JSON.stringify(value));
+    return;
+  }
+  test.showWork.push(value);
 };
 test.stop = function () {
-  this.log('test.stop')
 };
 test.run = function (resultsCallback) {
-  this.log('test.run')
+
 };
 test.render = function (isBrowser) {
-  this.log('test.render');
 
   test.countTests = 0;
   test.countPass = 0;
@@ -105,7 +102,7 @@ test.render = function (isBrowser) {
   for (i in test.nodes) {
     var testNode = test.nodes[i].nodeType;
     if (!isBrowser) {
-      if (testNode=='e') {
+      if (testNode == 'e') {
         testNode = '.';
       } else {
         testNode = '';
@@ -130,6 +127,7 @@ test.render = function (isBrowser) {
       case '.':
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+          test.showWork = [];
           var test_Results = test.callTestCode(test.nodes[i].func);
           if (test_Results.toString() !== test.nodes[i].expectedValue.toString()) {
             test.countFail++;
@@ -152,6 +150,7 @@ test.render = function (isBrowser) {
         pre.className = "prettyprint";
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+          test.showWork = [];
           var test_Results = test.callTestCode(test.nodes[i].func);
           var exampleCode = '';
           exampleCode += test.formatCode(test.nodes[i].func);
@@ -159,14 +158,18 @@ test.render = function (isBrowser) {
             if (!test.countFail) headerDiv.style.background = '#F33'; // fail color color
             test.countFail++;
             pre.style.background = "#fcc"; // red
-            exampleCode += '✘ <b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+            if (test.wasThrown) {
+              exampleCode += '✘ <b>ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+            } else {
+              exampleCode += '✘ <b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+            }
           } else {
             test.countPass++;
             pre.style.background = "#cfc"; // green
             if (test.wasThrown) {
               exampleCode += '✓ <b>error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
-              exampleCode += '✓ <b>returns ' + test_Results + ' as expected</b>'; // ✘
+              exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
             }
           }
           pre.innerHTML = '<code>' + exampleCode + '</code>';
@@ -189,7 +192,7 @@ test.render = function (isBrowser) {
   if (isBrowser) {
     if (!test.countFail) headerDiv.style.background = '#6C7'; // pass color
   } else {
-    var results = '\n '+test.countTests+' pass('+test.countPass+') fail('+test.countFail+') defer('+test.countDefer+') ';
+    var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
     if (test.countFail)
       console.log(colors.inverse(colors.red(results)));
     else
@@ -198,13 +201,12 @@ test.render = function (isBrowser) {
 };
 test.updateStats = function () {
   var stats = document.getElementById("stats");
-  stats.innerHTML = test.converter.makeHtml('**tequila** tests: **'+test.countTests+'** pass: **'+test.countPass+'** fail: **'+test.countFail+'** defer: **'+test.countDefer+'**');
+  stats.innerHTML = test.converter.makeHtml('**tequila** tests: **' + test.countTests + '** pass: **' + test.countPass + '** fail: **' + test.countFail + '** defer: **' + test.countDefer + '**');
 }
 test.expressionInfo = function (expr) {
 
   if (typeof expr == 'string') {
     return '"' + expr.replace(/"/g, '\\\"') + '"';
-    //str = '"' + expr.replace(/"/g, '\"') + '"'
   }
   return expr;
 }
@@ -224,9 +226,23 @@ test.formatCode = function (txt) {
   var gotNonSpace = false;
   var line = '';
   var i, j;
+  var w = 0;
   var s = txt.toString();
   for (i = 0; i < s.length; i++) {
     if (s[i] == '\n') {
+      if (line.substring(0, 9) == 'test.show') {
+        if (w < test.showWork.length) {
+          var oldline = line.substring(10);
+          if (oldline.length>0) oldline = oldline.substring(0,oldline.length-1);
+          if (oldline.length>0) oldline = oldline.substring(0,oldline.length-1);
+          if (oldline)
+            line = '<b>// ' + oldline + ' is ' + test.showWork[w] + '</b>';
+          else
+            line = '<b>// i got nothing</b>';
+          console.log(line);
+          w++;
+        }
+      }
       lines.push(line);
       line = '';
       spaces.push(spaceCount);
