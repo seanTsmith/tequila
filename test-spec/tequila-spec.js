@@ -3,6 +3,7 @@
  * tequila-spec
  */
 
+console.log('mod: tequila-spec.js');
 test.start();
   test.heading('CLASS LIBRARY', function () {
     test.classLibrary();

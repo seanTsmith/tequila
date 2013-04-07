@@ -2,6 +2,7 @@
  * tequila
  * test-tequila
  */
+console.log('mod: test-tequila.js');
 var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, deferedExample, expectedValue) {
   this.nodeType = nodeType; // nodeType 1 char string: H)eading P)aragraph E)xample E(X)eption
   this.level = level;
@@ -14,6 +15,7 @@ var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, 
   return this;
 };
 var test = {};
+console.log('test: '+JSON.stringify(test));
 test.converter = new Markdown.Converter();
 test.showWork = [];
 test.start = function (options) {
@@ -154,7 +156,14 @@ test.render = function (isBrowser) {
           var test_Results = test.callTestCode(test.nodes[i].func);
           var exampleCode = '';
           exampleCode += test.formatCode(test.nodes[i].func);
-          if (test_Results.toString() !== test.nodes[i].expectedValue.toString()) {
+          var testPassed;
+
+          if (typeof test_Results == 'undefined' ) {
+            if (typeof test.nodes[i].expectedValue == 'undefined') testPassed=true;
+          } else {
+            if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() !== test.nodes[i].expectedValue.toString()) testPassed=true;
+          }
+          if (testPassed) {
             if (!test.countFail) headerDiv.style.background = '#F33'; // fail color color
             test.countFail++;
             pre.style.background = "#fcc"; // red

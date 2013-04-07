@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale = 1.0, user-scalable = no">
+    <title>tgiCloud</title>
+    <script>
+        window.onload = function()
+        {
+            var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+            var txt = document.getElementById("devwidth");
+            txt.innerHTML = 'device width: '+width;
+        }
+    </script>
+    <style type="text/css">
+        body {
+            font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+            padding: 0px;
+            margin: 0px;
+            color: #080808;
+            background-color: #f8f8f8;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: Tahoma, Geneva, sans-serif;
+        }
+
+        code {
+            font-family: "Lucida Console", Monaco, monospace;
+        }
+
+        div {
+            border: 8px solid gray;
+            background-color: #FFF;
+            padding: 4px;
+            margin-top: 8px;
+            margin-right: 2px;
+            margin-left: 2px;
+            margin-bottom: 0px;
+        }
+
+        div.outerspace {
+            width: 100%;
+            border: none;
+            background-color: #ABC;
+            padding: 0px;
+            margin: 0px;
+            /*max-width: 320px;*/
+        }
+
+        div.innerspace{
+            border: none;
+            background-color: #966;
+            padding: 0px;
+            margin: 0px auto;
+            max-width: 358px;
+        }
+
+        div.footer {
+            border: 1px solid gray;
+            background-color: #444;
+            margin-top: 0px;
+            padding-top: 0px;
+            padding-right: 0px;
+            padding-left: 0px;
+            padding-bottom: 0px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        div.workspace {
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: gray;
+            border-right: none;
+            border-left: none;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: gray;
+
+            background-color: #444;
+            margin-top: 0px;
+            margin-left: 0px;
+            margin-right: 0px;
+            padding-top: 42px;
+            padding-right: 0px;
+            padding-left: 0px;
+            padding-bottom: 0px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        div.header {
+            display: inline;
+            /*height: 44px;*/
+            position: fixed;
+            z-index: 99999;
+            left:0px;
+            /*width: 320px;*/
+            border-bottom-color: #666;
+            border-top-style: none;
+            border-right-style: none;
+            border-left-style: none;
+            border-bottom-style:solid;
+            background-color: #955;
+            margin: 0px;
+            padding-top: 0px;
+            padding-right: 0px;
+            padding-left: 0px;
+            padding-bottom: 0px;
+            overflow-y: hidden;
+            overflow-x: scroll;
+            white-space: nowrap;
+        }
+        .tabButton {
+            text-align: center;
+            text-wrap: normal;
+            /*text-shadow: 2px 2px #222;*/
+            list-style: none;
+            text-decoration: none;
+            font-weight: lighter;
+            font-size: small;
+
+            min-width: 48px;;
+            /*height: 12em;*/
+            min-height: 36px;;
+            padding-right: 12px;
+            padding-left: 12px;
+            padding-top: 3px;
+            padding-bottom: 6px;
+            margin-top: 2px;
+            margin-right: 1px;
+            margin-left: 1px;
+            margin-bottom: -4px;
+            float: left;
+            border: none;
+            /*display: inline;*/
+            /*background: #777 url(gradient.png) repeat-x bottom;*/
+            background: #777 repeat-x bottom;
+            color: #fff;
+            cursor: pointer;
+            /*overflow: hidden;*/
+            border-top-right-radius: 12px;
+            border-top-left-radius: 12px;
+            border-bottom-right-radius: 0px;
+            border-bottom-left-radius: 0px;
+            -moz-border-radius-topright: 12px;
+            -moz-border-radius-topleft: 12px;
+            -moz-border-radius-bottomright: 0px;
+            -moz-border-radius-bottomleft: 0px;
+            -webkit-border-top-right-radius: 12px;
+            -webkit-border-top-left-radius: 12px;
+            -webkit-border-bottom-right-radius: 0px;
+            -webkit-border-bottom-left-radius: 0px;
+
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+        }
+
+        .tabButton:hover {
+            /*background-color: #9400bf;*/
+        }
+
+        .tabButton:active {
+            /*background-position: 0 top;*/
+            /*position: relative;*/
+            /*top: 1px;*/
+            /*padding: 6px 10px 4px;*/
+        }
+
+        .tabButton.red {
+            background-color: #e50000;
+        }
+
+        .tabButton.purple {
+            background-color: #9400bf;
+        }
+
+        .tabButton.green {
+            background-color: #58aa00;
+        }
+
+        .tabButton.orange {
+            background-color: #ff9c00;
+        }
+
+        .tabButton.blue {
+            background-color: #2c6da0;
+        }
+
+        .tabButton.black {
+            background-color: #333;
+        }
+
+        .tabButton.white {
+            background-color: #fff;
+            color: #000;
+            /*text-shadow: 1px 1px #fff;*/
+        }
+    </style>
+
+
+</head>
+
+<body>
+<!--<script>-->
+<!--var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;-->
+<!--var bodyfix = document.getElementsByTagName("bodyid"); //[0].style.maxWidth="150px";-->
+<!--console.log(bodyfix);-->
+
+<!--// bodyfix.setAttribute('style','maxWidth="150px');-->
+<!--</script>-->
+<!--max-width: 320px;-->
+<script>
+    var btnClick = function(ele) {
+        var txt = document.getElementById("info");
+        txt.innerHTML = 'click ' + ele.id;
+
+//        txt = document.getElementById('d01');
+//        txt.style.visibility = 'hidden';
+//        txt = document.getElementById('d02');
+//        txt.style.visibility = 'hidden';
+//        txt = document.getElementById('d03');
+//        txt.style.visibility = 'hidden';
+//        txt = document.getElementById('d04');
+//        txt.style.visibility = 'hidden';
+//        txt = document.getElementById('d05');
+//        txt.style.visibility = 'hidden';
+//        txt = document.getElementById('d06');
+//        txt.style.visibility = 'hidden';
+
+        ele.parentNode.appendChild(ele,ele.parentNode);
+
+//        txt = document.getElementById('d' + ele.id);
+//        txt.parentNode.insertBefore(txt,txt.parentNode.firstChild);
+//        txt.style.visibility = 'visible';
+//        txt.focus();
+    }
+</script>
+
+<div class='outerspace'>
+    <div class='innerspace'>
+    <!-- Header -->
+    <div class='header'>
+        <ul style="margin:0; padding:0;">
+        <li id="01" class='tabButton red' onclick="btnClick(this);">Customer Invoice<br>Shumate Air</b></li>
+        <li id="02" class='tabButton blue' onclick="btnClick(this);">Vendor Invoice<br>Penn Fan</b></li>
+        <li id="03" class='tabButton green' onclick="btnClick(this);">Company File<br>Balance Sheet</b></li>
+        <li id="04" class='tabButton white' onclick="btnClick(this);">moe</li>
+        <li id="05" class='tabButton white ' onclick="btnClick(this);">larry</li>
+        <li id="06" class='tabButton purple' onclick="btnClick(this);" onclick="btnClick(this);">curly</li>
+        <li id="07" class='tabButton orange' onclick="btnClick(this);">moe</li>
+        <li id="08" class='tabButton black' onclick="btnClick(this);">larry</li>
+        <li id="09" class='tabButton' onclick="btnClick(this);">big<br>Pussy</li>
+        <li id="10" class='tabButton' onclick="btnClick(this);">fat tony</li>
+        <li id="11" class='tabButton' onclick="btnClick(this);">larry</li>
+        <li id="12" class='tabButton' onclick="btnClick(this);">curly</li>
+        <li id="13" class='tabButton' onclick="btnClick(this);">moe</li>
+        <li id="14" class='tabButton' onclick="btnClick(this);">larry</li>
+        <li id="15" class='tabButton' onclick="btnClick(this);">curly</li>
+        <li id="16" class='tabButton' onclick="btnClick(this);">moe</li>
+        <li id="17" class='tabButton' onclick="btnClick(this);">larry</li>
+        <li id="18" class='tabButton' onclick="btnClick(this);">curly</li>
+        <li id="19" class='tabButton' onclick="btnClick(this);">moe</li>
+        <li id="20" class='tabButton' onclick="btnClick(this);">larry</li>
+        <li id="21" class='tabButton' onclick="btnClick(this);">curly</li>
+        </ul>
+    </div>
+
+    <!-- Main content -->
+    <div class='workspace'>
+        <div id="d01"><a name="a01"></a>
+            <h1>Heading 1</h1>
+            <p id="devwidth">paragraph text with heading</p>
+        </div>
+        <div id="d02"><a name="a02"></a>
+            <h2>Heading 2</h2>
+            <p id="info">paragraph text with heading</p>
+        </div>
+        <div id="d03"><a name="a03"></a>
+            <code>
+                This is code.
+                That means that the line breaks are preserved and well maybe not I guess what the fuck.
+            </code>
+        </div>
+        <div id="d04"><a name="a04"></a>
+            <h1>Heading 1</h1>
+            <p>paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading </p>
+        </div>
+        <div id="d05"><a name="a05"></a>
+            <h2>Heading 2</h2>
+            <p>paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading </p>
+        </div>
+        <div id="d06"><a name="a06"></a>
+            <code>
+                This is code.
+                That means that the line breaks are preserved and well maybe not I guess what the fuck.
+            </code>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class='footer'>
+        <address>
+            <img src="foot.jpg" alt="This is the footer it is just a foot for now." height="383" width="593">
+        </address>
+    </div>
+
+    </div>
+</div>
+</body>
+</html>
