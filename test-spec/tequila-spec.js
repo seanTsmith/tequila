@@ -3,13 +3,14 @@
  * tequila-spec
  */
 
-console.log('mod: tequila-spec.js');
 test.start();
-  test.heading('CLASS LIBRARY', function () {
-    test.classLibrary();
-  });
-  test.heading('MODELS', function () {
-  });
-  test.heading('INTEGRATION TESTS', function () {
-  });
+test.heading('CLASS LIBRARY', function () {
+  test.runnerTequila();
+  test.runnerModel();
+  test.runnerAttribute();
+});
+test.heading('MODELS', function () {
+});
+test.heading('INTEGRATION TESTS', function () {
+});
 test.stop();

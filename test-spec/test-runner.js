@@ -2,7 +2,6 @@
  * tequila
  * test-tequila
  */
-console.log('mod: test-tequila.js');
 var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, deferedExample, expectedValue) {
   this.nodeType = nodeType; // nodeType 1 char string: H)eading P)aragraph E)xample E(X)eption
   this.level = level;
@@ -10,12 +9,15 @@ var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, 
   this.text = text;
   this.func = func;
   this.exampleNumber = exampleNumber;
-  this.deferedExample = deferedExample;
+  var funcText;
+  if (func) {
+    funcText = test.formatCode(func);
+  }
+  this.deferedExample = (funcText && funcText.length>0) ? deferedExample : true;
   this.expectedValue = expectedValue;
   return this;
 };
 var test = {};
-console.log('test: '+JSON.stringify(test));
 test.converter = new Markdown.Converter();
 test.showWork = [];
 test.start = function (options) {
@@ -49,7 +51,7 @@ test.xexample = function (text, expect, func) {
   this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
 };
 test.show = function (value) {
-  if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function'  || value instanceof RegExp) {
+  if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
     test.showWork.push(value);
     return;
   }
@@ -158,27 +160,27 @@ test.render = function (isBrowser) {
           exampleCode += test.formatCode(test.nodes[i].func);
           var testPassed;
 
-          if (typeof test_Results == 'undefined' ) {
-            if (typeof test.nodes[i].expectedValue == 'undefined') testPassed=true;
+          if (typeof test_Results == 'undefined') {
+            if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
           } else {
-            if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() !== test.nodes[i].expectedValue.toString()) testPassed=true;
+            if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
           }
           if (testPassed) {
-            if (!test.countFail) headerDiv.style.background = '#F33'; // fail color color
-            test.countFail++;
-            pre.style.background = "#fcc"; // red
-            if (test.wasThrown) {
-              exampleCode += '✘ <b>ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
-            } else {
-              exampleCode += '✘ <b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
-            }
-          } else {
             test.countPass++;
             pre.style.background = "#cfc"; // green
             if (test.wasThrown) {
               exampleCode += '✓ <b>error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
               exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+            }
+          } else {
+            test.countFail++;
+            if (!test.countFail) headerDiv.style.background = '#F33'; // fail color color
+            pre.style.background = "#fcc"; // red
+            if (test.wasThrown) {
+              exampleCode += '✘ <b>ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+            } else {
+              exampleCode += '✘ <b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
             }
           }
           pre.innerHTML = '<code>' + exampleCode + '</code>';
@@ -210,7 +212,7 @@ test.render = function (isBrowser) {
 };
 test.updateStats = function () {
   var stats = document.getElementById("stats");
-  stats.innerHTML = test.converter.makeHtml('**tequila** tests: **' + test.countTests + '** pass: **' + test.countPass + '** fail: **' + test.countFail + '** defer: **' + test.countDefer + '**');
+  stats.innerHTML = test.converter.makeHtml('**tequila** tests(**' + test.countTests + '**) pass(**' + test.countPass + '**) fail(**' + test.countFail + '**) defer(**' + test.countDefer + '**)');
 }
 test.expressionInfo = function (expr) {
 
@@ -242,8 +244,8 @@ test.formatCode = function (txt) {
       if (line.substring(0, 9) == 'test.show') {
         if (w < test.showWork.length) {
           var oldline = line.substring(10);
-          if (oldline.length>0) oldline = oldline.substring(0,oldline.length-1);
-          if (oldline.length>0) oldline = oldline.substring(0,oldline.length-1);
+          if (oldline.length > 0) oldline = oldline.substring(0, oldline.length - 1);
+          if (oldline.length > 0) oldline = oldline.substring(0, oldline.length - 1);
           if (oldline)
             line = '<b>// ' + oldline + ' is ' + test.showWork[w] + '</b>';
           else
