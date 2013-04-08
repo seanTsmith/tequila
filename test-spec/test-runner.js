@@ -13,7 +13,7 @@ var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, 
   if (func) {
     funcText = test.formatCode(func);
   }
-  this.deferedExample = (funcText && funcText.length>0) ? deferedExample : true;
+  this.deferedExample = (funcText && funcText.length > 0) ? deferedExample : true;
   this.expectedValue = expectedValue;
   return this;
 };
@@ -50,6 +50,10 @@ test.xexample = function (text, expect, func) {
   this.exampleNumber++;
   this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
 };
+test.assertion = function (truDat) {
+  // TODO track count of calls in example, when rendering use that to x the line that failed and do each one without throwing error just use all for render also check each
+  if (!truDat) throw Error('Assertion(s) failed debug results')
+}
 test.show = function (value) {
   if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
     test.showWork.push(value);
@@ -158,8 +162,9 @@ test.render = function (isBrowser) {
           var test_Results = test.callTestCode(test.nodes[i].func);
           var exampleCode = '';
           exampleCode += test.formatCode(test.nodes[i].func);
-          var testPassed;
-
+          var testPassed = false;
+          if (test_Results == 'ReferenceError: Model is not defined')
+            console.log(test_Results);
           if (typeof test_Results == 'undefined') {
             if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
           } else {
@@ -171,7 +176,11 @@ test.render = function (isBrowser) {
             if (test.wasThrown) {
               exampleCode += '✓ <b>error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
-              exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+              if (typeof test_Results == 'undefined' ) {
+                exampleCode += '✓ <b>returns without harming any puppies</b>'; // ✘
+              } else {
+                exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+              }
             }
           } else {
             test.countFail++;
@@ -220,6 +229,14 @@ test.expressionInfo = function (expr) {
     return '"' + expr.replace(/"/g, '\\\"') + '"';
   }
   return expr;
+}
+test.shouldThrow = function (err, func) {
+  try {
+    func();
+    throw('oh what the fuck');
+  } catch (e) {
+    if (err.toString() != e.toString()) throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
+  }
 }
 test.callTestCode = function (func) {
   try {

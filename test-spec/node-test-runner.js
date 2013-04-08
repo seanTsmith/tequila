@@ -2067,7 +2067,11 @@ test.render = function (isBrowser) {
             if (test.wasThrown) {
               exampleCode += '✓ <b>error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
-              exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+              if (test_Results==undefined) {
+                exampleCode += '✓ <b>returns without harming any puppies</b>'; // ✘
+              } else {
+                exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+              }
             }
           }
           pre.innerHTML = '<code>' + exampleCode + '</code>';
