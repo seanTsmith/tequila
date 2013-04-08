@@ -11,7 +11,7 @@ var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, 
   this.exampleNumber = exampleNumber;
   var funcText;
   if (func) {
-    funcText = test.formatCode(func);
+    funcText = test.formatCode(func, false);
   }
   this.deferedExample = (funcText && funcText.length > 0) ? deferedExample : true;
   this.expectedValue = expectedValue;
@@ -51,8 +51,7 @@ test.xexample = function (text, expect, func) {
   this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
 };
 test.assertion = function (truDat) {
-  // TODO track count of calls in example, when rendering use that to x the line that failed and do each one without throwing error just use all for render also check each
-  if (!truDat) throw Error('Assertion(s) failed debug results')
+  test.assertions.push(truDat);
 }
 test.show = function (value) {
   if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
@@ -68,17 +67,39 @@ test.show = function (value) {
 test.stop = function () {
 };
 test.run = function (resultsCallback) {
-
 };
-test.render = function (isBrowser) {
 
+test.getParam = function (name) {
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.href);
+  if (results == null)
+    return "";
+  else
+    return results[1];
+};
+
+test.refresh = function () {
+  var vars = '';
+  if (test.hideExamples) vars += (vars ? '&' : '') + '?he=Y';
+  if (test.filterSection) vars += (vars ? '&' : '') + '?fs=' + test.filterSection;
+  window.location.href = "file:///Users/sean/Sites/tequila/test-spec/test-runner.html#" + vars;
+  window.location.reload();
+}
+
+test.render = function (isBrowser) {
   test.countTests = 0;
   test.countPass = 0;
   test.countFail = 0;
   test.countDefer = 0;
-
   // Browser Dressing
   if (isBrowser) {
+
+    // Get vars from URL
+    test.hideExamples = (test.getParam('he') == 'Y');
+    test.filterSection = test.getParam('fs');
+
     // Fixed Header Div
     var headerDiv = document.createElement("div");
     headerDiv.style.position = 'fixed';
@@ -87,14 +108,41 @@ test.render = function (isBrowser) {
     headerDiv.style.zIndex = '100000';
     headerDiv.style.width = '100%';
     headerDiv.style.background = '#AA4'; // yellow header to start
+    document.body.appendChild(headerDiv);
+
+    // div for stats
     var stats = document.createElement("p");
     stats.id = "stats";
     stats.innerHTML = test.converter.makeHtml('**tequila**');
-    stats.align = 'center';
+    stats.style.float = 'left';
+    stats.align = 'left';
     stats.style.padding = '0px';
-    stats.style.margin = '0px';
+    stats.style.margin = '0px 8px';
     headerDiv.appendChild(stats);
-    document.body.appendChild(headerDiv);
+
+    // div for controls
+    var controls = document.createElement("div");
+    controls.id = "controls";
+    controls.style.float = 'right';
+    controls.style.padding = '0px';
+    controls.style.margin = '0px 16px';
+    headerDiv.appendChild(controls);
+
+    // button for toggle example display
+    var btnExampleToggle = document.createElement("button");
+    btnExampleToggle.id = "btnExampleToggle";
+    btnExampleToggle.name = "btnExampleToggle";
+    if (test.hideExamples) {
+      btnExampleToggle.innerHTML = '<b>examples</b><br><em>(hidden)</em>';
+    } else {
+      btnExampleToggle.innerHTML = '<b>examples</b><br><em>(shown)</em>';
+    }
+    btnExampleToggle.onclick = function () {
+      test.hideExamples = !test.hideExamples;
+      test.refresh();
+    };
+    controls.appendChild(btnExampleToggle);
+
     // Outer & Inner Div to center content
     var outerDiv = document.createElement("div");
     outerDiv.style.width = "100%";
@@ -103,11 +151,29 @@ test.render = function (isBrowser) {
     innerDiv.style.width = "1000px";
     innerDiv.style.margin = "0 auto";
     outerDiv.appendChild(innerDiv);
+
   } else {
     process.stdout.write('Testing 123...');
   }
 
+  var scrollFirstError = 0;
+
   for (i in test.nodes) {
+
+    // Check filter
+    var isFiltered = false;
+    if (test.filterSection && (test.nodes[i].levelText).indexOf(test.filterSection+'.')!=0) {
+      isFiltered = true;
+      var x1 = (test.filterSection+'.');
+      var x2 = (test.nodes[i].levelText);
+      if ((test.filterSection+'.').indexOf((test.nodes[i].levelText))==0) {
+        isFiltered = false;
+      }
+    }
+
+    console.log( (isFiltered ? 'YA ':'NA ')+test.filterSection+'. : ' + test.nodes[i].levelText);
+
+
     var testNode = test.nodes[i].nodeType;
     if (!isBrowser) {
       if (testNode == 'e') {
@@ -118,18 +184,29 @@ test.render = function (isBrowser) {
     }
     switch (testNode) {
       case 'h':
-        var p = document.createElement("h" + test.nodes[i].level);
-        var lt = test.nodes[i].levelText;
-        if (lt == '1.') lt = '';
-        if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
-        p.innerHTML = lt + ' ' + test.nodes[i].text;
-        innerDiv.appendChild(p);
+        if (!isFiltered) {
+          var p = document.createElement("h" + test.nodes[i].level);
+          var lt = test.nodes[i].levelText;
+          if (lt == '1.') lt = '';
+          if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
+          p.innerHTML = lt + ' ' + test.nodes[i].text;
+          p.onclick = function () {
+            var words = this.innerText.split(' ');
+            test.filterSection = '';
+            if (words.length>0 && parseInt(words[0])>0)
+              test.filterSection = words[0];
+            test.refresh();
+          };
+          innerDiv.appendChild(p);
+        }
         break;
 
       case 'P':
-        var p = document.createElement("p");
-        p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
-        innerDiv.appendChild(p);
+        if (!isFiltered) {
+          var p = document.createElement("p");
+          p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
+          innerDiv.appendChild(p);
+        }
         break;
 
       case '.':
@@ -151,45 +228,57 @@ test.render = function (isBrowser) {
         break;
 
       case 'e':
+        var testPassed = false;
+        var ranTest = false;
         var caption = document.createElement("caption");
         caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>'
-        innerDiv.appendChild(caption);
         var pre = document.createElement("pre");
         pre.className = "prettyprint";
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.showWork = [];
+          test.assertions = [];
           var test_Results = test.callTestCode(test.nodes[i].func);
+          ranTest = true;
           var exampleCode = '';
-          exampleCode += test.formatCode(test.nodes[i].func);
-          var testPassed = false;
-          if (test_Results == 'ReferenceError: Model is not defined')
-            console.log(test_Results);
+          exampleCode += test.formatCode(test.nodes[i].func, true);
           if (typeof test_Results == 'undefined') {
             if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
           } else {
             if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
           }
-          if (testPassed) {
+          // Check assertions
+          // test.assertions
+          var gotFailedAssertions = false;
+          for (var j in test.assertions) {
+            if (!test.assertions[j]) gotFailedAssertions = true;
+          }
+          if (testPassed && !gotFailedAssertions) {
             test.countPass++;
             pre.style.background = "#cfc"; // green
             if (test.wasThrown) {
-              exampleCode += '✓ <b>error thrown as expected (' + test_Results + ')</b>'; // ✘
+              exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
-              if (typeof test_Results == 'undefined' ) {
-                exampleCode += '✓ <b>returns without harming any puppies</b>'; // ✘
+              if (typeof test_Results == 'undefined') {
+                exampleCode += '✓<b>returns without harming any puppies</b>'; // ✘
               } else {
-                exampleCode += '✓ <b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+                exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
               }
             }
           } else {
             test.countFail++;
-            if (!test.countFail) headerDiv.style.background = '#F33'; // fail color color
+            if (test.countFail) headerDiv.style.background = '#F33'; // fail color color
             pre.style.background = "#fcc"; // red
             if (test.wasThrown) {
-              exampleCode += '✘ <b>ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+              if (test.nodes[i].expectedValue === undefined) {
+                exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+              } else {
+                exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>';
+              }
+            } else if (testPassed && gotFailedAssertions) {
+              exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
             } else {
-              exampleCode += '✘ <b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+              exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
             }
           }
           pre.innerHTML = '<code>' + exampleCode + '</code>';
@@ -197,19 +286,28 @@ test.render = function (isBrowser) {
           test.countDefer++;
           pre.style.background = "#ffc"; // yellow
           if (test.nodes[i].func) {
-            exampleCode = test.formatCode(test.nodes[i].func);
+            exampleCode = test.formatCode(test.nodes[i].func, false);
             exampleCode += '✍ <b>(test disabled)</b>';
             pre.innerHTML = exampleCode;
           } else {
             pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
           }
         }
-        innerDiv.appendChild(pre);
+        var showExample = !test.hideExamples;
+        if (isFiltered) showExample = false;
+        if (ranTest && !testPassed) showExample = true;
+        if (showExample) innerDiv.appendChild(caption);
+        if (showExample) innerDiv.appendChild(pre);
         test.updateStats();
+        if (ranTest && !testPassed && scrollFirstError < 1) {
+          scrollFirstError = document.height - document.documentElement.clientHeight;
+        }
         break;
     }
   }
   if (isBrowser) {
+    if (scrollFirstError > 0)
+      window.scroll(0, scrollFirstError);
     if (!test.countFail) headerDiv.style.background = '#6C7'; // pass color
   } else {
     var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
@@ -247,15 +345,17 @@ test.callTestCode = function (func) {
     return e;
   }
 }
-test.formatCode = function (txt) {
+test.formatCode = function (txt, rancode) {
   var lines = [];
   var spaces = [];
+  var marks = [];
   var spaceCount = 0;
   var gotNonSpace = false;
   var line = '';
   var i, j;
   var w = 0;
   var s = txt.toString();
+  var assertionsSeen = 0;
   for (i = 0; i < s.length; i++) {
     if (s[i] == '\n') {
       if (line.substring(0, 9) == 'test.show') {
@@ -267,10 +367,20 @@ test.formatCode = function (txt) {
             line = '<b>// ' + oldline + ' is ' + test.showWork[w] + '</b>';
           else
             line = '<b>// i got nothing</b>';
-          console.log(line);
+//          console.log(line);
           w++;
         }
       }
+      if (rancode && line.substring(0, 14) == 'test.assertion') {
+        marks.push((test.assertions[assertionsSeen++]) ? '✓' : '✘');
+        var oldline = line.substring(15);
+        if (oldline.length > 0) oldline = oldline.substring(0, oldline.length - 1);
+        if (oldline.length > 0) oldline = oldline.substring(0, oldline.length - 1);
+        line = '<b>ASSERT: </b>' + oldline;
+      } else {
+        marks.push(' ');
+      }
+
       lines.push(line);
       line = '';
       spaces.push(spaceCount);
@@ -290,7 +400,7 @@ test.formatCode = function (txt) {
   for (i = 1; i < lines.length; i++) { // skip 'function'
     var spaceOut = spaces[i] - adjustspace;
     for (j = 1; j < spaceOut; j++) output += ' ';
-    output += ' ' + lines[i] + '\n';
+    output += marks[i] + lines[i] + '\n';
   }
 
   return output;
