@@ -45,8 +45,9 @@ function Attribute(args, arg2) {
       this.value = args.value || null;
       break;
     case 'Model':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value', 'modelType']);
       this.value = args.value || null;
+      this.modelType = args.modelType || null;
       break;
     case 'Group':
       unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value']);
@@ -71,7 +72,7 @@ Attribute.prototype.toString = function () {
 Attribute.prototype.getValidationErrors = function () {
   var errors = [];
   if (!this.name) errors.push('name required');
-  if (!T.contains(types, this.type)) errors.push('Invalid type: ' + this.type);
+  if (!T.contains(attributeTypes, this.type)) errors.push('Invalid type: ' + this.type);
   switch (this.type) {
     case 'ID':
       if (!(this.value == null || this.value instanceof ID)) errors.push('value must be null or a ID');
@@ -92,6 +93,7 @@ Attribute.prototype.getValidationErrors = function () {
       break;
     case 'Model':
       if (!(this.value == null || typeof this.value == 'number')) errors.push('value must be null or a Model');
+      if (!(this.modelType instanceof Model)) errors.push('modelType must be instance of Model');
       break;
     case 'Group':
       if (this.value == null || this.value instanceof Array) {
@@ -111,7 +113,8 @@ Attribute.prototype.getValidationErrors = function () {
 /*
  * Helpers
  */
-var types = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Group'];
+
+var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group'];
 
 function splitParens(str, outside, inside) {
   var tmpSplit = str.split('(');

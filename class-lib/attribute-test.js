@@ -57,7 +57,7 @@ test.runnerAttribute = function () {
           test.show(record);
           // It's the default and it passes constructor validation
         });
-        test.example('should accept assignment of correct type and validate incorrect types', undefined, function () {
+        test.example('should accept assignment of correct type and validate incorrect attributeTypes', undefined, function () {
           // TODO move myTypes to T.getAttributeTypes
           var myTypes = ['String', 'Date', 'Boolean', 'Number', 'Group'];
           var myValues = ['Jane Doe', new Date, true, 18, [new Attribute('likes'), new Attribute('dislikes')]];
@@ -68,13 +68,13 @@ test.runnerAttribute = function () {
                 new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j] });
               } else {
                 // mismatches bad so should throw error (is caught unless no error or different error)
-                test.shouldThrow(Error('error creating Attribute: value must be null or a '+myTypes[i]),function() {
+                test.shouldThrow(Error('error creating Attribute: value must be null or a ' + myTypes[i]), function () {
                   new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
                 });
               }
               // other objects should throw always
-              test.shouldThrow(Error('error creating Attribute: value must be null or a '+myTypes[i]),function() {
-              new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: {} });
+              test.shouldThrow(Error('error creating Attribute: value must be null or a ' + myTypes[i]), function () {
+                new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: {} });
               });
             }
         });
@@ -87,7 +87,7 @@ test.runnerAttribute = function () {
         });
       });
       test.heading('String', function () {
-        test.example("should have type of 'String'",'String', function () {
+        test.example("should have type of 'String'", 'String', function () {
           return new Attribute({name: 'Cheese', type: 'String'}).type;
         });
         test.example('should have size property', 10, function () {
@@ -97,13 +97,13 @@ test.runnerAttribute = function () {
           return new Attribute({name: 'stuff'}).size;
         });
         test.example('size should be an integer', 'Error: error creating Attribute: size must be a number from 1 to 255', function () {
-            new Attribute({name: 'zipCode', size: "10"});
+          new Attribute({name: 'zipCode', size: "10"});
         });
         test.example('size should be between 1 and 255', undefined, function () {
-          test.shouldThrow(Error('error creating Attribute: size must be a number from 1 to 255'),function() {
+          test.shouldThrow(Error('error creating Attribute: size must be a number from 1 to 255'), function () {
             new Attribute({name: 'partyLikeIts', size: 1999});
           });
-          test.shouldThrow(Error('error creating Attribute: size must be a number from 1 to 255'),function() {
+          test.shouldThrow(Error('error creating Attribute: size must be a number from 1 to 255'), function () {
             new Attribute({name: 'iGotNothing', size: 0});
           });
         });
@@ -112,7 +112,7 @@ test.runnerAttribute = function () {
         });
       });
       test.heading('Number', function () {
-        test.example("type should be 'Number'",'Number', function () {
+        test.example("type should be 'Number'", 'Number', function () {
           return new Attribute({name: 'healthPoints', type: 'Number'}).type;
         });
       });
@@ -127,13 +127,17 @@ test.runnerAttribute = function () {
         });
       });
       test.heading('Model', function () {
-        test.xexample("should be type of 'Model' or null", 'Model', function () {
-          return new Attribute({name: 'Twiggy', type: 'Model'}).type;
+        test.paragraph('Parameter type Model is used to store a reference to another model of any type.');
+        test.example("should be type of 'Model' or null", 'Model', function () {
+          return new Attribute({name: 'Twiggy', type: 'Model', modelType: new Model()}).type;
+        });
+        test.example('modelType is required', Error('error creating Attribute: modelType must be instance of Model'), function () {
+          return new Attribute({name: 'Twiggy', type: 'Model'});
         });
       });
       test.heading('Group', function () {
-        test.example("should have type of 'Group'", function () {
-          new Attribute({name: 'stuff', type: 'Group'}).type.should.equal('Group');
+        test.example("should have type of 'Group'", 'Group',function () {
+          return new Attribute({name: 'stuff', type: 'Group'}).type;
         });
         test.example('deep check value for valid Attributes that pass getValidationErrors() test', 1, function () {
           // this example is just to conventionalize nested components
@@ -164,11 +168,11 @@ test.runnerAttribute = function () {
         test.example('should return array of validation errors', undefined, function () {
           test.assertion(new Attribute({name: 'name'}).getValidationErrors() instanceof Array);
           var nameHosed = new Attribute({name: 'name'}); // No errors
-          test.assertion(nameHosed.getValidationErrors().length==0);
+          test.assertion(nameHosed.getValidationErrors().length == 0);
           nameHosed.name = ''; // 1 err
-          test.assertion(nameHosed.getValidationErrors().length==1);
+          test.assertion(nameHosed.getValidationErrors().length == 1);
           nameHosed.type = ''; // 2 errors
-          test.assertion(nameHosed.getValidationErrors().length==2);
+          test.assertion(nameHosed.getValidationErrors().length == 2);
         });
       });
     });

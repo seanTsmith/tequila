@@ -2,7 +2,8 @@
  * tequila
  * test-tequila
  */
-var TestNode = function (nodeType, level, levelText, text, func, exampleNumber, deferedExample, expectedValue) {
+var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func, exampleNumber, deferedExample, expectedValue) {
+  this.inheritanceTest = inheritanceTest;
   this.nodeType = nodeType; // nodeType 1 char string: H)eading P)aragraph E)xample E(X)eption
   this.level = level;
   this.levelText = levelText;
@@ -30,7 +31,7 @@ test.heading = function (text, func) {
   this.levels[this.headingLevel]++;
   this.outlineLabel = '';
   for (var i in this.levels) this.outlineLabel += this.levels[i].toString() + '.';
-  this.nodes.push(new TestNode('h', this.headingLevel + 1, this.outlineLabel, text, func));
+  this.nodes.push(new TestNode(T.inheritanceTest, 'h', this.headingLevel + 1, this.outlineLabel, text, func));
   if (func) {
     this.headingLevel++;
     this.levels[this.headingLevel] = 0;
@@ -40,19 +41,19 @@ test.heading = function (text, func) {
   }
 };
 test.paragraph = function (text) {
-  this.nodes.push(new TestNode('P', this.headingLevel + 1, this.outlineLabel, text));
+  this.nodes.push(new TestNode(T.inheritanceTest, 'p', this.headingLevel + 1, this.outlineLabel, text));
 };
 test.example = function (text, expect, func) {
   this.exampleNumber++;
-  this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, false, expect));
+  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, false, expect));
 };
 test.xexample = function (text, expect, func) {
   this.exampleNumber++;
-  this.nodes.push(new TestNode('e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
+  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
 };
 test.assertion = function (truDat) {
   test.assertions.push(truDat);
-}
+};
 test.show = function (value) {
   if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
     test.showWork.push(value);
@@ -86,7 +87,7 @@ test.refresh = function () {
   if (test.filterSection) vars += (vars ? '&' : '') + '?fs=' + test.filterSection;
   window.location.href = "file:///Users/sean/Sites/tequila/test-spec/test-runner.html#" + vars;
   window.location.reload();
-}
+};
 
 test.render = function (isBrowser) {
   test.countTests = 0;
@@ -99,6 +100,7 @@ test.render = function (isBrowser) {
     // Get vars from URL
     test.hideExamples = (test.getParam('he') == 'Y');
     test.filterSection = test.getParam('fs');
+    test.filterTest = test.getParam('ft');
 
     // Fixed Header Div
     var headerDiv = document.createElement("div");
@@ -113,8 +115,10 @@ test.render = function (isBrowser) {
     // div for stats
     var stats = document.createElement("p");
     stats.id = "stats";
+    stats.class = "stats";
     stats.innerHTML = test.converter.makeHtml('**tequila**');
     stats.style.float = 'left';
+    stats.style.fontSize = 'large'
     stats.align = 'left';
     stats.style.padding = '0px';
     stats.style.margin = '0px 8px';
@@ -162,32 +166,31 @@ test.render = function (isBrowser) {
 
     // Check filter
     var isFiltered = false;
-    if (test.filterSection && (test.nodes[i].levelText).indexOf(test.filterSection+'.')!=0) {
+    var x1 = (test.filterSection+'.');
+    if (x1.indexOf('..')>=0) x1 = (test.filterSection);
+    if (test.filterSection && (test.nodes[i].levelText).indexOf(x1)!=0) {
       isFiltered = true;
-      var x1 = (test.filterSection+'.');
       var x2 = (test.nodes[i].levelText);
-      if ((test.filterSection+'.').indexOf((test.nodes[i].levelText))==0) {
+      console.log(x1 + ' : ' + x2);
+      if (x1.indexOf((test.nodes[i].levelText))==0) {
         isFiltered = false;
       }
     }
+    if (test.nodes[i].inheritanceTest) isFiltered = true;
 
-    console.log( (isFiltered ? 'YA ':'NA ')+test.filterSection+'. : ' + test.nodes[i].levelText);
-
-
-    var testNode = test.nodes[i].nodeType;
+    var testNodeType = test.nodes[i].nodeType;
     if (!isBrowser) {
-      if (testNode == 'e') {
-        testNode = '.';
+      if (testNodeType == 'e') {
+        testNodeType = '.';
       } else {
-        testNode = '';
+        testNodeType = '';
       }
     }
-    switch (testNode) {
+    switch (testNodeType) {
       case 'h':
         if (!isFiltered) {
           var p = document.createElement("h" + test.nodes[i].level);
           var lt = test.nodes[i].levelText;
-          if (lt == '1.') lt = '';
           if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
           p.innerHTML = lt + ' ' + test.nodes[i].text;
           p.onclick = function () {
@@ -201,7 +204,7 @@ test.render = function (isBrowser) {
         }
         break;
 
-      case 'P':
+      case 'p':
         if (!isFiltered) {
           var p = document.createElement("p");
           p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
@@ -231,7 +234,7 @@ test.render = function (isBrowser) {
         var testPassed = false;
         var ranTest = false;
         var caption = document.createElement("caption");
-        caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>'
+        caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>';
         var pre = document.createElement("pre");
         pre.className = "prettyprint";
         test.countTests++;
@@ -319,7 +322,7 @@ test.render = function (isBrowser) {
 };
 test.updateStats = function () {
   var stats = document.getElementById("stats");
-  stats.innerHTML = test.converter.makeHtml('**tequila** tests(**' + test.countTests + '**) pass(**' + test.countPass + '**) fail(**' + test.countFail + '**) defer(**' + test.countDefer + '**)');
+  stats.innerHTML = test.converter.makeHtml('***tequila*** ' + T.getVersion() + ' ' +  (test.countFail?'☹':'☺') + ' tests(**' + test.countTests + '**) pass ( **' + test.countPass + '** ) fail ( **' + test.countFail + '** ) defer ( **' + test.countDefer + '** )');
 }
 test.expressionInfo = function (expr) {
 
@@ -331,7 +334,6 @@ test.expressionInfo = function (expr) {
 test.shouldThrow = function (err, func) {
   try {
     func();
-    throw('oh what the fuck');
   } catch (e) {
     if (err.toString() != e.toString()) throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
   }
