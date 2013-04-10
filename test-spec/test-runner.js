@@ -69,7 +69,6 @@ test.stop = function () {
 };
 test.run = function (resultsCallback) {
 };
-
 test.getParam = function (name) {
   name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
   var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -80,15 +79,15 @@ test.getParam = function (name) {
   else
     return results[1];
 };
-
 test.refresh = function () {
   var vars = '';
   if (test.hideExamples) vars += (vars ? '&' : '') + '?he=Y';
   if (test.filterSection) vars += (vars ? '&' : '') + '?fs=' + test.filterSection;
-  window.location.href = "file:///Users/sean/Sites/tequila/test-spec/test-runner.html#" + vars;
+  var rootPath = window.location.href;
+  if (rootPath.indexOf('#') > 0) rootPath = rootPath.substring(0, rootPath.indexOf('#'))
+  window.location.href = rootPath + vars ? ("#" + vars) : '';
   window.location.reload();
 };
-
 test.render = function (isBrowser) {
   test.countTests = 0;
   test.countPass = 0;
@@ -104,49 +103,86 @@ test.render = function (isBrowser) {
 
     // Fixed Header Div
     var headerDiv = document.createElement("div");
+
+    headerDiv.style.display = 'inline-block';
+    headerDiv.align = 'center';
     headerDiv.style.position = 'fixed';
     headerDiv.style.top = '0px';
-    headerDiv.style.margin = 'auto';
+    headerDiv.style.margin = '0px';
+    headerDiv.style.padding = '0px';
     headerDiv.style.zIndex = '100000';
     headerDiv.style.width = '100%';
     headerDiv.style.background = '#AA4'; // yellow header to start
     document.body.appendChild(headerDiv);
 
-    // div for stats
-    var stats = document.createElement("p");
-    stats.id = "stats";
-    stats.class = "stats";
-    stats.innerHTML = test.converter.makeHtml('**tequila**');
-    stats.style.float = 'left';
-    stats.style.fontSize = 'large'
-    stats.align = 'left';
-    stats.style.padding = '0px';
-    stats.style.margin = '0px 8px';
-    headerDiv.appendChild(stats);
+//    // div for stats
+//    var stats = document.createElement("p");
+//    stats.id = "stats";
+//    stats.class = "stats";
+//    stats.innerHTML = test.converter.makeHtml('**loading....**');
+//    stats.style.display = 'inline-block';
+//    stats.style.padding = '0px';
+//    stats.style.margin = '0px 8px';
+//    headerDiv.appendChild(stats);
 
     // div for controls
     var controls = document.createElement("div");
     controls.id = "controls";
-    controls.style.float = 'right';
+    controls.style.display = 'inline-block';
     controls.style.padding = '0px';
-    controls.style.margin = '0px 16px';
+    controls.style.margin = '0px 0px'; // was 0 / 16
     headerDiv.appendChild(controls);
 
-    // button for toggle example display
-    var btnExampleToggle = document.createElement("button");
-    btnExampleToggle.id = "btnExampleToggle";
-    btnExampleToggle.name = "btnExampleToggle";
-    if (test.hideExamples) {
-      btnExampleToggle.innerHTML = '<b>examples</b><br><em>(hidden)</em>';
-    } else {
-      btnExampleToggle.innerHTML = '<b>examples</b><br><em>(shown)</em>';
-    }
-    btnExampleToggle.onclick = function () {
+    // control button maker
+    var buttonControl = function (text, help, func) {
+      var control = document.createElement("button");
+      if (help) {
+        control.className = "tooltip";
+        control.innerHTML = text + '<span class="classic">' + help + '</span>';
+      } else {
+        control.innerHTML = text;
+      }
+      control.onclick = func;
+      controls.appendChild(control);
+      return control;
+    };
+
+    // Hide / Show Examples
+    test.tequilaStats = '☠';
+    test.helpTestTequila = 'tequila ' + T.getVersion() + '<br>click to clear any filters';
+    test.btnTequila = buttonControl(test.tequilaStats + ' tequila',
+      test.helpTestTequila,
+      function () {
+        test.hideExamples = false;
+        test.filterSection = false;
+        test.filterTest = false;
+        test.refresh();
+      });
+
+    // Hide / Show Examples
+    test.helpTestPass = 'passing tests<br>click to filter';
+    test.textTestPass = 'pass ' + '<code class="counter_green">$1</code>';
+    test.btnTestPass = buttonControl(test.textTestPass, test.helpTestPass, function () {
+      test.refresh();
+    });
+    test.helpTestFail = 'failing tests<br>click to filter';
+    test.textTestFail = 'fail ' + '<code class="counter_red">$1</code>';
+    test.btnTestFail = buttonControl(test.textTestFail, test.helpTestFail, function () {
+      test.refresh();
+    });
+    test.helpTestDefer = 'deferred tests<br>click to filter';
+    test.textTestDefer = 'defer ' + '<code class="counter_yellow">$1</code>';
+    test.btnTestDefer = buttonControl(test.textTestDefer, test.helpTestDefer, function () {
+      test.refresh();
+    });
+
+    // Hide / Show Examples
+    var btnExampleToggle = buttonControl((test.hideExamples ? '✩' : '✭') + ' examples', 'show/hide examples<br>errors always show', function () {
       test.hideExamples = !test.hideExamples;
       test.refresh();
-    };
-    controls.appendChild(btnExampleToggle);
+    });
 
+//
     // Outer & Inner Div to center content
     var outerDiv = document.createElement("div");
     outerDiv.style.width = "100%";
@@ -166,13 +202,13 @@ test.render = function (isBrowser) {
 
     // Check filter
     var isFiltered = false;
-    var x1 = (test.filterSection+'.');
-    if (x1.indexOf('..')>=0) x1 = (test.filterSection);
-    if (test.filterSection && (test.nodes[i].levelText).indexOf(x1)!=0) {
+    var x1 = (test.filterSection + '.');
+    if (x1.indexOf('..') >= 0) x1 = (test.filterSection);
+    if (test.filterSection && (test.nodes[i].levelText).indexOf(x1) != 0) {
       isFiltered = true;
       var x2 = (test.nodes[i].levelText);
-      console.log(x1 + ' : ' + x2);
-      if (x1.indexOf((test.nodes[i].levelText))==0) {
+//      console.log(x1 + ' : ' + x2);
+      if (x1.indexOf((test.nodes[i].levelText)) == 0) {
         isFiltered = false;
       }
     }
@@ -196,7 +232,7 @@ test.render = function (isBrowser) {
           p.onclick = function () {
             var words = this.innerText.split(' ');
             test.filterSection = '';
-            if (words.length>0 && parseInt(words[0])>0)
+            if (words.length > 0 && parseInt(words[0]) > 0)
               test.filterSection = words[0];
             test.refresh();
           };
@@ -321,11 +357,30 @@ test.render = function (isBrowser) {
   }
 };
 test.updateStats = function () {
-  var stats = document.getElementById("stats");
-  stats.innerHTML = test.converter.makeHtml('***tequila*** ' + T.getVersion() + ' ' +  (test.countFail?'☹':'☺') + ' tests(**' + test.countTests + '**) pass ( **' + test.countPass + '** ) fail ( **' + test.countFail + '** ) defer ( **' + test.countDefer + '** )');
+
+  newtequilaStats = '☠';
+  if (test.countPass > 0) newtequilaStats = '☺';
+  if (test.countDefer > 0) newtequilaStats = '☻';
+  if (test.countFail > 0) newtequilaStats = '☹';
+  if (test.tequilaStats != newtequilaStats) {
+    test.tequilaStats = newtequilaStats;
+    test.btnTequila.innerHTML = test.tequilaStats + ' tequila' + '<span class="classic">' + test.helpTestTequila + '</span>';
+  }
+
+  if (!test.lastCountPass || test.lastCountPass != test.countPass) {
+    test.lastCountPass = test.countPass;
+    test.btnTestPass.innerHTML = test.textTestPass.replace('$1', test.countPass) + '<span class="classic">' + test.helpTestPass + '</span>';
+  }
+  if (!test.lastCountFail || test.lastCountFail != test.countFail) {
+    test.lastCountFail = test.countFail;
+    test.btnTestFail.innerHTML = test.textTestFail.replace('$1', test.countFail) + '<span class="classic">' + test.helpTestFail + '</span>';
+  }
+  if (!test.lastCountDefer || test.lastCountDefer != test.countDefer) {
+    test.lastCountDefer = test.countDefer;
+    test.btnTestDefer.innerHTML = test.textTestDefer.replace('$1', test.countDefer) + '<span class="classic">' + test.helpTestDefer + '</span>';
+  }
 }
 test.expressionInfo = function (expr) {
-
   if (typeof expr == 'string') {
     return '"' + expr.replace(/"/g, '\\\"') + '"';
   }

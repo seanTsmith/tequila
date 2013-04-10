@@ -136,8 +136,8 @@ test.runnerAttribute = function () {
         });
       });
       test.heading('Group', function () {
-        test.example("should have type of 'Group'", 'Group',function () {
-          return new Attribute({name: 'stuff', type: 'Group'}).type;
+        test.example("should have type of 'Group'", function () {
+          new Attribute({name: 'stuff', type: 'Group'}).type.should.equal('Group');
         });
         test.example('deep check value for valid Attributes that pass getValidationErrors() test', 1, function () {
           // this example is just to conventionalize nested components

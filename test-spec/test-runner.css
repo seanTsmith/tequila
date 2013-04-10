@@ -1,4 +1,4 @@
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th,
 td {
     margin: 0;
     padding: 0;
@@ -10,42 +10,34 @@ td {
     font-size: 100%;
     vertical-align: baseline;
 }
+
 body {
-    line-height: 1;
+    font: 15px/1.5 "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #000;
     background: #fff;
+    background-color: #F8F8F0;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
-th,
-td {
-    text-align: left;
-    font-weight: normal;
-    vertical-align: middle;
-}
-a img {
-    border: none;
-}
-h1:hover,h2:hover,h3:hover,h4:hover,h5:hover,h6:hover
-{
+
+h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
     color: #0A0;
-    text-decoration:underline;
+    text-decoration: underline;
 }
-h1,h2,h4,h4,h5,h6
-{
+
+h1, h2, h4, h4, h5, h6 {
     line-height: 1;
     margin-bottom: 0.25em;
 }
+
 h1 {
     font-size: 2em;
     font-weight: 900;
     margin-top: 1em;
 }
 h2 {
-
-    /*font-style:normal;*/
-    /*font-style:italic;*/
-    /*font-style:oblique;*/
-    /*color: #0A0;*/
-
     font-size: 1.8em;
     font-weight: 500;
     margin-top: 1em;
@@ -68,41 +60,45 @@ h6 {
     margin-top: 0.5em;
 }
 p {
-    font-weight:normal;
+    font-weight: normal;
     margin-top: 0.25em;
     margin-bottom: 0.5em;
 }
+
 li {
     margin-left: 2em;
 }
+
 em {
     font-style: italic;
 }
+
 strong {
-    font-weight:bolder;
+    font-weight: bolder;
 }
-pre {
-    max-width: 980px;
-    min-width: 98px;
-    overflow: hidden;
-    background: #fff;
-    border: solid;
-    border-width:thin;
-    white-space: pre-wrap;
-    margin-top: 0em;
-    margin-bottom: 0.25em;
-    margin-left: 0.25em;
-    margin-right: 0.25em;
-}
-pre.fail {
-    background: #fcc;
-}
-pre.pass {
-    background: #ccf;
-}
-pre.skip {
-    background: #fcf;
-}
+
+/*pre {*/
+    /*max-width: 980px;*/
+    /*min-width: 98px;*/
+    /*overflow: hidden;*/
+    /*background: #fff;*/
+    /*border: solid;*/
+    /*border-width: thin;*/
+    /*white-space: pre-wrap;*/
+    /*margin-top: 0em;*/
+    /*margin-bottom: 0.25em;*/
+    /*margin-left: 0.25em;*/
+    /*margin-right: 0.25em;*/
+/*}*/
+/*pre.fail {*/
+    /*background: #fcc;*/
+/*}*/
+/*pre.pass {*/
+    /*background: #ccf;*/
+/*}*/
+/*pre.skip {*/
+    /*background: #fcf;*/
+/*}*/
 code {
     font-weight: normal;
     border: none;
@@ -118,12 +114,113 @@ caption {
     margin-left: 0.25em;
     margin-right: 0.25em;
 }
-body {
-    font: 14px/1.5 "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #F8F8F0;
-    padding-top: 32px;
-    padding-bottom: 32px;
-    padding-left: 0px;
-    padding-right: 0px;
+button {
+    background-color: #eeeeee;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, #cccccc));
+    background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+    background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+    background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+    background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+    background-image: linear-gradient(top, #eeeeee, #cccccc);
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #bbb;
+    border-radius: 3px;
+    color: #333;
+    font: bold 20px/1.25 "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+    padding: 8px 6px;
+    text-align: center;
+    text-shadow: 0 1px 0 #eee;
+    /*width: 120px;*/
+}
+button:hover {
+    background-color: #dddddd;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #dddddd), color-stop(100%, #bbbbbb));
+    background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: linear-gradient(top, #dddddd, #bbbbbb);
+    border: 1px solid #bbb;
+    border-bottom: 1px solid #999;
+    cursor: pointer;
+    text-shadow: 0 1px 0 #ddd;
+}
+button:active {
+    border: 1px solid #aaa;
+    border-bottom: 1px solid #888;
+    -webkit-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
+    box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
+}
+.counter {
+    color: #000;
+    -webkit-box-shadow: inset 0 0 5px 2px #aaa, 0 1px 0 0 #eee;
+    padding-top: 0px;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 0px;
+    text-shadow: 0px 2px 3px #999;
+    border-radius: 4px;
+}
+.counter_yellow {
+    color: #ff0;
+    -webkit-box-shadow: inset 0 0 5px 2px #aaa, 0 1px 0 0 #eee;
+    padding-top: 0px;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 0px;
+    text-shadow: 0px 2px 3px #999;
+    border-radius: 4px;
+}
+.counter_green {
+    color: #090;
+    -webkit-box-shadow: inset 0 0 5px 2px #aaa, 0 1px 0 0 #eee;
+    padding-top: 0px;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 0px;
+    text-shadow: 0px 2px 3px #999;
+    border-radius: 4px;
+}
+.counter_red {
+    color: #e00;
+    -webkit-box-shadow: inset 0 0 5px 2px #aaa, 0 1px 0 0 #eee;
+    padding-top: 0px;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 0px;
+    text-shadow: 0px 2px 3px #999;
+    border-radius: 4px;
 }
 
+.tooltip {
+    border-bottom: 1px dotted #000000; color: #000000; outline: none;
+    cursor: help; text-decoration: none;
+    position: relative;
+}
+.tooltip span {
+    margin-left: -999em;
+    position: absolute;
+}
+.tooltip:hover span {
+    border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+    font-family: Calibri, Tahoma, Geneva, sans-serif;
+    position: absolute; left: 1em; top: 2em; z-index: 99;
+    margin-left: 0; width: 250px;
+}
+.tooltip:hover img {
+    border: 0; margin: -10px 0 0 -55px;
+    float: left; position: absolute;
+}
+.tooltip:hover em {
+    font-family: Candara, Tahoma, Geneva, sans-serif; font-size: 1.2em; font-weight: bold;
+    display: block; padding: 0.2em 0 0.6em 0;
+}
+.classic { padding: 0.8em 1em; }
+.custom { padding: 0.5em 0.8em 0.8em 2em; }
+* html a:hover { background: transparent; }
+.classic {background: #FFFFAA; border: 1px solid #FFAD33; }
+.critical { background: #FFCCAA; border: 1px solid #FF3334;	}
+.help { background: #9FDAEE; border: 1px solid #2BB0D7;	}
+.info { background: #9FDAEE; border: 1px solid #2BB0D7;	}
+.warning { background: #FFFFAA; border: 1px solid #FFAD33; }

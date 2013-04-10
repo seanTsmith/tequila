@@ -19,15 +19,12 @@
             color: #080808;
             background-color: #f8f8f8;
         }
-
         h1, h2, h3, h4, h5, h6 {
             font-family: Tahoma, Geneva, sans-serif;
         }
-
         code {
             font-family: "Lucida Console", Monaco, monospace;
         }
-
         div {
             border: 8px solid gray;
             background-color: #FFF;
@@ -36,8 +33,13 @@
             margin-right: 2px;
             margin-left: 2px;
             margin-bottom: 0px;
-        }
 
+
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            user-select: none;
+
+        }
         div.outerspace {
             width: 100%;
             border: none;
@@ -46,15 +48,15 @@
             margin: 0px;
             /*max-width: 320px;*/
         }
-
         div.innerspace{
             border: none;
             background-color: #966;
             padding: 0px;
             margin: 0px auto;
-            max-width: 358px;
+            /*max-width: 358px;*/
+            /*max-width: 1000px;*/
+            max-width: 320px;
         }
-
         div.footer {
             border: 1px solid gray;
             background-color: #444;
@@ -66,7 +68,6 @@
             overflow: hidden;
             white-space: nowrap;
         }
-
         div.workspace {
             border-top-width: 1px;
             border-top-style: solid;
@@ -86,16 +87,15 @@
             padding-left: 0px;
             padding-bottom: 0px;
             overflow: hidden;
-            white-space: nowrap;
         }
 
         div.header {
             display: inline;
-            /*height: 44px;*/
+            height: 44px;
             position: fixed;
             z-index: 99999;
             left:0px;
-            /*width: 320px;*/
+            width: 100%;
             border-bottom-color: #666;
             border-top-style: none;
             border-right-style: none;
@@ -107,8 +107,7 @@
             padding-right: 0px;
             padding-left: 0px;
             padding-bottom: 0px;
-            overflow-y: hidden;
-            overflow-x: scroll;
+            overflow: hidden;
             white-space: nowrap;
         }
         .tabButton {
@@ -296,6 +295,13 @@
             <p>paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading paragraph text with heading </p>
         </div>
         <div id="d06"><a name="a06"></a>
+            <code>
+                This is code.
+                That means that the line breaks are preserved and well maybe not I guess what the fuck.
+            </code>
+
+        </div>
+        <div id="d07"><a name="a07"></a>
             <code>
                 This is code.
                 That means that the line breaks are preserved and well maybe not I guess what the fuck.
