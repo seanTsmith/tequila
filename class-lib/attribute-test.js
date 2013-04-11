@@ -56,31 +56,42 @@ test.runnerAttribute = function () {
           test.show(record);
           // It's the default and it passes constructor validation
         });
-        test.xexample('should accept assignment of correct type and validate incorrect attributeTypes', undefined, function () {
+        test.example('should accept assignment of correct type and validate incorrect attributeTypes', undefined, function () {
           var myTypes = T.getAttributeTypes();
           test.show(myTypes);
           // TODO ID
-          var Food = new Model();
-          var food = new Attribute({name: 'food', type: 'Model', ModelType: Food});
-
-
-          var myValues = [null, 'Jane Doe', new Date, true, 18]; // , [new Attribute('likes'), new Attribute('dislikes')]];
+          var myModel = new Model();
+          var myGroup = new Attribute({name: 'columns', type: 'Group', value: [new Attribute("Name")]});
+          var myTable = new Attribute({name: 'bills', type: 'Table', group: myGroup });
+          var myValues = [null, 'Jane Doe', new Date, true, 18, new Model(), [], myTable]; // , [new Attribute('likes'), new Attribute('dislikes')]];
           for (var i in myTypes)
             for (var j in myValues) {
               console.log(i + ',' + j);
               if (i == j) {
-                // matches good so no errors thrown
-                new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j] });
+                switch (myTypes[i]) {
+                  case 'Model':
+                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j], modelType: myModel});
+                    break;
+                  case 'Group':
+                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
+                    break;
+                  case 'Table':
+                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j], group: myGroup});
+                    break;
+                  default:
+                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j] });
+                    break;
+                }
               } else {
-//                // mismatches bad so should throw error (is caught unless no error or different error)
-//                test.shouldThrow(Error('error creating Attribute: value must be null or a ' + myTypes[i]), function () {
-//                  new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
-//                });
+                // mismatches bad so should throw error (is caught unless no error or different error)
+                test.shouldThrow('*', function () {
+                  new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
+                });
               }
-//              // other objects should throw always
-//              test.shouldThrow(Error('error creating Attribute: value must be null or a ' + myTypes[i]), function () {
-//                new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: {} });
-//              });
+              // other objects should throw always
+              test.shouldThrow('*', function () {
+                new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: {} });
+              });
             }
         });
       });

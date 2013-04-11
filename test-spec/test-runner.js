@@ -390,7 +390,8 @@ test.shouldThrow = function (err, func) {
   try {
     func();
   } catch (e) {
-    if (err.toString() != e.toString()) throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
+    if (err !== undefined)
+      if (err.toString() != e.toString() && err.toString() != '*') throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
   }
 }
 test.callTestCode = function (func) {
