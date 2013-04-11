@@ -12,6 +12,7 @@ var Tequila = (function () {
 //      console.log("I am private");
 //    }
 //    var privateVariable = "Im also private";
+    var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table'];
     return    {
       // Public methods and variables
       getVersion: function () {
@@ -40,6 +41,9 @@ var Tequila = (function () {
         function f() {};
         f.prototype = p;
         return new f();
+      },
+      getAttributeTypes: function() {
+        return attributeTypes;
       }
     };
   };
