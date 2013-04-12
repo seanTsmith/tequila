@@ -3,8 +3,8 @@
  * tequila-test
  */
 test.runnerTequila = function () {
-  test.heading('Tequila() Singleton', function () {
-    test.paragraph('The Tequila() Singleton provides a namespace for the library.  In it is access to the classes ' +
+  test.heading('Tequila Class Singleton', function () {
+    test.paragraph('The Tequila Singleton provides a namespace for the library.  In it is access to the classes ' +
       'that make up the library, a series of helper functions.');
     test.heading('CONSTRUCTOR', function () {
       test.example('multiple instances are deep equal', true, function () {

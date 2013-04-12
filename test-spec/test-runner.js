@@ -85,30 +85,32 @@ test.getParam = function (name) {
     return results[1];
 };
 test.refresh = function () {
+//  test.filterLevel='All';
   var vars = '';
   if (test.hideExamples) vars += (vars ? '&' : '') + '?he=Y';
   if (test.filterSection) vars += (vars ? '&' : '') + '?fs=' + test.filterSection;
+  if (test.filterLevel) vars += (vars ? '&' : '') + '?fl=' + test.filterLevel;
   var rootPath = window.location.href;
   if (rootPath.indexOf('#') > 0) rootPath = rootPath.substring(0, rootPath.indexOf('#'))
   window.location.href = rootPath + vars ? ("#" + vars) : '';
   window.location.reload();
 };
 test.render = function (isBrowser) {
+  var i, j;
+  test.countUnique = 0;
   test.countTests = 0;
   test.countPass = 0;
   test.countFail = 0;
   test.countDefer = 0;
   // Browser Dressing
   if (isBrowser) {
-
     // Get vars from URL
     test.hideExamples = (test.getParam('he') == 'Y');
     test.filterSection = test.getParam('fs');
     test.filterTest = test.getParam('ft');
-
+    test.filterLevel = test.getParam('fl') || 'All';
     // Fixed Header Div
     var headerDiv = document.createElement("div");
-
     headerDiv.style.display = 'inline-block';
     headerDiv.align = 'center';
     headerDiv.style.position = 'fixed';
@@ -119,17 +121,6 @@ test.render = function (isBrowser) {
     headerDiv.style.width = '100%';
     headerDiv.style.background = '#AA4'; // yellow header to start
     document.body.appendChild(headerDiv);
-
-//    // div for stats
-//    var stats = document.createElement("p");
-//    stats.id = "stats";
-//    stats.class = "stats";
-//    stats.innerHTML = test.converter.makeHtml('**loading....**');
-//    stats.style.display = 'inline-block';
-//    stats.style.padding = '0px';
-//    stats.style.margin = '0px 8px';
-//    headerDiv.appendChild(stats);
-
     // div for controls
     var controls = document.createElement("div");
     controls.id = "controls";
@@ -137,7 +128,6 @@ test.render = function (isBrowser) {
     controls.style.padding = '0px';
     controls.style.margin = '0px 0px'; // was 0 / 16
     headerDiv.appendChild(controls);
-
     // control button maker
     var buttonControl = function (text, help, func) {
       var control = document.createElement("button");
@@ -151,43 +141,55 @@ test.render = function (isBrowser) {
       controls.appendChild(control);
       return control;
     };
-
-    // Hide / Show Examples
+    // Reset Filters
     test.tequilaStats = '☠';
-    test.helpTestTequila = 'tequila ' + T.getVersion() + '<br>click to clear any filters';
+    test.helpTestTequila = 'tequila ' + T.getVersion() + '<br>click filters for test pass/fail and selected session<b><em>note: click on any section below to filter</em></b>';
     test.btnTequila = buttonControl(test.tequilaStats + ' tequila',
       test.helpTestTequila,
       function () {
-        test.hideExamples = false;
         test.filterSection = false;
         test.filterTest = false;
         test.refresh();
       });
-
-    // Hide / Show Examples
+    // Hide / Show Tests
     test.helpTestPass = 'passing tests<br>click to filter';
-    test.textTestPass = 'pass ' + '<code class="counter_green">$1</code>';
+    test.textTestPass = 'pass<br>' + '<code class="counter_green">$1</code>';
     test.btnTestPass = buttonControl(test.textTestPass, test.helpTestPass, function () {
       test.refresh();
     });
     test.helpTestFail = 'failing tests<br>click to filter';
-    test.textTestFail = 'fail ' + '<code class="counter_red">$1</code>';
+    test.textTestFail = 'fail<br>' + '<code class="counter_red">$1</code>';
     test.btnTestFail = buttonControl(test.textTestFail, test.helpTestFail, function () {
       test.refresh();
     });
     test.helpTestDefer = 'deferred tests<br>click to filter';
-    test.textTestDefer = 'defer ' + '<code class="counter_yellow">$1</code>';
+    test.textTestDefer = 'todo<br>' + '<code class="counter_yellow">$1</code>';
     test.btnTestDefer = buttonControl(test.textTestDefer, test.helpTestDefer, function () {
       test.refresh();
     });
-
+    // Hide / Show Test Level
+    test.helpTestLevel = 'set filter level of detail<br>click to cycle thru';
+    test.textTestLevel = 'level<br>' + '<code class="counter">' + test.filterLevel + '</code>';
+    test.btnTestLevel = buttonControl(test.textTestLevel, test.helpTestLevel, function () {
+      switch (test.filterLevel) {
+        case 'All':
+          test.filterLevel = 'TOC';
+          break;
+        case 'TOC':
+          test.filterLevel = 'Mid';
+          break;
+        default:
+          test.filterLevel = 'All';
+          break;
+      }
+      test.refresh();
+    });
     // Hide / Show Examples
-    var btnExampleToggle = buttonControl((test.hideExamples ? '✩' : '✭') + ' examples', 'show/hide examples<br>errors always show', function () {
+//    buttonControl((test.hideExamples ? '✩' : '✭') + ' examples', 'show/hide examples<br>errors always show', function () {
+    buttonControl('ex.<br>' + '<code class="counter">' + (test.hideExamples ? 'Off' : 'On&nbsp;'  ) + '</code>', 'show/hide examples<br>errors always show', function () {
       test.hideExamples = !test.hideExamples;
       test.refresh();
     });
-
-//
     // Outer & Inner Div to center content
     var outerDiv = document.createElement("div");
     outerDiv.style.width = "100%";
@@ -196,29 +198,35 @@ test.render = function (isBrowser) {
     innerDiv.style.width = "1000px";
     innerDiv.style.margin = "0 auto";
     outerDiv.appendChild(innerDiv);
-
   } else {
     process.stdout.write('Testing 123...');
   }
-
   var scrollFirstError = 0;
-
   for (i in test.nodes) {
-
-    // Check filter
+    // Check filters
+    var filterSection = (test.filterSection + '.');
+    if (filterSection.indexOf('..') >= 0) filterSection = (test.filterSection);
+    var curSection = (test.nodes[i].levelText);
     var isFiltered = false;
-    var x1 = (test.filterSection + '.');
-    if (x1.indexOf('..') >= 0) x1 = (test.filterSection);
-    if (test.filterSection && (test.nodes[i].levelText).indexOf(x1) != 0) {
+    var dots = 0;
+    for (j = 0; j < curSection.length; j++) if (curSection[j] == '.') dots++;
+    switch (test.filterLevel) {
+      case 'TOC':
+        test.filterLevel = 'TOC';
+        if (dots > 2) isFiltered = true;
+        break;
+      case 'Mid':
+        test.filterLevel = 'Mid'; // TOC with paragraph text
+        if (dots > 2) isFiltered = true;
+        break;
+    }
+    if (test.filterSection && curSection.indexOf(filterSection) != 0) {
       isFiltered = true;
-      var x2 = (test.nodes[i].levelText);
-//      console.log(x1 + ' : ' + x2);
-      if (x1.indexOf((test.nodes[i].levelText)) == 0) {
+      if (filterSection.indexOf(curSection) == 0) {
         isFiltered = false;
       }
     }
     if (test.nodes[i].inheritanceTest) isFiltered = true;
-
     var testNodeType = test.nodes[i].nodeType;
     if (!isBrowser) {
       if (testNodeType == 'e') {
@@ -233,7 +241,10 @@ test.render = function (isBrowser) {
           var p = document.createElement("h" + test.nodes[i].level);
           var lt = test.nodes[i].levelText;
           if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
-          p.innerHTML = lt + ' ' + test.nodes[i].text;
+//          if (dots < 2)
+//            p.innerHTML = test.nodes[i].text;
+//          else
+            p.innerHTML = lt + ' ' + test.nodes[i].text;
           p.onclick = function () {
             var words = this.innerText.split(' ');
             test.filterSection = '';
@@ -244,15 +255,13 @@ test.render = function (isBrowser) {
           innerDiv.appendChild(p);
         }
         break;
-
       case 'p':
-        if (!isFiltered) {
+        if (!isFiltered && (dots < 2 || test.filterLevel != 'TOC')) {
           var p = document.createElement("p");
           p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
           innerDiv.appendChild(p);
         }
         break;
-
       case '.':
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
@@ -270,7 +279,6 @@ test.render = function (isBrowser) {
           process.stdout.write(colors.yellow('✍'));
         }
         break;
-
       case 'e':
         var testPassed = false;
         var ranTest = false;
@@ -279,6 +287,7 @@ test.render = function (isBrowser) {
         var pre = document.createElement("pre");
         pre.className = "prettyprint";
         test.countTests++;
+        if (!test.nodes[i].inheritanceTest) test.countUnique++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.showWork = [];
           test.assertions = [];
@@ -363,26 +372,34 @@ test.render = function (isBrowser) {
 };
 test.updateStats = function () {
 
+  var miniPad, i;
   newtequilaStats = '☠';
   if (test.countPass > 0) newtequilaStats = '☺';
   if (test.countDefer > 0) newtequilaStats = '☻';
   if (test.countFail > 0) newtequilaStats = '☹';
-  if (test.tequilaStats != newtequilaStats) {
-    test.tequilaStats = newtequilaStats;
-    test.btnTequila.innerHTML = test.tequilaStats + ' tequila' + '<span class="classic">' + test.helpTestTequila + '</span>';
+  if (test.tequilaStats != test.countUnique+newtequilaStats) {
+    test.tequilaStats = test.countUnique+newtequilaStats;
+    //    test.textTestDefer = 'todo<br>' + '<code class="counter_yellow">$1</code>';
+
+    var myName = newtequilaStats + ' ' + test.countUnique.toString();
+    for (miniPad = '', i = 0; i < (3 - myName.toString().length); i++) miniPad += '&nbsp;'
+    test.btnTequila.innerHTML = 'tequila<br><code class="counter">' + miniPad + myName + '</code>' + '<span class="classic">' + test.helpTestTequila + '</span>';
   }
 
   if (!test.lastCountPass || test.lastCountPass != test.countPass) {
     test.lastCountPass = test.countPass;
-    test.btnTestPass.innerHTML = test.textTestPass.replace('$1', test.countPass) + '<span class="classic">' + test.helpTestPass + '</span>';
+    for (miniPad = '', i = 0; i < (3 - test.countPass.toString().length); i++) miniPad += '&nbsp;'
+    test.btnTestPass.innerHTML = test.textTestPass.replace('$1', miniPad + test.countPass) + '<span class="classic">' + test.helpTestPass + '</span>';
   }
   if (!test.lastCountFail || test.lastCountFail != test.countFail) {
     test.lastCountFail = test.countFail;
-    test.btnTestFail.innerHTML = test.textTestFail.replace('$1', test.countFail) + '<span class="classic">' + test.helpTestFail + '</span>';
+    for (miniPad = '', i = 0; i < (3 - test.countFail.toString().length); i++) miniPad += '&nbsp;'
+    test.btnTestFail.innerHTML = test.textTestFail.replace('$1', miniPad + test.countFail) + '<span class="classic">' + test.helpTestFail + '</span>';
   }
   if (!test.lastCountDefer || test.lastCountDefer != test.countDefer) {
     test.lastCountDefer = test.countDefer;
-    test.btnTestDefer.innerHTML = test.textTestDefer.replace('$1', test.countDefer) + '<span class="classic">' + test.helpTestDefer + '</span>';
+    for (miniPad = '', i = 0; i < (3 - test.countDefer.toString().length); i++) miniPad += '&nbsp;'
+    test.btnTestDefer.innerHTML = test.textTestDefer.replace('$1', miniPad + test.countDefer) + '<span class="classic">' + test.helpTestDefer + '</span>';
   }
 }
 test.expressionInfo = function (expr) {

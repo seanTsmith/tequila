@@ -20,6 +20,7 @@ test-spec/node-test-runner.js: test-spec/node-test-header.js test-spec/test-tequ
 	        >> test-spec/node-test-runner.js
 
 make.lib:
+	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > tequila.js
 	@cat \
 	    lib/tequila-class.js \
 	        >> tequila.js

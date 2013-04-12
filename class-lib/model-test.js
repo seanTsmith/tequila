@@ -7,6 +7,9 @@ test.runnerModel = function (SurrogateModelClass,inheritanceTest) {
   var inheritanceTestWas = T.inheritanceTest;
   T.inheritanceTest = inheritanceTest;
   test.heading('Model Class', function () {
+    test.paragraph('Models being the primary purpose of this library are extensions of javascript objects.  ' +
+      'The tequila class library provides this class to encapsulate and enforce consistant programming interface' +
+      'to the models created by this library.');
     test.heading('CONSTRUCTOR', function () {
       test.paragraph('Creation of all Models must adhere to following examples:');
       test.example('objects created should be an instance of Model', true, function () {

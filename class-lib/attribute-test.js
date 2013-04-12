@@ -3,7 +3,7 @@
  * attribute-test
  */
 test.runnerAttribute = function () {
-  test.heading('Attribute Class()', function () {
+  test.heading('Attribute Class', function () {
     test.heading('CONSTRUCTOR', function () {
       test.example('objects created should be an instance of Attribute', true, function () {
         return new Attribute({name: 'aMust'}) instanceof Attribute;
