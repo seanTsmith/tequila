@@ -72,6 +72,45 @@ function Attribute(args, arg2) {
 Attribute.prototype.toString = function () {
   return this.name === null ? 'new Attribute' : 'Attribute: ' + this.name;
 };
+Attribute.prototype.coerce = function (value) {
+  var newValue = value;
+  var temp;
+  switch (this.type) {
+    case 'String':
+      if (typeof newValue == 'undefined') return '';
+      if (typeof newValue == 'boolean' && !newValue) return 'false';
+      if (!newValue) return '';
+      newValue = value.toString();
+      if (newValue.length > this.size) return newValue.substring(0, this.size);
+      return newValue;
+      break;
+    case 'Number':
+      if (typeof newValue == 'undefined') return 0;
+      if (!newValue) return 0;
+      if (typeof newValue == 'string') {
+        newValue = newValue.replace(/^\s+|\s+$/g, ''); // trim
+        temp = newValue.split(' ');
+        newValue = temp.length ? temp[0] : '';
+        newValue = Number(newValue.replace(/[^/0-9\ \.]+/g, ""));
+      } else {
+        newValue = Number(newValue);
+      }
+      if (!newValue) return 0;
+      return newValue;
+      break;
+    case 'Boolean':
+      if (typeof newValue == 'undefined') return false;
+      if (typeof newValue == 'string') {
+        newValue =newValue.toUpperCase();
+        if (newValue === 'Y' || newValue === 'YES' || newValue === 'T' || newValue === 'TRUE' || newValue === '1')
+          return true;
+        return false;
+      }
+      return (newValue == true);
+      break;
+  }
+  throw(Error('coerce cannot determine appropriate value'))
+};
 Attribute.prototype.getValidationErrors = function () {
   var errors = [];
   if (!this.name) errors.push('name required');
@@ -115,7 +154,7 @@ Attribute.prototype.getValidationErrors = function () {
         errors.push('group property required');
       } else {
         if (this.group.value instanceof Array) {
-          if (this.group.value.length<1) {
+          if (this.group.value.length < 1) {
             errors.push('group property value must contain at least one Attribute');
           } else {
             for (var i in this.group.value) {

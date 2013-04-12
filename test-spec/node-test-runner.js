@@ -2090,7 +2090,7 @@ test.render = function (isBrowser) {
               exampleCode += '<b>✓error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
               if (test_Results == undefined) {
-                exampleCode += '<b>✓returns without harming any puppies</b>'; // ✘
+                exampleCode += '<b>✓returns without harming any kittens</b>'; // ✘
               } else {
                 exampleCode += '<b>✓returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
               }

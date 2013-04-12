@@ -66,7 +66,7 @@ test.runnerAttribute = function () {
           var myValues = [null, 'Jane Doe', new Date, true, 18, new Model(), [], myTable]; // , [new Attribute('likes'), new Attribute('dislikes')]];
           for (var i in myTypes)
             for (var j in myValues) {
-              console.log(i + ',' + j);
+//              console.log(i + ',' + j);
               if (i == j) {
                 switch (myTypes[i]) {
                   case 'Model':
@@ -199,6 +199,50 @@ test.runnerAttribute = function () {
       test.heading('toString()', function () {
         test.example('should return a description of the attribute', 'Attribute: name', function () {
           return new Attribute({name: 'name'}).toString();
+        });
+      });
+      test.heading('coerce(newValue)', function () {
+        test.paragraph('Method returns the type equivalent of newValue for the owner objects type.');
+        test.example('coerce method basic usage', undefined, function () {
+          var myString = new Attribute({name: 'name', size: 10});
+          var myNumber = new Attribute({name: 'age', type: 'Number' });
+          var myBool = new Attribute({name: 'active', type: 'Boolean' });
+          var myGroup = new Attribute({name: 'columns', type: 'Group', value: [new Attribute("Name")]});
+          var myTable = new Attribute({name: 'bills', type: 'Table', group: myGroup });
+          test.show(myBool.coerce('12/31/99'));
+          // Strings
+          test.assertion(myString.coerce() === '');
+          test.assertion(myString.coerce(false) === 'false');
+          test.assertion(myString.coerce(12) === '12');
+          test.assertion(myString.coerce(1 / 0) === 'Infinity');
+          test.assertion(myString.coerce('01234567890') === '0123456789');
+          test.assertion(myString.coerce() === '');
+          // Numbers
+          test.assertion(myNumber.coerce() === 0);
+          test.assertion(myNumber.coerce(false) === 0);
+          test.assertion(myNumber.coerce(true) === 1);
+          test.assertion(myNumber.coerce(' 007 ') === 7);
+          test.assertion(myNumber.coerce(' $123,456.78 ') === 123456.78);
+          test.assertion(myNumber.coerce(' $123, 456.78 ') === 123); // space will split
+          test.assertion(myNumber.coerce('4/20') === 0); // slash kills it
+          // Boolean
+          test.assertion(myBool.coerce() === false && myBool.coerce(null) === false && myBool.coerce(0) === false);
+          test.assertion(myBool.coerce(true) === true && myBool.coerce(1) === true);
+          test.assertion(myBool.coerce('y') && myBool.coerce('yEs') && myBool.coerce('t') && myBool.coerce('TRUE') && myBool.coerce('1'));
+          test.assertion(!((myBool.coerce('') || (myBool.coerce('yep')))));
+          // TODO
+          test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
+            new Attribute('TODO','Date').coerce();
+          });
+          test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
+            new Attribute({name: 'Twiggy', type: 'Model', modelType: new Model()}).coerce();
+          });
+          test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
+            new Attribute(myGroup.coerce());
+          });
+          test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
+            new Attribute(myTable.coerce());
+          });
         });
       });
       test.heading('getValidationErrors()', function () {

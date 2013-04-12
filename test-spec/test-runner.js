@@ -55,15 +55,20 @@ test.assertion = function (truDat) {
   test.assertions.push(truDat);
 };
 test.show = function (value) {
-  if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
+  try {
+    if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
+      test.showWork.push(value);
+      return;
+    }
+    if (value !== undefined) {
+      test.showWork.push(JSON.stringify(value));
+      return;
+    }
     test.showWork.push(value);
-    return;
+  } catch (e) {
+    test.showWork.push(e);
   }
-  if (value !== undefined) {
-    test.showWork.push(JSON.stringify(value));
-    return;
-  }
-  test.showWork.push(value);
+
 };
 test.stop = function () {
 };
@@ -299,7 +304,7 @@ test.render = function (isBrowser) {
               exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
             } else {
               if (typeof test_Results == 'undefined') {
-                exampleCode += '✓<b>returns without harming any puppies</b>'; // ✘
+                exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
               } else {
                 exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
               }
