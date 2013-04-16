@@ -301,7 +301,6 @@ test.render = function (isBrowser) {
             if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
           }
           // Check assertions
-          // test.assertions
           var gotFailedAssertions = false;
           for (var j in test.assertions) {
             if (!test.assertions[j]) gotFailedAssertions = true;
@@ -447,15 +446,12 @@ test.formatCode = function (txt, rancode) {
             line = '<b>// ' + oldline + ' is ' + test.showWork[w] + '</b>';
           else
             line = '<b>// i got nothing</b>';
-//          console.log(line);
           w++;
         }
       }
       if (rancode && line.substring(0, 14) == 'test.assertion') {
         marks.push((test.assertions[assertionsSeen++]) ? '✓' : '✘');
         var oldline = line.substring(15);
-        if (oldline.length > 0) oldline = oldline.substring(0, oldline.length - 1);
-        if (oldline.length > 0) oldline = oldline.substring(0, oldline.length - 1);
         line = '<b>ASSERT: </b>' + oldline;
       } else {
         marks.push(' ');

@@ -87,6 +87,7 @@ pre {
     /*background: #fff;*/
     /*border: solid;*/
     /*border-width: thin;*/
+    /*white-space: normal;*/
     white-space: pre-wrap;
     /*margin-top: 0em;*/
     /*margin-bottom: 0.25em;*/
@@ -129,10 +130,10 @@ button {
     background-image: linear-gradient(top, #eeeeee, #cccccc);
     border: 1px solid #ccc;
     border-bottom: 1px solid #bbb;
-    border-radius: 3px;
+    border-radius: 5px;
     color: #333;
     font: bold 20px/1.25 "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
-    padding-top: 8px;
+    padding-top: 2px;
     padding-left: 6px;
     padding-bottom: 8px;
     padding-right: 6px;
@@ -158,11 +159,13 @@ button:hover {
     text-shadow: 0 1px 0 #ddd;
 }
 button:active {
-    padding-top: 9px;
+    padding-top: 3px;
     padding-left: 7px;
     padding-bottom: 7px;
     padding-right: 5px;
-    /*margin-top: 1px;*/
+    margin-top: 2px;
+    margin-right: 1px;
+    margin-left: 1px;
     margin-bottom: 3px;
     border: 1px solid #aaa;
     border-bottom: 1px solid #888;

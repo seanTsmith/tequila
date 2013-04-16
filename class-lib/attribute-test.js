@@ -4,6 +4,8 @@
  */
 test.runnerAttribute = function () {
   test.heading('Attribute Class', function () {
+    test.paragraph('Attributes are the means for models to represent data of different types.  They have no' +
+      ' dependencies on Models however and can be used beyond that.');
     test.heading('CONSTRUCTOR', function () {
       test.example('objects created should be an instance of Attribute', true, function () {
         return new Attribute({name: 'aMust'}) instanceof Attribute;

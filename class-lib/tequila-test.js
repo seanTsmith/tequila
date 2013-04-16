@@ -3,7 +3,7 @@
  * tequila-test
  */
 test.runnerTequila = function () {
-  test.heading('Tequila Class Singleton', function () {
+  test.heading('Tequila Singleton', function () {
     test.paragraph('The Tequila Singleton provides a namespace for the library.  In it is access to the classes ' +
       'that make up the library, a series of helper functions.');
     test.heading('CONSTRUCTOR', function () {
@@ -46,16 +46,16 @@ test.runnerTequila = function () {
         };
         Car = function (name) {
           Thing.call(this,name); // apply Thing constructer
-          this.canDrive = true;
+          this.canBeDriven = true;
         };
         Car.prototype = T.inheritPrototype(Thing.prototype); // <- proper usage
         Food = function (name) {
           Thing.call(this,name); // apply Thing constructer
-          this.canEat = true;
+          this.canBeEaten = true;
         };
         var thing = new Thing('rock'), car = new Car('mustang'), food = new Food('pizza');
-        test.assertion(!thing.canDrive && car.canDrive && !food.canDrive);
-        test.assertion(!thing.canEat && !car.canEat && food.canEat);
+        test.assertion(!thing.canBeDriven && car.canBeDriven && !food.canBeDriven);
+        test.assertion(!thing.canBeEaten && !car.canBeEaten && food.canBeEaten);
         test.assertion(thing.name == 'rock' && car.name == 'mustang' && food.name == 'pizza');
         test.assertion(car instanceof Car && car instanceof Thing); // T.inheritPrototype makes this work
         test.assertion(food instanceof Food && !(food instanceof Thing)); // without calling T.inheritPrototype
