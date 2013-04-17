@@ -60,7 +60,6 @@ test.runnerTequila = function () {
         test.assertion(car instanceof Car && car instanceof Thing); // T.inheritPrototype makes this work
         test.assertion(food instanceof Food && !(food instanceof Thing)); // without calling T.inheritPrototype
       });
-
     });
   });
 };

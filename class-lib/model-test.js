@@ -3,7 +3,7 @@
  * model-test
  */
 
-test.runnerModel = function (SurrogateModelClass,inheritanceTest) {
+test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
   var inheritanceTestWas = T.inheritanceTest;
   T.inheritanceTest = inheritanceTest;
   test.heading('Model Class', function () {
@@ -16,8 +16,11 @@ test.runnerModel = function (SurrogateModelClass,inheritanceTest) {
         return new SurrogateModelClass() instanceof Model;
       });
       test.example('should make sure new operator used', Error('new operator required'), function () {
-        Model();
+        SurrogateModelClass();
       });
+      test.xexample('create with parms ... attributes', undefined, function () {
+      });
+
     });
     test.heading('PROPERTIES', function () {
       test.heading('tags', function () {
@@ -42,15 +45,30 @@ test.runnerModel = function (SurrogateModelClass,inheritanceTest) {
         });
         test.example('elements of array must be instance of Attribute', undefined, function () {
           var model = new SurrogateModelClass();
-          model.attributes = [new Attribute("ID","ID")];
-          test.assertion(model.getValidationErrors().length==0);
-          model.attributes = [new Attribute("ID","ID"), new SurrogateModelClass(), 0, 'a', {}, [], null];
-          test.assertion(model.getValidationErrors().length==6);
+          model.attributes = [new Attribute("ID", "ID")];
+          test.assertion(model.getValidationErrors().length == 0);
+          model.attributes = [new Attribute("ID", "ID"), new SurrogateModelClass(), 0, 'a', {}, [], null];
+          test.assertion(model.getValidationErrors().length == 6);
         });
       });
     });
     test.heading('METHODS', function () {
-    });
+      test.heading('toString()', function () {
+        test.xexample('should return a description of the attribute', 'Attribute: name', function () {
+          return new Model({name: 'name'}).toString();
+        });
+      });
+      test.heading('getValidationErrors()', function () {
+        test.example('should return array of validation errors', undefined, function () {
+          test.assertion(new SurrogateModelClass().getValidationErrors() instanceof Array);
+//          var nameHosed = new Attribute({name: 'name'}); // No errors
+//          test.assertion(nameHosed.getValidationErrors().length == 0);
+//          nameHosed.name = ''; // 1 err
+//          test.assertion(nameHosed.getValidationErrors().length == 1);
+//          nameHosed.type = ''; // 2 errors
+//          test.assertion(nameHosed.getValidationErrors().length == 2);
+        });
+      });    });
   });
   T.inheritanceTest = inheritanceTestWas;
 };
