@@ -4,9 +4,9 @@
  */
 
 // Constructor
-var MemoryStore = function () {
+var MemoryStore = function (args) {
   if (false === (this instanceof MemoryStore)) throw new Error('new operator required');
-  Store.call(this);
+  Store.call(this,args);
   this.modelType = "MemoryStore";
   this.interface.getModel = true;
   this.store = {};

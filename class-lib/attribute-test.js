@@ -8,15 +8,15 @@ test.runnerAttribute = function () {
       ' dependencies on Models however and can be used beyond that.');
     test.heading('CONSTRUCTOR', function () {
       test.example('objects created should be an instance of Attribute', true, function () {
-        return new Attribute({name: 'aMust'}) instanceof Attribute;
+        return new Attribute({name: 'name'}) instanceof Attribute;
+      });
+      test.example('should make sure new operator used', Error('new operator required'), function () {
+        Attribute({name: 'name'});
       });
       test.example('should make sure properties are valid', Error('error creating Attribute: invalid property: sex'), function () {
         new Attribute({name: 'name', sex: 'female'});
       });
-      test.example('should make sure new operator used', Error('new operator required'), function () {
-        Attribute({name: 'Name'});
-      });
-      test.example('should validate and throw errors before returning from function', Error('error creating Attribute: multiple errors'), function () {
+      test.example('should validate and throw errors before returning from constructor', Error('error creating Attribute: multiple errors'), function () {
         new Attribute({eman: 'the'}); // 2 errors: name missing and eman an unknown property
       });
     });
@@ -261,4 +261,3 @@ test.runnerAttribute = function () {
     });
   });
 };
-

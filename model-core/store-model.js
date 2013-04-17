@@ -4,9 +4,9 @@
  */
 
 // Constructor
-var Store = function () {
+var Store = function (args) {
   if (false === (this instanceof Store)) throw new Error('new operator required');
-  Model.call(this);
+  Model.call(this,args);
   this.modelType = "Store";
   this.interface = {
     getModel: false,

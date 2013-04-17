@@ -27,7 +27,8 @@ test.runnerStoreModel = function (SurrogateStoreModel) {
         test.example('getModel(model) must pass valid model', Error('argument must be a Model'), function () {
           new SurrogateStoreModel().getModel();
         });
-        test.xexample('getModel(model) must have ID set', Error('xxx'), function () {
+        test.
+          xexample('getModel(model) must have ID set', Error('xxx'), function () {
           new SurrogateStoreModel().getModel(new Model());
         });
 
