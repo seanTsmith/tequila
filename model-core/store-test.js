@@ -40,14 +40,6 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
             m.attributes[0].value = 1;
             new SurrogateStoreModel().getModel(m);
           });
-          test.example('getModel(model) throws exception when model is not found in store',
-            Error('cannot locate Model(Curly) in '+ new SurrogateStoreModel().modelType), function () {
-            var m = new Model();
-            m.attributes[0].value = "Curly";
-            new SurrogateStoreModel().getModel(m,function(){
-              // this is not right THINK :)
-            });
-          });
         } else{
           test.example('getModel() is not implemented', Error(new SurrogateStoreModel().modelType+ ' does not provide getModel'), function () {
             new SurrogateStoreModel().getModel();
@@ -56,8 +48,18 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
       });
       test.heading('putModel', function () {
         if (interface['putModel']) {
-          test.example('putModel() is not implemented', undefined, function () {
+          test.example('must pass valid model', Error('argument must be a Model'), function () {
             new SurrogateStoreModel().putModel();
+          });
+          test.example('model must have no validation errors', Error('model has validation errors'), function () {
+            var m = new Model();
+            m.attributes = null;
+            new SurrogateStoreModel().putModel(m);
+          });
+          test.example('callback function required', Error('callback required'), function () {
+            var m = new Model();
+            m.attributes[0].value = 1;
+            new SurrogateStoreModel().putModel(m);
           });
         } else {
           test.example('putModel() is not implemented', Error('Store does not provide putModel'), function () {
@@ -67,8 +69,18 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
       });
       test.heading('deleteModel', function () {
         if (interface['deleteModel']) {
-          test.example('deleteModel() is not implemented', undefined, function () {
+          test.example('must pass valid model', Error('argument must be a Model'), function () {
             new SurrogateStoreModel().deleteModel();
+          });
+          test.example('model must have no validation errors', Error('model has validation errors'), function () {
+            var m = new Model();
+            m.attributes = null;
+            new SurrogateStoreModel().deleteModel(m);
+          });
+          test.example('callback function required', Error('callback required'), function () {
+            var m = new Model();
+            m.attributes[0].value = 1;
+            new SurrogateStoreModel().deleteModel(m);
           });
         } else {
           test.example('deleteModel() is not implemented', Error('Store does not provide deleteModel'), function () {
