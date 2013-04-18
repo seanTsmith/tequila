@@ -15,7 +15,7 @@ test.heading('CLASS LIBRARY', function () {
 test.heading('CORE MODELS', function () {
   test.paragraph('These are models that are defined as part of the tequila core and are used in this library.');
   test.runnerUserModel();
-  test.runnerStoreModel(Store);
+  test.runnerStoreModel(Store),false;
   test.runnerMemoryStoreModel();
 });
 test.heading('SYSTEM INTEGRATION', function () {

@@ -8,6 +8,6 @@ test.runnerMemoryStoreModel = function () {
     test.example('objects created should be an instance of MemoryStore', true, function () {
       return new MemoryStore() instanceof MemoryStore;
     });
-    test.runnerStoreModel(MemoryStore);
+    test.runnerStoreModel(MemoryStore,true);
   });
 };

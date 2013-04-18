@@ -374,7 +374,7 @@ test.updateStats = function () {
   var miniPad, i;
   newtequilaStats = '☠';
   if (test.countPass > 0) newtequilaStats = '☺';
-  if (test.countDefer > 0) newtequilaStats = '☻';
+//  if (test.countDefer > 0) newtequilaStats = '☻';
   if (test.countFail > 0) newtequilaStats = '☹';
   if (test.tequilaStats != test.countUnique+newtequilaStats) {
     test.tequilaStats = test.countUnique+newtequilaStats;

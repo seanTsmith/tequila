@@ -4,7 +4,6 @@
  */
 var Tequila = (function () {
   var singletonInstance;
-
   function init() {
     // Private methods and variables
     var version = '0.0.1';
@@ -52,6 +51,5 @@ var Tequila = (function () {
     return singletonInstance;
   };
 })();
-
 // Library scoped ref to singleton
 var T = Tequila();

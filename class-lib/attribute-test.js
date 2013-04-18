@@ -5,7 +5,7 @@
 test.runnerAttribute = function () {
   test.heading('Attribute Class', function () {
     test.paragraph('Attributes are the means for models to represent data of different types.  They have no' +
-      ' dependencies on Models however and can be used beyond that.');
+      ' dependencies on Models however and can be used without creating a model.');
     test.heading('CONSTRUCTOR', function () {
       test.example('objects created should be an instance of Attribute', true, function () {
         return new Attribute({name: 'name'}) instanceof Attribute;
@@ -159,7 +159,7 @@ test.runnerAttribute = function () {
           return new Attribute({name: 'stuff', type: 'Group'}).type;
         });
         test.example('deep check value for valid Attributes that pass getValidationErrors() test', 1, function () {
-          // this example is just to conventionalize nested components
+          // this example is just to conceptualize nested components
           var myStuff = new Attribute("stuff", "Group");
           var myCars = new Attribute("cars", "Group");
           var myFood = new Attribute("food", "Group");

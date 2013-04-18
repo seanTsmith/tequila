@@ -5,12 +5,14 @@
 test.runnerTequila = function () {
   test.heading('Tequila Singleton', function () {
     test.paragraph('The Tequila Singleton provides a namespace for the library.  In it is access to the classes ' +
-      'that make up the library, a series of helper functions.');
+      'that make up the library and a collection of helper methods.');
     test.heading('CONSTRUCTOR', function () {
+      test.paragraph('The object is instantiated upon loading the source file.  Any call to Tequila() will return a ' +
+        'reference to the singleton.');
       test.example('multiple instances are deep equal', true, function () {
         return (Tequila() === Tequila() && Tequila() === new Tequila());
       });
-      test.example('A reference is avabailable internally to all modules in the library "T"', true, function () {
+      test.example('A reference is available internally to all modules in the library "T"', true, function () {
         return T === Tequila();
       });
     });
