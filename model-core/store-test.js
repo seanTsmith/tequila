@@ -40,6 +40,10 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
             m.attributes[0].value = 1;
             new SurrogateStoreModel().getModel(m);
           });
+          test.example('fucking async shit', test.AsyncResponse('tit'), function (shit) {
+            shit();
+          });
+
         } else{
           test.example('getModel() is not implemented', Error(new SurrogateStoreModel().modelType+ ' does not provide getModel'), function () {
             new SurrogateStoreModel().getModel();

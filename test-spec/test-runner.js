@@ -21,6 +21,9 @@ var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func
 var test = {};
 test.converter = new Markdown.Converter();
 test.showWork = [];
+test.AsyncResponse = function(wut){
+  return 'test.AsyncResponse: '+wut;
+};
 test.start = function (options) {
   this.nodes = [];
   this.exampleNumber = 0;
@@ -291,7 +294,11 @@ test.render = function (isBrowser) {
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.showWork = [];
           test.assertions = [];
-          var test_Results = test.callTestCode(test.nodes[i].func);
+          var fuckShit = function() {
+            console.log('fuckShit');
+            throw new Error('hissy fit');
+          }
+          var test_Results = test.callTestCode(test.nodes[i].func,fuckShit);
           ranTest = true;
           var exampleCode = '';
           exampleCode += test.formatCode(test.nodes[i].func, true);
@@ -415,10 +422,10 @@ test.shouldThrow = function (err, func) {
       if (err.toString() != e.toString() && err.toString() != '*') throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
   }
 }
-test.callTestCode = function (func) {
+test.callTestCode = function (func,funkytown) {
   try {
     test.wasThrown = false;
-    return func();
+    return func(funkytown);
   } catch (e) {
     test.wasThrown = true;
     return e;
