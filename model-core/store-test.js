@@ -17,13 +17,13 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
         var interface = new SurrogateStoreModel().getStoreInterface();
         test.show(interface);
         test.assertion(interface instanceof Object);
-        test.assertion(typeof interface['getModel'] == 'boolean');
-        test.assertion(typeof interface['putModel'] == 'boolean');
-        test.assertion(typeof interface['deleteModel'] == 'boolean');
+        test.assertion(typeof interface['canGetModel'] == 'boolean');
+        test.assertion(typeof interface['canPutModel'] == 'boolean');
+        test.assertion(typeof interface['canDeleteModel'] == 'boolean');
       });
       var interface = new SurrogateStoreModel().getStoreInterface();
       test.heading('getModel', function () {
-        if (interface['getModel']) {
+        if (interface['canGetModel']) {
           test.example('must pass valid model', Error('argument must be a Model'), function () {
             new SurrogateStoreModel().getModel();
           });
@@ -40,8 +40,16 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
             m.attributes[0].value = 1;
             new SurrogateStoreModel().getModel(m);
           });
-          test.example('fucking async shit', test.AsyncResponse('tit'), function (shit) {
-            shit();
+          test.example('returns error when model not found', test.AsyncResponse(Error('model not found in store')), function (testNode, returnResponse) {
+            var m = new Model();
+            m.attributes[0].value = 1;
+            new SurrogateStoreModel().getModel(m,function(mod,err) {
+              if (err) {
+                returnResponse(testNode,err);
+              } else {
+                returnResponse(testNode,mod);
+              }
+            });
           });
 
         } else{
@@ -51,7 +59,7 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
         }
       });
       test.heading('putModel', function () {
-        if (interface['putModel']) {
+        if (interface['canPutModel']) {
           test.example('must pass valid model', Error('argument must be a Model'), function () {
             new SurrogateStoreModel().putModel();
           });
@@ -72,7 +80,7 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
         }
       });
       test.heading('deleteModel', function () {
-        if (interface['deleteModel']) {
+        if (interface['canDeleteModel']) {
           test.example('must pass valid model', Error('argument must be a Model'), function () {
             new SurrogateStoreModel().deleteModel();
           });

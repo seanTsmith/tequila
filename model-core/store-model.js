@@ -9,9 +9,9 @@ var Store = function (args) {
   Model.call(this,args);
   this.modelType = "Store";
   this.interface = {
-    getModel: false,
-    putModel: false,
-    deleteModel: false
+    canGetModel: false,
+    canPutModel: false,
+    canDeleteModel: false
   };
 };
 Store.prototype = T.inheritPrototype(Model.prototype);

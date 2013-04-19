@@ -21,8 +21,8 @@ var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func
 var test = {};
 test.converter = new Markdown.Converter();
 test.showWork = [];
-test.AsyncResponse = function(wut){
-  return 'test.AsyncResponse: '+wut;
+test.AsyncResponse = function (wut) {
+  return 'test.AsyncResponse: ' + wut;
 };
 test.start = function (options) {
   this.nodes = [];
@@ -105,6 +105,60 @@ test.render = function (isBrowser) {
   test.countPass = 0;
   test.countFail = 0;
   test.countDefer = 0;
+  test.countPending = 0;
+  test.testsLaunched = false;
+  // function to evaluate results of async
+  var asyncCallback = function (node, test_Results) {
+    if (node.errorThrown) return;
+    var testPassed = false;
+    test.wasThrown = false;
+    var expectedValue = node.expectedValue.substr(20, 999);
+    exampleCode = '';
+    if (typeof test_Results == 'undefined') {
+      if (typeof expectedValue == 'undefined') testPassed = true;
+    } else {
+      if (typeof expectedValue != 'undefined' && test_Results.toString() === expectedValue.toString()) testPassed = true;
+    }
+    // Check assertions
+    var gotFailedAssertions = false;
+    for (var j in test.assertions) {
+      if (!test.assertions[j]) gotFailedAssertions = true;
+    }
+    test.countPending--;
+    if (testPassed && !gotFailedAssertions) {
+      test.countPass++;
+      node.examplePre.style.background = "#cfc"; // green
+      if (test.wasThrown) {
+        exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
+      } else {
+        if (typeof test_Results == 'undefined') {
+          exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
+        } else {
+          exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+        }
+      }
+    } else {
+      // clear invisible attribute if failed
+      node.examplePre.style.display = "";
+      node.exampleCaption.style.display = "";
+      test.countFail++;
+      node.examplePre.style.background = "#fcc"; // red
+      if (test.wasThrown) {
+        if (node.expectedValue === undefined) {
+          exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+        } else {
+          exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>';
+        }
+      } else if (testPassed && gotFailedAssertions) {
+        exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
+      } else {
+        exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>'; // ✘
+      }
+    }
+    node.examplePre.innerHTML = '<code>' + exampleCode + '</code>';
+
+    test.updateStats();
+  };
   // Browser Dressing
   if (isBrowser) {
     // Get vars from URL
@@ -113,24 +167,24 @@ test.render = function (isBrowser) {
     test.filterTest = test.getParam('ft');
     test.filterLevel = test.getParam('fl') || 'All';
     // Fixed Header Div
-    var headerDiv = document.createElement("div");
-    headerDiv.style.display = 'inline-block';
-    headerDiv.align = 'center';
-    headerDiv.style.position = 'fixed';
-    headerDiv.style.top = '0px';
-    headerDiv.style.margin = '0px';
-    headerDiv.style.padding = '0px';
-    headerDiv.style.zIndex = '100000';
-    headerDiv.style.width = '100%';
-    headerDiv.style.background = '#AA4'; // yellow header to start
-    document.body.appendChild(headerDiv);
+    test.headerDiv = document.createElement("div");
+    test.headerDiv.style.display = 'inline-block';
+    test.headerDiv.align = 'center';
+    test.headerDiv.style.position = 'fixed';
+    test.headerDiv.style.top = '0px';
+    test.headerDiv.style.margin = '0px';
+    test.headerDiv.style.padding = '0px';
+    test.headerDiv.style.zIndex = '100000';
+    test.headerDiv.style.width = '100%';
+    test.headerDiv.style.background = '#AA4'; // yellow header to start
+    document.body.appendChild(test.headerDiv);
     // div for controls
     var controls = document.createElement("div");
     controls.id = "controls";
     controls.style.display = 'inline-block';
     controls.style.padding = '0px';
     controls.style.margin = '0px 0px'; // was 0 / 16
-    headerDiv.appendChild(controls);
+    test.headerDiv.appendChild(controls);
     // control button maker
     var buttonControl = function (text, help, func) {
       var control = document.createElement("button");
@@ -247,7 +301,7 @@ test.render = function (isBrowser) {
 //          if (dots < 2)
 //            p.innerHTML = test.nodes[i].text;
 //          else
-            p.innerHTML = lt + ' ' + test.nodes[i].text;
+          p.innerHTML = lt + ' ' + test.nodes[i].text;
           p.onclick = function () {
             var words = this.innerText.split(' ');
             test.filterSection = '';
@@ -269,7 +323,7 @@ test.render = function (isBrowser) {
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.showWork = [];
-          var test_Results = test.callTestCode(test.nodes[i].func);
+          var test_Results = test.callTestCode(test.nodes[i]);
           if (test_Results.toString() !== test.nodes[i].expectedValue.toString()) {
             test.countFail++;
             console.log('\n' + colors.red('✘') + colors.white(' RETURNED: ' + test.expressionInfo(test_Results) + ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
@@ -288,56 +342,64 @@ test.render = function (isBrowser) {
         var caption = document.createElement("caption");
         caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>';
         var pre = document.createElement("pre");
+        test.nodes[i].exampleCaption = caption;
+        test.nodes[i].examplePre = pre;
         pre.className = "prettyprint";
         test.countTests++;
         if (!test.nodes[i].inheritanceTest) test.countUnique++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+          test.nodes[i].asyncTest = false;
+          if (typeof (test.nodes[i].expectedValue) != 'undefined') {
+            if (test.nodes[i].expectedValue.toString().indexOf('test.AsyncResponse') == 0)
+              test.nodes[i].asyncTest = true;
+          }
           test.showWork = [];
           test.assertions = [];
-          var fuckShit = function() {
-            console.log('fuckShit');
-            throw new Error('hissy fit');
-          }
-          var test_Results = test.callTestCode(test.nodes[i].func,fuckShit);
-          ranTest = true;
           var exampleCode = '';
           exampleCode += test.formatCode(test.nodes[i].func, true);
-          if (typeof test_Results == 'undefined') {
-            if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
+          if (test.nodes[i].asyncTest) {
+            exampleCode += '✍<b>pending async results</b>';
+            test.countPending++;
+            pre.style.background = "#ffa500"; // oranges
           } else {
-            if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
-          }
-          // Check assertions
-          var gotFailedAssertions = false;
-          for (var j in test.assertions) {
-            if (!test.assertions[j]) gotFailedAssertions = true;
-          }
-          if (testPassed && !gotFailedAssertions) {
-            test.countPass++;
-            pre.style.background = "#cfc"; // green
-            if (test.wasThrown) {
-              exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
+            var test_Results = test.callTestCode(test.nodes[i], asyncCallback);
+            ranTest = true;
+            if (typeof test_Results == 'undefined') {
+              if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
             } else {
-              if (typeof test_Results == 'undefined') {
-                exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
-              } else {
-                exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
-              }
+              if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
             }
-          } else {
-            test.countFail++;
-            if (test.countFail) headerDiv.style.background = '#F33'; // fail color color
-            pre.style.background = "#fcc"; // red
-            if (test.wasThrown) {
-              if (test.nodes[i].expectedValue === undefined) {
-                exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+            // Check assertions
+            var gotFailedAssertions = false;
+            for (var j in test.assertions) {
+              if (!test.assertions[j]) gotFailedAssertions = true;
+            }
+            if (testPassed && !gotFailedAssertions) {
+              test.countPass++;
+              pre.style.background = "#cfc"; // green
+              if (test.wasThrown) {
+                exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
               } else {
-                exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>';
+                if (typeof test_Results == 'undefined') {
+                  exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
+                } else {
+                  exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+                }
               }
-            } else if (testPassed && gotFailedAssertions) {
-              exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
             } else {
-              exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+              test.countFail++;
+              pre.style.background = "#fcc"; // red
+              if (test.wasThrown) {
+                if (test.nodes[i].expectedValue === undefined) {
+                  exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+                } else {
+                  exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>';
+                }
+              } else if (testPassed && gotFailedAssertions) {
+                exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
+              } else {
+                exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+              }
             }
           }
           pre.innerHTML = '<code>' + exampleCode + '</code>';
@@ -355,19 +417,43 @@ test.render = function (isBrowser) {
         var showExample = !test.hideExamples;
         if (isFiltered) showExample = false;
         if (ranTest && !testPassed) showExample = true;
-        if (showExample) innerDiv.appendChild(caption);
-        if (showExample) innerDiv.appendChild(pre);
+        if (test.nodes[i].asyncTest) {
+          if (!showExample) pre.style.display = "none";
+          if (!showExample) caption.style.display = "none";
+          innerDiv.appendChild(caption);
+          innerDiv.appendChild(pre);
+        } else {
+          if (showExample) innerDiv.appendChild(caption);
+          if (showExample) innerDiv.appendChild(pre);
+        }
         test.updateStats();
         if (ranTest && !testPassed && scrollFirstError < 1) {
           scrollFirstError = document.height - document.documentElement.clientHeight;
         }
+        if (test.nodes[i].asyncTest) {
+          test.nodes[i].errorThrown = false;
+          var err = test.callTestCode(test.nodes[i], asyncCallback);
+          if (test.wasThrown) {
+            test.countPending--;
+            test.countFail++;
+            test.nodes[i].errorThrown = true;
+            exampleCode = test.formatCode(test.nodes[i].func, true);
+            exampleCode += '<b>✘ERROR THROWN: ' + err + '\n';
+            pre.innerHTML = '<code>' + exampleCode + '</code>';
+            test.nodes[i].examplePre.style.display = "";
+            test.nodes[i].exampleCaption.style.display = "";
+            test.nodes[i].examplePre.style.background = "#fcc"; // red
+            test.updateStats();
+          }
+        }
         break;
     }
   }
+  test.testsLaunched = true;
+  test.updateStats();
   if (isBrowser) {
     if (scrollFirstError > 0)
       window.scroll(0, scrollFirstError);
-    if (!test.countFail) headerDiv.style.background = '#6C7'; // pass color
   } else {
     var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
     if (test.countFail)
@@ -377,21 +463,16 @@ test.render = function (isBrowser) {
   }
 };
 test.updateStats = function () {
-
   var miniPad, i;
   newtequilaStats = '☠';
   if (test.countPass > 0) newtequilaStats = '☺';
-//  if (test.countDefer > 0) newtequilaStats = '☻';
   if (test.countFail > 0) newtequilaStats = '☹';
-  if (test.tequilaStats != test.countUnique+newtequilaStats) {
-    test.tequilaStats = test.countUnique+newtequilaStats;
-    //    test.textTestDefer = 'todo<br>' + '<code class="counter_yellow">$1</code>';
-
+  if (test.tequilaStats != test.countUnique + newtequilaStats) {
+    test.tequilaStats = test.countUnique + newtequilaStats;
     var myName = newtequilaStats + ' ' + test.countUnique.toString();
     for (miniPad = '', i = 0; i < (3 - myName.toString().length); i++) miniPad += '&nbsp;'
     test.btnTequila.innerHTML = 'tequila<br><code class="counter">' + miniPad + myName + '</code>' + '<span class="classic">' + test.helpTestTequila + '</span>';
   }
-
   if (!test.lastCountPass || test.lastCountPass != test.countPass) {
     test.lastCountPass = test.countPass;
     for (miniPad = '', i = 0; i < (3 - test.countPass.toString().length); i++) miniPad += '&nbsp;'
@@ -402,10 +483,14 @@ test.updateStats = function () {
     for (miniPad = '', i = 0; i < (3 - test.countFail.toString().length); i++) miniPad += '&nbsp;'
     test.btnTestFail.innerHTML = test.textTestFail.replace('$1', miniPad + test.countFail) + '<span class="classic">' + test.helpTestFail + '</span>';
   }
-  if (!test.lastCountDefer || test.lastCountDefer != test.countDefer) {
-    test.lastCountDefer = test.countDefer;
-    for (miniPad = '', i = 0; i < (3 - test.countDefer.toString().length); i++) miniPad += '&nbsp;'
-    test.btnTestDefer.innerHTML = test.textTestDefer.replace('$1', miniPad + test.countDefer) + '<span class="classic">' + test.helpTestDefer + '</span>';
+  if (!test.lastCountDefer || test.lastCountDefer != (test.countDefer + test.countPending)) {
+    test.lastCountDefer = test.countDefer + test.countPending;
+    for (miniPad = '', i = 0; i < (3 - test.lastCountDefer.toString().length); i++) miniPad += '&nbsp;'
+    test.btnTestDefer.innerHTML = test.textTestDefer.replace('$1', miniPad + test.lastCountDefer) + '<span class="classic">' + test.helpTestDefer + '</span>';
+  }
+  if (test.testsLaunched && test.countPending < 1) {
+    if (test.countFail) test.headerDiv.style.background = '#F33'; // fail color color
+    if (!test.countFail) test.headerDiv.style.background = '#6C7'; // pass color
   }
 }
 test.expressionInfo = function (expr) {
@@ -422,10 +507,10 @@ test.shouldThrow = function (err, func) {
       if (err.toString() != e.toString() && err.toString() != '*') throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
   }
 }
-test.callTestCode = function (func,funkytown) {
+test.callTestCode = function (node, funkytown) {
   try {
     test.wasThrown = false;
-    return func(funkytown);
+    return node.func(node, funkytown);
   } catch (e) {
     test.wasThrown = true;
     return e;
@@ -485,6 +570,5 @@ test.formatCode = function (txt, rancode) {
     for (j = 1; j < spaceOut; j++) output += ' ';
     output += marks[i] + lines[i] + '\n';
   }
-
   return output;
 };
