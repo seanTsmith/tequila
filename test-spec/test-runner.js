@@ -356,14 +356,15 @@ test.render = function (isBrowser) {
           test.showWork = [];
           test.assertions = [];
           var exampleCode = '';
-          exampleCode += test.formatCode(test.nodes[i].func, true);
           if (test.nodes[i].asyncTest) {
+            exampleCode += test.formatCode(test.nodes[i].func, true);
             exampleCode += '✍<b>pending async results</b>';
             test.countPending++;
             pre.style.background = "#ffa500"; // oranges
           } else {
             var test_Results = test.callTestCode(test.nodes[i], asyncCallback);
             ranTest = true;
+            exampleCode += test.formatCode(test.nodes[i].func, true);
             if (typeof test_Results == 'undefined') {
               if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
             } else {
