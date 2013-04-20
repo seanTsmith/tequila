@@ -51,7 +51,6 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
               }
             });
           });
-
         } else{
           test.example('getModel() is not implemented', Error(new SurrogateStoreModel().modelType+ ' does not provide getModel'), function () {
             new SurrogateStoreModel().getModel();
@@ -73,6 +72,17 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
             m.attributes[0].value = 1;
             new SurrogateStoreModel().putModel(m);
           });
+          test.example('returns error when model not found', test.AsyncResponse(Error('model not found in store')), function (testNode, returnResponse) {
+            var m = new Model();
+            m.attributes[0].value = 1;
+            new SurrogateStoreModel().putModel(m,function(mod,err) {
+              if (err) {
+                returnResponse(testNode,err);
+              } else {
+                returnResponse(testNode,mod);
+              }
+            });
+          });
         } else {
           test.example('putModel() is not implemented', Error('Store does not provide putModel'), function () {
             new SurrogateStoreModel().putModel();
@@ -93,6 +103,17 @@ test.runnerStoreModel = function (SurrogateStoreModel, isSubClass) {
             var m = new Model();
             m.attributes[0].value = 1;
             new SurrogateStoreModel().deleteModel(m);
+          });
+          test.example('returns error when model not found', test.AsyncResponse(Error('model not found in store')), function (testNode, returnResponse) {
+            var m = new Model();
+            m.attributes[0].value = 1;
+            new SurrogateStoreModel().deleteModel(m,function(mod,err) {
+              if (err) {
+                returnResponse(testNode,err);
+              } else {
+                returnResponse(testNode,mod);
+              }
+            });
           });
         } else {
           test.example('deleteModel() is not implemented', Error('Store does not provide deleteModel'), function () {

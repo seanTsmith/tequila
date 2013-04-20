@@ -263,7 +263,8 @@ test.render = function (isBrowser) {
     // Check filters
     var filterSection = (test.filterSection + '.');
     if (filterSection.indexOf('..') >= 0) filterSection = (test.filterSection);
-    var curSection = (test.nodes[i].levelText);
+    var curSection = test.nodes[i].levelText;
+    var testNodeType = test.nodes[i].nodeType;
     var isFiltered = false;
     var dots = 0;
     for (j = 0; j < curSection.length; j++) if (curSection[j] == '.') dots++;
@@ -279,12 +280,12 @@ test.render = function (isBrowser) {
     }
     if (test.filterSection && curSection.indexOf(filterSection) != 0) {
       isFiltered = true;
-      if (filterSection.indexOf(curSection) == 0) {
+      if (testNodeType != 'e' && filterSection.indexOf(curSection) == 0) {
         isFiltered = false;
       }
     }
     if (test.nodes[i].inheritanceTest) isFiltered = true;
-    var testNodeType = test.nodes[i].nodeType;
+//    console.log(testNodeType+' '+isFiltered.toString()+' '+filterSection+' '+curSection);
     if (!isBrowser) {
       if (testNodeType == 'e') {
         testNodeType = '.';

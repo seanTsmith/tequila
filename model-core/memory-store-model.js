@@ -18,15 +18,17 @@ MemoryStore.prototype.getModel = function (model,callBack) {
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (!model.attributes[0].value) throw new Error('ID not set');
   if (typeof callBack != "function") throw new Error('callback required');
-  callBack(model,new Error('model not found in store'))
+  callBack(model,new Error('model not found in store'));
 };
-MemoryStore.prototype.putModel = function (model /* {modelType:model} */) {
+MemoryStore.prototype.putModel = function (model,callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
+  callBack(model,new Error('model not found in store'));
 };
-MemoryStore.prototype.deleteModel = function (model /* {modelType:modelID} */) {
+MemoryStore.prototype.deleteModel = function (model,callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
+  callBack(model,new Error('model not found in store'));
 };
