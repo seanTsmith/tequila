@@ -1,20 +1,20 @@
 /**
  * tequila
- * collection-test
+ * list-test
  */
 
-test.runnerCollection = function (SurrogateCollectionClass, inheritanceTest) {
+test.runnerList = function (SurrogateListClass, inheritanceTest) {
   var inheritanceTestWas = T.inheritanceTest;
   T.inheritanceTest = inheritanceTest;
-  test.heading('Collection Class', function () {
-//    test.paragraph('The Collection Class is a container for Model sets.');
+  test.heading('List Class', function () {
+//    test.paragraph('The List Class is a container for Model sets.');
 //    test.heading('CONSTRUCTOR', function () {
 //      test.paragraph('Creation of all Collections must adhere to following examples:');
-//      test.example('objects created should be an instance of Collection', true, function () {
-//        return new SurrogateCollectionClass() instanceof Collection;
+//      test.example('objects created should be an instance of List', true, function () {
+//        return new SurrogateListClass() instanceof List;
 //      });
 //      test.example('should make sure new operator used', Error('new operator required'), function () {
-//        Collection();
+//        List();
 //      });
 //    });
 //    test.heading('PROPERTIES', function () {
@@ -26,7 +26,7 @@ test.runnerCollection = function (SurrogateCollectionClass, inheritanceTest) {
 //          test.paragraph('Associative array, no duplicate IDs, single Model.');
 //        });
 //        test.heading('list', function () {
-//          test.paragraph('Collection of Models of same type with order in list preserved.');
+//          test.paragraph('List of Models of same type with order in list preserved.');
 //        });
 //        test.heading('filter', function () {
 //          test.paragraph('Calculated collection of Models of same type based filter and order properties.');
@@ -35,7 +35,7 @@ test.runnerCollection = function (SurrogateCollectionClass, inheritanceTest) {
 //          test.paragraph('Repository of Collections.  Primary usage with StoreInterface.');
 //        });
 //        test.heading('workspace', function () {
-//          test.paragraph('Collection of Models of any type or other Collections');
+//          test.paragraph('List of Models of any type or other Collections');
 //        });
 //      });
 //      test.heading('modelType', function () {

@@ -3,22 +3,21 @@
  * tequila-spec
  */
 test.start();
-test.heading('CLASS LIBRARY', function () {
-  test.paragraph('The class library is a set of base class definitions that are extended into subclasses then' +
-    ' can be instantiated for usage.  The inheritance is via javascript prototypical inheritance in conjunction' +
-    ' with a helper function to extend the prototype of objects.');
+test.heading('CORE CLASSES', function () {
+  test.paragraph('The core classes provide a abstract interface that are subclassed via prototypical inheritance.');
   test.runnerTequila();
   test.runnerAttribute();
   test.runnerModel(Model,false);
-  test.runnerCollection(Collection,false);
+  test.runnerList(List,false);
 });
 test.heading('CORE MODELS', function () {
-  test.paragraph('These are models that are defined as part of the tequila core and are used in this library.');
+  test.paragraph('The core models inherit from the core classes and provide the framework structure.');
   test.runnerUserModel();
-  test.runnerStoreModel(Store),false;
+  test.runnerStoreModel();
   test.runnerMemoryStoreModel();
 });
 test.heading('SYSTEM INTEGRATION', function () {
-  test.paragraph('This area contains system integration test and further documents the usage of this library.');
+  test.paragraph('The system functionality and requirements for the library as a whole is contained in this section.');
+  test.runnerStoreIntegration();
 });
 test.stop();

@@ -44,3 +44,18 @@ Model.prototype.getValidationErrors = function () {
   }
   return errors;
 };
+Model.prototype.getAttributeValue = function(attribute) {
+  for (var i = 0; i < this.attributes.length; i++) {
+    if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase())
+      return this.attributes[i].value;
+  }
+};
+Model.prototype.setAttributeValue = function(attribute,value) {
+  for (var i = 0; i < this.attributes.length; i++) {
+    if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase()) {
+      this.attributes[i].value = value;
+      return;
+    }
+  }
+  throw new Error('attribute not valid for model');
+};

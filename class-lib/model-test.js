@@ -69,6 +69,27 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           return m.getValidationErrors();
         });
       });
+      test.heading('getAttributeValue(attributeName)', function () {
+        test.example('returns undefined if the attribute does not exists', undefined, function () {
+          return new SurrogateModelClass().getAttributeValue('whatever');
+        });
+        test.example("returns the value for given attribute", 42, function () {
+          var question = new SurrogateModelClass({attributes: [new Attribute('answer','Number')]});
+          question.attributes[1].value = 42;
+          return question.getAttributeValue('answer');
+        });
+      });
+      test.heading('setAttributeValue(attributeName,value)', function () {
+        test.example('throws an error if the attribute does not exists', Error('attribute not valid for model'), function () {
+          new SurrogateModelClass().setAttributeValue('whatever');
+        });
+        test.example("sets the value for given attribute", 42, function () {
+          var question = new SurrogateModelClass({attributes: [new Attribute('answer','Number')]});
+          question.setAttributeValue('answer',42);
+          return question.attributes[1].value;
+        });
+      });
+
     });
   });
   T.inheritanceTest = inheritanceTestWas;

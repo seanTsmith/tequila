@@ -265,17 +265,17 @@ test.render = function (isBrowser) {
     if (filterSection.indexOf('..') >= 0) filterSection = (test.filterSection);
     var curSection = test.nodes[i].levelText;
     var testNodeType = test.nodes[i].nodeType;
-    var isFiltered = false;
-    var dots = 0;
-    for (j = 0; j < curSection.length; j++) if (curSection[j] == '.') dots++;
+    var dotCount = curSection.match(/\./g) ? curSection.match(/\./g).length : 0;
+    var isInScope = curSection.indexOf(filterSection) == 0;
+    var isFiltered = false; // If true will not be rendered
     switch (test.filterLevel) {
       case 'TOC':
         test.filterLevel = 'TOC';
-        if (dots > 2) isFiltered = true;
+        if (!isInScope && dotCount > 2) isFiltered = true;
         break;
       case 'Mid':
         test.filterLevel = 'Mid'; // TOC with paragraph text
-        if (dots > 2) isFiltered = true;
+        if (!isInScope && dotCount > 2) isFiltered = true;
         break;
     }
     if (test.filterSection && curSection.indexOf(filterSection) != 0) {
@@ -285,7 +285,7 @@ test.render = function (isBrowser) {
       }
     }
     if (test.nodes[i].inheritanceTest) isFiltered = true;
-//    console.log(testNodeType+' '+isFiltered.toString()+' '+filterSection+' '+curSection);
+//    console.log((isInScope?'SCOPE ':'scope ')+testNodeType+(isFiltered?' FILTER ':' filter ')+filterSection+' '+curSection);
     if (!isBrowser) {
       if (testNodeType == 'e') {
         testNodeType = '.';
@@ -314,7 +314,7 @@ test.render = function (isBrowser) {
         }
         break;
       case 'p':
-        if (!isFiltered && (dots < 2 || test.filterLevel != 'TOC')) {
+        if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
           var p = document.createElement("p");
           p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
           innerDiv.appendChild(p);
@@ -368,6 +368,8 @@ test.render = function (isBrowser) {
             exampleCode += test.formatCode(test.nodes[i].func, true);
             if (typeof test_Results == 'undefined') {
               if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
+            } else if (test_Results === null) {
+              if (typeof test.nodes[i].expectedValue != 'undefined' && test.nodes[i].expectedValue === null) testPassed = true;
             } else {
               if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
             }
