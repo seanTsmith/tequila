@@ -59,6 +59,32 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           return new SurrogateModelClass().toString();
         });
       });
+      test.heading('copy(sourceModel)', function () {
+        test.example('copy all attribute values of a model', undefined, function () {
+          var Foo = function (args) {
+            Model.call(this, args);
+            this.modelType = "Foo";
+            this.attributes.push(new Attribute('name'));
+          };
+          Foo.prototype = T.inheritPrototype(Model.prototype);
+          var m1 = new Foo();
+          var m2 = new Foo();
+          var m3 = m1;
+          m1.setAttributeValue('name', 'Bar');
+          m2.setAttributeValue('name', 'Bar');
+          // First demonstrate instance ref versus anothel model with equal attributes
+          test.assertion(m1 === m3); // assigning one model to variable references same instance
+          test.assertion(m3.getAttributeValue('name') === 'Bar'); // m3 changed when m1 changed
+          test.assertion(m1 !== m2); // 2 models are not the same instance
+          test.assertion(JSON.stringify(m1) === JSON.stringify(m2)); // but they are identical
+          // clone m1 into m4 and demonstrate that contents equal but not same ref to object
+          var m4 = new Foo();
+          m4.copy(m1);
+          test.assertion(m1 !== m4); // 2 models are not the same instance
+          test.assertion(JSON.stringify(m1) === JSON.stringify(m4)); // but they are identical
+        });
+      });
+
       test.heading('getValidationErrors()', function () {
         test.example('should return array of validation errors', undefined, function () {
           test.assertion(new SurrogateModelClass().getValidationErrors() instanceof Array);
@@ -74,7 +100,7 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           return new SurrogateModelClass().getAttributeValue('whatever');
         });
         test.example("returns the value for given attribute", 42, function () {
-          var question = new SurrogateModelClass({attributes: [new Attribute('answer','Number')]});
+          var question = new SurrogateModelClass({attributes: [new Attribute('answer', 'Number')]});
           question.attributes[1].value = 42;
           return question.getAttributeValue('answer');
         });
@@ -84,8 +110,8 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           new SurrogateModelClass().setAttributeValue('whatever');
         });
         test.example("sets the value for given attribute", 42, function () {
-          var question = new SurrogateModelClass({attributes: [new Attribute('answer','Number')]});
-          question.setAttributeValue('answer',42);
+          var question = new SurrogateModelClass({attributes: [new Attribute('answer', 'Number')]});
+          question.setAttributeValue('answer', 42);
           return question.attributes[1].value;
         });
       });

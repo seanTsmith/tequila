@@ -385,7 +385,7 @@ test.render = function (isBrowser) {
                 exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
               } else {
                 if (typeof test_Results == 'undefined') {
-                  exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
+                  exampleCode += '✓<b>returns without harming any kittens</b>'; // TODO This is wrong for async since tests are not really done yet!!!
                 } else {
                   exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
                 }
@@ -546,8 +546,8 @@ test.formatCode = function (txt, rancode) {
         }
       }
       if (rancode && line.substring(0, 14) == 'test.assertion') {
-        marks.push((test.assertions[assertionsSeen++]) ? '✓' : '✘');
-        var oldline = line.substring(15);
+        marks.push((test.assertions[assertionsSeen++]) ? '✓' : '✘'); // TODO if code is never reached shows x yet test does not fail!!!
+        var oldline = line.substring(14);
         line = '<b>ASSERT: </b>' + oldline;
       } else {
         marks.push(' ');

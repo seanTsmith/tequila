@@ -23,6 +23,12 @@ var Model = function (args) {
 Model.prototype.toString = function () {
   return "a " + this.modelType;
 };
+
+Model.prototype.copy = function (sourceModel) {
+  for (var i in this.attributes) {
+    this.attributes[i].value = sourceModel.attributes[i].value;
+  }
+}
 Model.prototype.getValidationErrors = function () {
   var errors = [];
   // check attributes
