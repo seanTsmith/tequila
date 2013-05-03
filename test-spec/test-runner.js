@@ -275,7 +275,7 @@ test.render = function (isBrowser) {
     innerDiv.style.margin = "0 auto";
     outerDiv.appendChild(innerDiv);
   } else {
-    process.stdout.write('Testing 123...');
+    process.stdout.write('Testing 123');
   }
   var scrollFirstError = 0;
   for (i in test.nodes) {

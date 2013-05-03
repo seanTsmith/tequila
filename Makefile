@@ -1,5 +1,4 @@
 all: test
-	@echo "Good job all your work is done, you deserve a Margarita."
 
 test: make.test
 	@bin/tequila test
