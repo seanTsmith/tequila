@@ -100,6 +100,7 @@ test.refresh = function () {
 };
 test.render = function (isBrowser) {
   var i, j;
+  test.isBrowser = isBrowser;
   test.countUnique = 0;
   test.countTests = 0;
   test.countPass = 0;
@@ -124,40 +125,58 @@ test.render = function (isBrowser) {
     for (var j in test.assertions) {
       if (!test.assertions[j]) gotFailedAssertions = true;
     }
+    gotFailedAssertions = true; /////////////////////////////////// FORCE
     test.countPending--;
-    if (testPassed && !gotFailedAssertions) {
-      test.countPass++;
-      node.examplePre.style.background = "#cfc"; // green
-      if (test.wasThrown) {
-        exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
-      } else {
-        if (typeof test_Results == 'undefined') {
-          exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
+    if (test.isBrowser) {
+      if (testPassed && !gotFailedAssertions) {
+        test.countPass++;
+        node.examplePre.style.background = "#cfc"; // green
+        if (test.wasThrown) {
+          exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
         } else {
-          exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+          if (typeof test_Results == 'undefined') {
+            exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
+          } else {
+            exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+          }
+        }
+      } else {
+        // clear invisible attribute if failed
+        node.examplePre.style.display = "";
+        node.exampleCaption.style.display = "";
+        test.countFail++;
+        node.examplePre.style.background = "#fcc"; // red
+        if (test.wasThrown) {
+          if (node.expectedValue === undefined) {
+            exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+          } else {
+            exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>';
+          }
+        } else if (testPassed && gotFailedAssertions) {
+          exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
+        } else {
+          exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>'; // ✘
         }
       }
+      node.examplePre.innerHTML = '<code>' + exampleCode + '</code>';
+      test.updateStats();
     } else {
-      // clear invisible attribute if failed
-      node.examplePre.style.display = "";
-      node.exampleCaption.style.display = "";
-      test.countFail++;
-      node.examplePre.style.background = "#fcc"; // red
-      if (test.wasThrown) {
-        if (node.expectedValue === undefined) {
-          exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
-        } else {
-          exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>';
-        }
-      } else if (testPassed && gotFailedAssertions) {
-        exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
+      if (testPassed && !gotFailedAssertions) {
+        test.countPass++;
+        process.stdout.write(colors.green('✓'));
       } else {
-        exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>'; // ✘
+        test.countFail++;
+        var ref =test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+        if (test.wasThrown) {
+          process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: idk' ));
+        } else {
+          process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+            'RETURNED: ' + test.expressionInfo(test_Results) +
+              ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+        }
+
       }
     }
-    node.examplePre.innerHTML = '<code>' + exampleCode + '</code>';
-
-    test.updateStats();
   };
   // Browser Dressing
   if (isBrowser) {
@@ -323,18 +342,39 @@ test.render = function (isBrowser) {
       case '.':
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+          test.nodes[i].asyncTest = false;
+          if (typeof (test.nodes[i].expectedValue) != 'undefined') {
+            if (test.nodes[i].expectedValue.toString().indexOf('test.AsyncResponse') == 0)
+              test.nodes[i].asyncTest = true;
+          }
           test.showWork = [];
-          var test_Results = test.callTestCode(test.nodes[i]);
-          var test_Value = 'undefined';
-          if (typeof test_Results !== 'undefined') test_Value = test_Results.toString();
-          var expected_Value = 'undefined';
-          if (typeof test.nodes[i].expectedValue !== 'undefined') expected_Value = test.nodes[i].expectedValue.toString();
-          if (test_Value !== expected_Value) {
-            test.countFail++;
-            console.log('\n' + colors.red('✘') + colors.white(' RETURNED: ' + test.expressionInfo(test_Results) + ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+          test.assertions = [];
+          var ref =test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+          if (test.nodes[i].asyncTest) {
+            test.countPending++;
+            test.nodes[i].errorThrown = false;
+            var err = test.callTestCode(test.nodes[i], asyncCallback);
+            if (test.wasThrown) {
+              process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: ' + err));
+              test.countPending--;
+              test.countFail++;
+              test.nodes[i].errorThrown = true;
+            }
           } else {
-            test.countPass++;
-            process.stdout.write(colors.green('✓'));
+            var test_Results = test.callTestCode(test.nodes[i]);
+            var test_Value = 'undefined';
+            if (typeof test_Results !== 'undefined') test_Value = test_Results.toString();
+            var expected_Value = 'undefined';
+            if (typeof test.nodes[i].expectedValue !== 'undefined') expected_Value = test.nodes[i].expectedValue.toString();
+            if (test_Value !== expected_Value) {
+              test.countFail++; // TODO if console is white this is invisible ink...
+              process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+                'RETURNED: ' + test.expressionInfo(test_Results) +
+                  ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+            } else {
+              test.countPass++;
+              process.stdout.write(colors.green('✓'));
+            }
           }
         } else {
           test.countDefer++;
@@ -463,13 +503,26 @@ test.render = function (isBrowser) {
     if (scrollFirstError > 0)
       window.scroll(0, scrollFirstError);
   } else {
-    var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
-    if (test.countFail)
-      console.log(colors.inverse(colors.red(results)));
-    else
-      console.log(colors.inverse(colors.green(results)));
+    test.closerCalled = false;
+    test.cliCloser();
   }
 };
+test.cliCloser = function() {
+  // Wait for deferred tasks to finish
+  if (test.countPending>0) {
+    if (!test.closerCalled) {
+      test.closerCalled=true;
+      console.log('\nWaiting for pending async results...');
+    }
+    setTimeout(test.cliCloser,0);
+  } else {
+  var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
+  if (test.countFail)
+    console.log(colors.inverse(colors.red(results)));
+  else
+    console.log(colors.inverse(colors.green(results)));
+  }
+}
 test.updateStats = function () {
   var miniPad, i;
   newtequilaStats = '☠';
