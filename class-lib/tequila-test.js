@@ -4,6 +4,10 @@
  */
 test.runnerTequila = function () {
   test.heading('Tequila Singleton', function () {
+    test.example('blah', undefined, function () {
+      test.assertion(1==2);
+    });
+
     test.paragraph('The Tequila Singleton provides a namespace for the library.  In it is access to the classes ' +
       'that make up the library and a collection of helper methods.');
     test.heading('CONSTRUCTOR', function () {

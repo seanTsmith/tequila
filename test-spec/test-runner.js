@@ -125,7 +125,7 @@ test.render = function (isBrowser) {
     for (var j in test.assertions) {
       if (!test.assertions[j]) gotFailedAssertions = true;
     }
-    gotFailedAssertions = true; /////////////////////////////////// FORCE
+    //gotFailedAssertions = true; /////////////////////////////////// FORCE
     test.countPending--;
     if (test.isBrowser) {
       if (testPassed && !gotFailedAssertions) {
@@ -362,11 +362,18 @@ test.render = function (isBrowser) {
             }
           } else {
             var test_Results = test.callTestCode(test.nodes[i]);
+            ranTest = true;
+            exampleCode += test.formatCode(test.nodes[i].func, true);
             var test_Value = 'undefined';
             if (typeof test_Results !== 'undefined') test_Value = test_Results.toString();
             var expected_Value = 'undefined';
             if (typeof test.nodes[i].expectedValue !== 'undefined') expected_Value = test.nodes[i].expectedValue.toString();
-            if (test_Value !== expected_Value) {
+            // Check assertions
+            var gotFailedAssertions = false;
+            for (var j in test.assertions) {
+              if (!test.assertions[j]) gotFailedAssertions = true;
+            }
+            if (test_Value !== expected_Value && !gotFailedAssertions) {
               test.countFail++; // TODO if console is white this is invisible ink...
               process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
                 'RETURNED: ' + test.expressionInfo(test_Results) +
