@@ -373,11 +373,16 @@ test.render = function (isBrowser) {
             for (var j in test.assertions) {
               if (!test.assertions[j]) gotFailedAssertions = true;
             }
-            if (test_Value !== expected_Value && !gotFailedAssertions) {
+            if (test_Value !== expected_Value || gotFailedAssertions) {
               test.countFail++; // TODO if console is white this is invisible ink...
-              process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
-                'RETURNED: ' + test.expressionInfo(test_Results) +
-                  ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+              if (gotFailedAssertions) {
+                process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+                  'ASSERTION(s) failed'));
+              } else {
+                process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+                  'RETURNED: ' + test.expressionInfo(test_Results) +
+                    ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+              }
             } else {
               test.countPass++;
               process.stdout.write(colors.green('✓'));
