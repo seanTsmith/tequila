@@ -325,7 +325,11 @@ test.render = function (isBrowser) {
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.showWork = [];
           var test_Results = test.callTestCode(test.nodes[i]);
-          if (test_Results.toString() !== test.nodes[i].expectedValue.toString()) {
+          var test_Value = 'undefined';
+          if (typeof test_Results !== 'undefined') test_Value = test_Results.toString();
+          var expected_Value = 'undefined';
+          if (typeof test.nodes[i].expectedValue !== 'undefined') expected_Value = test.nodes[i].expectedValue.toString();
+          if (test_Value !== expected_Value) {
             test.countFail++;
             console.log('\n' + colors.red('✘') + colors.white(' RETURNED: ' + test.expressionInfo(test_Results) + ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
           } else {
@@ -454,8 +458,8 @@ test.render = function (isBrowser) {
     }
   }
   test.testsLaunched = true;
-  test.updateStats();
   if (isBrowser) {
+    test.updateStats();
     if (scrollFirstError > 0)
       window.scroll(0, scrollFirstError);
   } else {
