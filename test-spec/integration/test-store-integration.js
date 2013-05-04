@@ -101,6 +101,7 @@ test.runnerStoreIntegration = function () {
           self.store.getModel(curly, hesDeadJim, self);
         }
 
+        // callback after lookup of
         function hesDeadJim(model, error, self) {
           test.assertion(error=='Error: id not found in store');
         }
