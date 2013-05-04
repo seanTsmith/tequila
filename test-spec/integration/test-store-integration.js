@@ -102,7 +102,7 @@ test.runnerStoreIntegration = function () {
         }
 
         function hesDeadJim(model, error, self) {
-          test.assertion(error==Error('id not found in store'))
+          test.assertion(error=='Error: id not found in store');
         }
 
       });
