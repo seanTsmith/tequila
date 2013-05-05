@@ -22,15 +22,17 @@ test.runnerStoreConstructor = function (SurrogateStoreModel) {
   });
 };
 test.runnerStoreMethods = function (SurrogateStoreModel) {
+  var interface = new SurrogateStoreModel().getStoreInterface();
   test.example('getStoreInterface() returns an array of method implementation for the Store.', undefined, function () {
-    var interface = new SurrogateStoreModel().getStoreInterface();
     test.show(interface);
     test.assertion(interface instanceof Object);
     test.assertion(typeof interface['canGetModel'] == 'boolean');
     test.assertion(typeof interface['canPutModel'] == 'boolean');
     test.assertion(typeof interface['canDeleteModel'] == 'boolean');
   });
-  var interface = new SurrogateStoreModel().getStoreInterface();
+  test.example('isReady()', test.AsyncResponse(true), function (testNode, returnResponse) {
+    returnResponse(testNode, fuckAduck);
+  });
   test.heading('getModel', function () {
     if (interface['canGetModel']) {
       test.example('must pass valid model', Error('argument must be a Model'), function () {

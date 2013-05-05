@@ -4,7 +4,7 @@
  */
 test.runnerRemoteStoreModel = function () {
   test.heading('RemoteStore', function () {
-    test.paragraph('The RemoteStore is a simple volatile store.');
+    test.paragraph('The RemoteStore is a store that is maintained by a remote connection.');
     test.heading('CONSTRUCTOR', function () {
       test.example('objects created should be an instance of RemoteStore', true, function () {
         return new RemoteStore() instanceof RemoteStore;

@@ -344,7 +344,7 @@ Store.prototype.getStoreInterface = function () {
   return this.interface;
 };
 Store.prototype.getModel = function (parm /* {modelType:modelID} */) {
-  throw new Error('Store does not provide getModel');
+  throw new Error(this.modelType + ' does not provide getModel');
 };
 Store.prototype.putModel = function (parm /* {modelType:model} */) {
   throw new Error('Store does not provide putModel');

@@ -15,6 +15,7 @@ test.heading('CORE MODELS', function () {
   test.runnerUserModel();
   test.runnerStoreModel();
   test.runnerMemoryStoreModel();
+  test.runnerRemoteStoreModel();
 });
 test.heading('SYSTEM INTEGRATION', function () {
   test.paragraph('The system functionality and requirements for the library as a whole is contained in this section.');
