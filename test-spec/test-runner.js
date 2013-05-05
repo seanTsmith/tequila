@@ -90,7 +90,7 @@ test.getParam = function (name) {
 test.refresh = function () {
 //  test.filterLevel='All';
   var vars = '';
-  if (test.hideExamples) vars += (vars ? '&' : '') + '?he=Y';
+  if (test.showExamples) vars += (vars ? '&' : '') + '?se=Y';
   if (test.filterSection) vars += (vars ? '&' : '') + '?fs=' + test.filterSection;
   if (test.filterLevel) vars += (vars ? '&' : '') + '?fl=' + test.filterLevel;
   var rootPath = window.location.href;
@@ -114,7 +114,7 @@ test.render = function (isBrowser) {
     var testPassed = false;
     test.wasThrown = false;
     var expectedValue = node.expectedValue.substr(20, 999);
-    exampleCode = '';
+    exampleCode = test.formatCode(node.func, true);
     if (typeof test_Results == 'undefined') {
       if (typeof expectedValue == 'undefined') testPassed = true;
     } else {
@@ -166,9 +166,9 @@ test.render = function (isBrowser) {
         process.stdout.write(colors.green('✓'));
       } else {
         test.countFail++;
-        var ref =test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+        var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
         if (test.wasThrown) {
-          process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: idk' ));
+          process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: idk'));
         } else {
           process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
             'RETURNED: ' + test.expressionInfo(test_Results) +
@@ -181,10 +181,10 @@ test.render = function (isBrowser) {
   // Browser Dressing
   if (isBrowser) {
     // Get vars from URL
-    test.hideExamples = (test.getParam('he') == 'Y');
+    test.showExamples = (test.getParam('se') == 'Y');
     test.filterSection = test.getParam('fs');
     test.filterTest = test.getParam('ft');
-    test.filterLevel = test.getParam('fl') || 'All';
+    test.filterLevel = test.getParam('fl') || 'TOC';
     // Fixed Header Div
     test.headerDiv = document.createElement("div");
     test.headerDiv.style.display = 'inline-block';
@@ -248,22 +248,22 @@ test.render = function (isBrowser) {
     test.textTestLevel = 'level<br>' + '<code class="counter">' + test.filterLevel + '</code>';
     test.btnTestLevel = buttonControl(test.textTestLevel, test.helpTestLevel, function () {
       switch (test.filterLevel) {
-        case 'All':
-          test.filterLevel = 'TOC';
-          break;
         case 'TOC':
-          test.filterLevel = 'Mid';
+          test.filterLevel = 'Inf';
+          break;
+        case 'Inf':
+          test.filterLevel = 'All';
           break;
         default:
-          test.filterLevel = 'All';
+          test.filterLevel = 'TOC';
           break;
       }
       test.refresh();
     });
     // Hide / Show Examples
-//    buttonControl((test.hideExamples ? '✩' : '✭') + ' examples', 'show/hide examples<br>errors always show', function () {
-    buttonControl('ex.<br>' + '<code class="counter">' + (test.hideExamples ? 'Off' : 'On&nbsp;'  ) + '</code>', 'show/hide examples<br>errors always show', function () {
-      test.hideExamples = !test.hideExamples;
+//    buttonControl((test.showExamples ? '✩' : '✭') + ' examples', 'show/hide examples<br>errors always show', function () {
+    buttonControl('ex.<br>' + '<code class="counter">' + (test.showExamples ? 'On&nbsp;' : 'Off'  ) + '</code>', 'show/hide examples<br>errors always show', function () {
+      test.showExamples = !test.showExamples;
       test.refresh();
     });
     // Outer & Inner Div to center content
@@ -292,8 +292,8 @@ test.render = function (isBrowser) {
         test.filterLevel = 'TOC';
         if (!isInScope && dotCount > 2) isFiltered = true;
         break;
-      case 'Mid':
-        test.filterLevel = 'Mid'; // TOC with paragraph text
+      case 'Inf':
+        test.filterLevel = 'Inf'; // TOC with paragraph text
         if (!isInScope && dotCount > 2) isFiltered = true;
         break;
     }
@@ -349,7 +349,7 @@ test.render = function (isBrowser) {
           }
           test.showWork = [];
           test.assertions = [];
-          var ref =test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+          var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
           if (test.nodes[i].asyncTest) {
             test.countPending++;
             test.nodes[i].errorThrown = false;
@@ -474,7 +474,7 @@ test.render = function (isBrowser) {
             pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
           }
         }
-        var showExample = !test.hideExamples;
+        var showExample = test.showExamples;
         if (isFiltered) showExample = false;
         if (ranTest && !testPassed) showExample = true;
         if (test.nodes[i].asyncTest) {
@@ -519,20 +519,20 @@ test.render = function (isBrowser) {
     test.cliCloser();
   }
 };
-test.cliCloser = function() {
+test.cliCloser = function () {
   // Wait for deferred tasks to finish
-  if (test.countPending>0) {
+  if (test.countPending > 0) {
     if (!test.closerCalled) {
-      test.closerCalled=true;
+      test.closerCalled = true;
       console.log('\nWaiting for pending async results...');
     }
-    setTimeout(test.cliCloser,0);
+    setTimeout(test.cliCloser, 0);
   } else {
-  var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
-  if (test.countFail)
-    console.log(colors.inverse(colors.red(results)));
-  else
-    console.log(colors.inverse(colors.green(results)));
+    var results = '\n ' + test.countTests + ' pass(' + test.countPass + ') fail(' + test.countFail + ') defer(' + test.countDefer + ') ';
+    if (test.countFail)
+      console.log(colors.inverse(colors.red(results)));
+    else
+      console.log(colors.inverse(colors.green(results)));
   }
 }
 test.updateStats = function () {

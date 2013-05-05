@@ -70,11 +70,11 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           var m1 = new Foo();
           var m2 = new Foo();
           var m3 = m1;
-          m1.setAttributeValue('name', 'Bar');
-          m2.setAttributeValue('name', 'Bar');
+          m1.set('name', 'Bar');
+          m2.set('name', 'Bar');
           // First demonstrate instance ref versus anothel model with equal attributes
           test.assertion(m1 === m3); // assigning one model to variable references same instance
-          test.assertion(m3.getAttributeValue('name') === 'Bar'); // m3 changed when m1 changed
+          test.assertion(m3.get('name') === 'Bar'); // m3 changed when m1 changed
           test.assertion(m1 !== m2); // 2 models are not the same instance
           test.assertion(JSON.stringify(m1) === JSON.stringify(m2)); // but they are identical
           // clone m1 into m4 and demonstrate that contents equal but not same ref to object
@@ -95,23 +95,23 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           return m.getValidationErrors();
         });
       });
-      test.heading('getAttributeValue(attributeName)', function () {
-        test.example('returns undefined if the attribute does not exists', undefined, function () {
-          return new SurrogateModelClass().getAttributeValue('whatever');
+      test.heading('get(attributeName)', function () {
+        test.example('returns undefined if the attribute does not exist', undefined, function () {
+          test.assertion(new SurrogateModelClass().get('whatever') === undefined)
         });
         test.example("returns the value for given attribute", 42, function () {
           var question = new SurrogateModelClass({attributes: [new Attribute('answer', 'Number')]});
           question.attributes[1].value = 42;
-          return question.getAttributeValue('answer');
+          return question.get('answer');
         });
       });
-      test.heading('setAttributeValue(attributeName,value)', function () {
+      test.heading('set(attributeName,value)', function () {
         test.example('throws an error if the attribute does not exists', Error('attribute not valid for model'), function () {
-          new SurrogateModelClass().setAttributeValue('whatever');
+          new SurrogateModelClass().set('whatever');
         });
         test.example("sets the value for given attribute", 42, function () {
           var question = new SurrogateModelClass({attributes: [new Attribute('answer', 'Number')]});
-          question.setAttributeValue('answer', 42);
+          question.set('answer', 42);
           return question.attributes[1].value;
         });
       });

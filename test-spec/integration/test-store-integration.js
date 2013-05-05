@@ -19,11 +19,11 @@ test.runnerStoreIntegration = function () {
 
         // create initial stooges
         this.moe = new this.Stooge();
-        this.moe.setAttributeValue('name', 'Moe');
+        this.moe.set('name', 'Moe');
         this.larry = new this.Stooge();
-        this.larry.setAttributeValue('name', 'Larry');
+        this.larry.set('name', 'Larry');
         this.shemp = new this.Stooge();
-        this.shemp.setAttributeValue('name', 'Shemp');
+        this.shemp.set('name', 'Shemp');
 
         // IDs after stored will be here
         this.stoogeIDsStored = [];
@@ -37,13 +37,13 @@ test.runnerStoreIntegration = function () {
         // callback after storing stooges
         function stoogeStored(model, error, self) {
           if (typeof error != 'undefined') throw error;
-          self.stoogeIDsStored.push(model.getAttributeValue('id'));
+          self.stoogeIDsStored.push(model.get('id'));
           if (self.stoogeIDsStored.length == 3) {
             // Now that first 3 stooges are stored lets retrieve and verify
             var actors = [];
             for (var i = 0; i < 3; i++) {
               actors.push(new self.Stooge());
-              actors[i].setAttributeValue('id', self.stoogeIDsStored[i]);
+              actors[i].set('id', self.stoogeIDsStored[i]);
               self.store.getModel(actors[i], stoogeRetrieved, self);
             }
           }
@@ -58,13 +58,13 @@ test.runnerStoreIntegration = function () {
             test.assertion(self.stoogesRetrieved[0] !== self.moe && // Make sure not a reference but a copy
               self.stoogesRetrieved[0] !== self.larry && self.stoogesRetrieved[0] !== self.shemp);
             var s = []; // get list of names to see if all stooges made it
-            for (var i = 0; i < 3; i++) s.push(self.stoogesRetrieved[i].getAttributeValue('name'));
+            for (var i = 0; i < 3; i++) s.push(self.stoogesRetrieved[i].get('name'));
             test.show(s);
             test.assertion(T.contains(s, 'Moe') && T.contains(s, 'Larry') && T.contains(s, 'Shemp'));
             // Replace Shemp with Curly
             for (var i = 0; i < 3; i++) {
-              if (self.stoogesRetrieved[i].getAttributeValue('name') == 'Shemp') {
-                self.stoogesRetrieved[i].setAttributeValue('name', 'Curly');
+              if (self.stoogesRetrieved[i].get('name') == 'Shemp') {
+                self.stoogesRetrieved[i].set('name', 'Curly');
                 self.store.putModel(self.stoogesRetrieved[i], stoogeChanged, self);
               }
             }
@@ -74,18 +74,18 @@ test.runnerStoreIntegration = function () {
         // callback after storing changed stooge
         function stoogeChanged(model, error, self) {
           if (typeof error != 'undefined') throw error;
-          test.assertion(model.getAttributeValue('name') == 'Curly');
+          test.assertion(model.get('name') == 'Curly');
           var curly = new self.Stooge();
-          curly.setAttributeValue('id', model.getAttributeValue('id'));
+          curly.set('id', model.get('id'));
           self.store.getModel(curly, storeChangedShempToCurly, self);
         }
 
         // callback after retrieving changed stooge
         function storeChangedShempToCurly(model, error, self) {
           if (typeof error != 'undefined') throw error;
-          test.assertion(model.getAttributeValue('name') == 'Curly');
+          test.assertion(model.get('name') == 'Curly');
           // Now test delete
-          self.deletedModelId = model.getAttributeValue('id'); // Remember this
+          self.deletedModelId = model.get('id'); // Remember this
           self.store.deleteModel(model, stoogeDeleted, self)
         }
 
@@ -93,11 +93,11 @@ test.runnerStoreIntegration = function () {
         function stoogeDeleted(model, error, self) {
           if (error) throw error;
           // model parameter is what was deleted
-          test.assertion(model.getAttributeValue('id') == null); // ID is removed
-          test.assertion(model.getAttributeValue('name') == 'Curly'); // the rest remains
+          test.assertion(model.get('id') == null); // ID is removed
+          test.assertion(model.get('name') == 'Curly'); // the rest remains
           // Is it really dead?
           var curly = new self.Stooge();
-          curly.setAttributeValue('id', self.deletedModelId);
+          curly.set('id', self.deletedModelId);
           self.store.getModel(curly, hesDeadJim, self);
         }
 

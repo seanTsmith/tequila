@@ -28,7 +28,7 @@ MemoryStore.prototype.getModel = function (model, callBack, self) {
     return;
   }
   // Find the ID now and put in instanceIndex
-  var id = model.getAttributeValue('id');
+  var id = model.get('id');
   var storedPair = this.data[modelIndex][1];
   var instanceIndex = -1;
   for (var i = 0; instanceIndex < 0 && i < storedPair.length; i++) if (storedPair[i][0] == id) instanceIndex = i;
@@ -48,7 +48,7 @@ MemoryStore.prototype.putModel = function (model, callBack, self) {
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
 
-  var id = model.getAttributeValue('ID');
+  var id = model.get('ID');
   if (id) {
     // Find model in memorystore, error out if can't find
     var modelIndex = -1;
@@ -59,7 +59,7 @@ MemoryStore.prototype.putModel = function (model, callBack, self) {
     }
     // Find the ID now
     var instanceIndex = -1;
-    var id = model.getAttributeValue('id');
+    var id = model.get('id');
     var storedPair = this.data[modelIndex][1];
     for (var i = 0; instanceIndex < 0 && i < storedPair.length; i++) if (storedPair[i][0] == id) instanceIndex = i;
     if (instanceIndex < 0) {
@@ -85,7 +85,7 @@ MemoryStore.prototype.putModel = function (model, callBack, self) {
     }
     // Add the id and model to memory store
     var newID = ++this.idCounter;
-    model.setAttributeValue('id', newID);
+    model.set('id', newID);
     var ModelValues = {};
     for (var a in model.attributes) {
       var theName = model.attributes[a].name;
@@ -110,7 +110,7 @@ MemoryStore.prototype.deleteModel = function (model, callBack, self) {
   }
   // Find the ID now
   var instanceIndex = -1;
-  var id = model.getAttributeValue('id');
+  var id = model.get('id');
   var storedPair = this.data[modelIndex][1];
   for (var i = 0; instanceIndex < 0 && i < storedPair.length; i++) if (storedPair[i][0] == id) instanceIndex = i;
   if (instanceIndex < 0) {
