@@ -20,5 +20,6 @@ test.heading('CORE MODELS', function () {
 test.heading('SYSTEM INTEGRATION', function () {
   test.paragraph('The system functionality and requirements for the library as a whole is contained in this section.');
   test.runnerStoreIntegration();
+  test.runnerRemoteStoreIntegration();
 });
 test.stop();

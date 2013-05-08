@@ -16,10 +16,10 @@ var RemoteStore = function (args) {
 };
 RemoteStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
-RemoteStore.prototype.onConnect = function (location,callBack) {
+RemoteStore.prototype.onConnect = function (location,callBack,self) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
-  callBack(new Error("not implemented"));
+  callBack(undefined,new Error("not implemented"),self);
 };
 RemoteStore.prototype.getModel = function (model, callBack, self) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');

@@ -20,10 +20,10 @@ Store.prototype = T.inheritPrototype(Model.prototype);
 Store.prototype.getStoreInterface = function () {
   return this.interface;
 };
-Store.prototype.onConnect = function (location,callBack) {
+Store.prototype.onConnect = function (location,callBack,self) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
-  callBack(this);
+  callBack(this,undefined,self);
 };
 Store.prototype.getModel = function (parm) {
   throw new Error(this.modelType + ' does not provide getModel');

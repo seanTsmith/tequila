@@ -1,6 +1,6 @@
 /**
  * tequila
- * test-store
+ * test-store-integration
  */
 test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {

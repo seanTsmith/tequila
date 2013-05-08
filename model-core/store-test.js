@@ -39,8 +39,8 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
       new SurrogateStoreModel().onConnect("");
     });
     if (interface['isReady']) {
-      test.example('onConnect(callback)', test.AsyncResponse(true), function (testNode, returnResponse) {
-        new SurrogateStoreModel().onConnect('',function (store,err) {
+      test.example('return store and undefined error upon successful connection to remote store.', test.AsyncResponse(true), function (testNode, returnResponse) {
+        new SurrogateStoreModel().onConnect('', function (store, err) {
           if (err) {
             returnResponse(testNode, err);
           } else {
