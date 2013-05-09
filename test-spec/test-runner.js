@@ -138,7 +138,7 @@ test.render = function (isBrowser) {
           if (typeof test_Results == 'undefined') {
             exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
           } else {
-            exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+            exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
           }
         }
       } else {
@@ -444,7 +444,7 @@ test.render = function (isBrowser) {
                 if (typeof test_Results == 'undefined') {
                   exampleCode += '✓<b>returns without harming any kittens</b>'; // TODO This is wrong for async since tests are not really done yet!!!
                 } else {
-                  exampleCode += '✓<b>returns ' + test.expressionInfo(test_Results) + ' as expected</b>'; // ✘
+                  exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
                 }
               }
             } else {

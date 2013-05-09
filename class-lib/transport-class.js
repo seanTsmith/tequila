@@ -2,35 +2,61 @@
  * tequila
  * transport-class
  */
-function Transport(location,callBack,self) {
+function Transport(location, callBack) {
   if (false === (this instanceof Transport)) throw new Error('new operator required');
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
-  var messageTypes = ['connect','disconnect','echo'];
-//  callBack('','',new Error('cannot '))
-
-  this.connected = false;
-  this.initialConnect = true;
-  this.socket = io.connect(location);
-  this.socket.on('connect', function () {
-    this.connected = true;
-    this.initialConnect = false;
+  var self = this;
+  self.connected = false;
+  self.initialConnect = true;
+  self.socket = io.connect(location);
+  self.socket.on('connect', function () {
+    self.connected = true;
+    self.initialConnect = false;
     console.log('socket.io connected');
+    callBack.call(self, new Message('Connected', ''));
   });
-  this.socket.on('error', function (reason) {
+  self.socket.on('error', function (reason) {
     var theReason = reason;
-    if (theReason.length<1) theReason = "(unknown)";
+    if (theReason.length < 1) theReason = "(unknown)";
     console.error('socket.io error: ' + theReason + '.');
     // If have not ever connected then signal error
-    if (!this.initialConnect) {
-      callBack('','',new Error('cannot connect'))
+    if (self.initialConnect) {
+      callBack.call(self, new Message('Error', 'cannot connect'));
     }
   });
-  this.socket.on('message', function (obj) {
-    console.log('socket.io message: ' + obj );
+  self.socket.on('message', function (obj) {
+    console.log('socket.io message: ' + obj);
   });
-  this.socket.on('disconnect', function (reason) {
-    this.connected = false;
-    console.log('Disconnected (' + reason + ').');
+  self.socket.on('disconnect', function (reason) {
+    self.connected = false;
+    console.log('socket.io disconnect: ' + reason);
   });
 }
+/*
+ * Methods
+ */
+Transport.prototype.send = function (message, callBack) {
+  var self = this;
+  if (typeof message == 'undefined') throw new Error('message required');
+  if (!(message instanceof Message)) throw new Error('parameter must be instance of Message');
+  if (typeof callBack != 'undefined' && typeof callBack != 'function') throw new Error('argument must a callback');
+  if (!this.connected) {
+    callBack.call(self, new Message('Error', 'not connected'));
+    return;
+  }
+  if (typeof callBack != 'undefined') {
+    self.socket.emit('ackmessage', message, function (msg) {
+      callBack.call(self, msg);
+    });
+  } else {
+    self.socket.send(message);
+  }
+  //callBack.call(self, new Message('Error', 'not connected'));
+
+};
+Transport.prototype.close = function () {
+  if (!this.connected)
+    throw new Error('not connected');
+  this.socket.disconnect();
+};

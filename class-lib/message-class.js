@@ -8,10 +8,18 @@ function Message(type,contents) {
   if ('undefined' == typeof type) throw new Error('message type required');
   if (!T.contains(T.getMessageTypes(), type)) throw new Error('Invalid message type: ' + type);
   this.type = type;
+  this.contents = contents;
 }
 /*
  * Methods
  */
 Message.prototype.toString = function () {
-  return this.type+ ' Message';
+  switch (this.type) {
+    case 'Null':
+      return this.type+ ' Message';
+      break;
+    default:
+      return this.type+ ' Message: ' + this.contents;
+      break;
+  }
 };

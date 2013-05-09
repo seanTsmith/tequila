@@ -39,6 +39,17 @@ var Connections = []; // Array of connections
 var io = require('socket.io').listen(server);
 io.set('log level', 1);
 io.sockets.on('connection', function (socket) {
+  socket.on('ackmessage', function (obj,fn) {
+    console.log('socket.io ackmessage: ' + obj);
+    fn('Ack');
+  });
+  socket.on('message', function (obj) {
+    console.log('socket.io message: ' + obj);
+  });
+  socket.on('disconnect', function (reason) {
+    console.log('socket.io disconnect: ' + reason);
+  });
+
   console.log('connect: '+socket);
 //  newConnection(socket);
 //  socket.on('disconnect', function (reason) {
