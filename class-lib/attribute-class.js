@@ -114,8 +114,7 @@ Attribute.prototype.coerce = function (value) {
 Attribute.prototype.getValidationErrors = function () {
   var errors = [];
   if (!this.name) errors.push('name required');
-  var shit = T.getAttributeTypes();
-  if (!T.contains(shit, this.type))
+  if (!T.contains(T.getAttributeTypes(), this.type))
     errors.push('Invalid type: ' + this.type);
   switch (this.type) {
     case 'ID': // Todo how to handle IDs ?

@@ -14,6 +14,7 @@ test-spec/node-test-runner.js: test-spec/node-test-header.js test-spec/test-runn
 	    test-spec/node-test-header.js \
 	    test-spec/test-runner.js \
         class-lib/tequila-test.js \
+        class-lib/message-test.js \
         class-lib/transport-test.js \
         class-lib/attribute-test.js \
         class-lib/model-test.js \
@@ -32,6 +33,7 @@ make.lib:
 	@cat \
 	    class-lib/tequila-class.js \
 	    class-lib/transport-class.js \
+        class-lib/message-class.js \
         class-lib/attribute-class.js \
         class-lib/model-class.js \
         class-lib/list-class.js \

@@ -6,6 +6,7 @@ test.start();
 test.heading('CORE CLASSES', function () {
   test.paragraph('The core classes provide a abstract interface that are subclassed via prototypical inheritance.');
   test.runnerTequila();
+  test.runnerMessage();
   test.runnerTransport();
   test.runnerAttribute();
   test.runnerModel(Model,false);
