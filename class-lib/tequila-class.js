@@ -4,6 +4,7 @@
  */
 var Tequila = (function () {
   var singletonInstance;
+
   function init() {
     // Private methods and variables
     var version = '0.0.1';
@@ -12,6 +13,7 @@ var Tequila = (function () {
 //    }
 //    var privateVariable = "Im also private";
     var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table'];
+    var messageTypes = ['Error', 'Ping'];
     return    {
       // Public methods and variables
       getVersion: function () {
@@ -32,16 +34,17 @@ var Tequila = (function () {
         }
         return props;
       },
-      inheritPrototype: function(p) {
+      inheritPrototype: function (p) {
         if (p == null) throw TypeError();
         if (Object.create) return Object.create(p);
         var t = typeof p;
         if (t !== "object" && typeof t !== "function") throw TypeError();
-        function f() {};
+        function f() {
+        };
         f.prototype = p;
         return new f();
       },
-      getAttributeTypes: function() {
+      getAttributeTypes: function () {
         return attributeTypes;
       }
     };

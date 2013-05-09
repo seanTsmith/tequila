@@ -21,6 +21,7 @@ var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func
 var test = {};
 test.converter = new Markdown.Converter();
 test.showWork = [];
+test.examplesDisabled = false;
 test.AsyncResponse = function (wut) {
   return 'test.AsyncResponse: ' + wut;
 };
@@ -48,7 +49,7 @@ test.paragraph = function (text) {
 };
 test.example = function (text, expect, func) {
   this.exampleNumber++;
-  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, false, expect));
+  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, test.examplesDisabled, expect));
 };
 test.xexample = function (text, expect, func) {
   this.exampleNumber++;

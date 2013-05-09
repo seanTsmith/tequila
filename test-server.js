@@ -1,6 +1,9 @@
 /**
  * tequila
  * node-server
+ *
+ * Right now this is host to unit tests
+ *
  */
 // Initialize connect
 var connect = require('connect');

@@ -15,7 +15,7 @@ var MemoryStore = function (args) {
 };
 MemoryStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
-MemoryStore.prototype.getModel = function (model, callBack, self) {
+MemoryStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (!model.attributes[0].value) throw new Error('ID not set');
@@ -24,7 +24,7 @@ MemoryStore.prototype.getModel = function (model, callBack, self) {
   var modelIndex = -1;
   for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
   if (modelIndex < 0) {
-    callBack(model, new Error('model not found in store'), self);
+    callBack(model, new Error('model not found in store'));
     return;
   }
   // Find the ID now and put in instanceIndex
@@ -33,7 +33,7 @@ MemoryStore.prototype.getModel = function (model, callBack, self) {
   var instanceIndex = -1;
   for (var i = 0; instanceIndex < 0 && i < storedPair.length; i++) if (storedPair[i][0] == id) instanceIndex = i;
   if (instanceIndex < 0) {
-    callBack(model, new Error('id not found in store'), self);
+    callBack(model, new Error('id not found in store'));
     return;
   }
   // Copy values from store to ref model
@@ -41,9 +41,9 @@ MemoryStore.prototype.getModel = function (model, callBack, self) {
   for (var a in model.attributes) {
     model.attributes[a].value = storeValues[model.attributes[a].name];
   }
-  callBack(model, undefined, self);
+  callBack(model, undefined);
 };
-MemoryStore.prototype.putModel = function (model, callBack, self) {
+MemoryStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
@@ -54,7 +54,7 @@ MemoryStore.prototype.putModel = function (model, callBack, self) {
     var modelIndex = -1;
     for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
     if (modelIndex < 0) {
-      callBack(model, new Error('model not found in store'), self);
+      callBack(model, new Error('model not found in store'));
       return;
     }
     // Find the ID now
@@ -63,7 +63,7 @@ MemoryStore.prototype.putModel = function (model, callBack, self) {
     var storedPair = this.data[modelIndex][1];
     for (var i = 0; instanceIndex < 0 && i < storedPair.length; i++) if (storedPair[i][0] == id) instanceIndex = i;
     if (instanceIndex < 0) {
-      callBack(model, new Error('id not found in store'), self);
+      callBack(model, new Error('id not found in store'));
       return;
     }
     // Copy from store
@@ -74,7 +74,7 @@ MemoryStore.prototype.putModel = function (model, callBack, self) {
       ModelValues[theName] = theValue;
     }
     storedPair[instanceIndex][1] = ModelValues;
-    callBack(model, undefined, self);
+    callBack(model, undefined);
   } else {
     // Find model in memorystore, add if not found
     var modelIndex = -1;
@@ -93,11 +93,11 @@ MemoryStore.prototype.putModel = function (model, callBack, self) {
       ModelValues[theName] = theValue;
     }
     this.data[modelIndex][1].push([newID, ModelValues]);
-    callBack(model, undefined, self);
+    callBack(model, undefined);
   }
 
 };
-MemoryStore.prototype.deleteModel = function (model, callBack, self) {
+MemoryStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
@@ -105,7 +105,7 @@ MemoryStore.prototype.deleteModel = function (model, callBack, self) {
   var modelIndex = -1;
   for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
   if (modelIndex < 0) {
-    callBack(model, new Error('model not found in store'), self);
+    callBack(model, new Error('model not found in store'));
     return;
   }
   // Find the ID now
@@ -114,7 +114,7 @@ MemoryStore.prototype.deleteModel = function (model, callBack, self) {
   var storedPair = this.data[modelIndex][1];
   for (var i = 0; instanceIndex < 0 && i < storedPair.length; i++) if (storedPair[i][0] == id) instanceIndex = i;
   if (instanceIndex < 0) {
-    callBack(model, new Error('id not found in store'), self);
+    callBack(model, new Error('id not found in store'));
     return;
   }
   // Splice out the stored values then prepare that Model for callback with ID stripped
@@ -126,5 +126,5 @@ MemoryStore.prototype.deleteModel = function (model, callBack, self) {
     else
       model.attributes[a].value = storeValues[model.attributes[a].name];
   }
-  callBack(model, undefined, self);
+  callBack(model, undefined);
 };

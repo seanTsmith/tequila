@@ -8,6 +8,8 @@ test.runnerStoreIntegration = function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
       test.example('Exercise and verify CRUD functionality.', undefined, function () {
 
+        var self = this;
+
         // setup store and stooge class
         this.store = new MemoryStore();
         this.Stooge = function (args) {
@@ -35,7 +37,7 @@ test.runnerStoreIntegration = function () {
         this.store.putModel(this.shemp, stoogeStored, this);
 
         // callback after storing stooges
-        function stoogeStored(model, error, self) {
+        function stoogeStored(model, error) {
           if (typeof error != 'undefined') throw error;
           self.stoogeIDsStored.push(model.get('id'));
           if (self.stoogeIDsStored.length == 3) {
@@ -44,13 +46,13 @@ test.runnerStoreIntegration = function () {
             for (var i = 0; i < 3; i++) {
               actors.push(new self.Stooge());
               actors[i].set('id', self.stoogeIDsStored[i]);
-              self.store.getModel(actors[i], stoogeRetrieved, self);
+              self.store.getModel(actors[i], stoogeRetrieved);
             }
           }
         }
 
         // callback after retrieving stored stooges
-        function stoogeRetrieved(model, error, self) {
+        function stoogeRetrieved(model, error) {
           if (typeof error != 'undefined') throw error;
           self.stoogesRetrieved.push(model);
           if (self.stoogesRetrieved.length == 3) {
@@ -65,32 +67,32 @@ test.runnerStoreIntegration = function () {
             for (var i = 0; i < 3; i++) {
               if (self.stoogesRetrieved[i].get('name') == 'Shemp') {
                 self.stoogesRetrieved[i].set('name', 'Curly');
-                self.store.putModel(self.stoogesRetrieved[i], stoogeChanged, self);
+                self.store.putModel(self.stoogesRetrieved[i], stoogeChanged);
               }
             }
           }
         }
 
         // callback after storing changed stooge
-        function stoogeChanged(model, error, self) {
+        function stoogeChanged(model, error) {
           if (typeof error != 'undefined') throw error;
           test.assertion(model.get('name') == 'Curly');
           var curly = new self.Stooge();
           curly.set('id', model.get('id'));
-          self.store.getModel(curly, storeChangedShempToCurly, self);
+          self.store.getModel(curly, storeChangedShempToCurly);
         }
 
         // callback after retrieving changed stooge
-        function storeChangedShempToCurly(model, error, self) {
+        function storeChangedShempToCurly(model, error) {
           if (typeof error != 'undefined') throw error;
           test.assertion(model.get('name') == 'Curly');
           // Now test delete
           self.deletedModelId = model.get('id'); // Remember this
-          self.store.deleteModel(model, stoogeDeleted, self)
+          self.store.deleteModel(model, stoogeDeleted)
         }
 
         // callback when Curly is deleted
-        function stoogeDeleted(model, error, self) {
+        function stoogeDeleted(model, error) {
           if (error) throw error;
           // model parameter is what was deleted
           test.assertion(model.get('id') == null); // ID is removed
@@ -98,11 +100,11 @@ test.runnerStoreIntegration = function () {
           // Is it really dead?
           var curly = new self.Stooge();
           curly.set('id', self.deletedModelId);
-          self.store.getModel(curly, hesDeadJim, self);
+          self.store.getModel(curly, hesDeadJim);
         }
 
         // callback after lookup of
-        function hesDeadJim(model, error, self) {
+        function hesDeadJim(model, error) {
           test.assertion(error=='Error: id not found in store');
         }
 

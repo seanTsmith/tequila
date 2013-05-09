@@ -8,7 +8,7 @@ test.runnerRemoteStoreIntegration = function () {
     test.xexample('do it to it', undefined, function () {
       this.store = new RemoteStore();
       this.store.onConnect('',storeConnected,this);
-      function storeConnected(store, err, self) {
+      function storeConnected(store, err) {
         if (err) throw err;
         throw new Error("TODO");
       }

@@ -15,18 +15,22 @@ function Transport(location,callBack,self) {
   this.socket.on('connect', function () {
     this.connected = true;
     this.initialConnect = false;
-    console.log('Connected to to ' + "???" + '.');
+    console.log('socket.io connected');
   });
   this.socket.on('error', function (reason) {
     var theReason = reason;
     if (theReason.length<1) theReason = "(unknown)";
     console.error('socket.io error: ' + theReason + '.');
+    // If have not ever connected then signal error
+    if (!this.initialConnect) {
+      callBack('','',new Error('cannot connect'))
+    }
   });
   this.socket.on('message', function (obj) {
     console.log('socket.io message: ' + obj );
   });
   this.socket.on('disconnect', function (reason) {
     this.connected = false;
-    console.log('Disconnected (' + reason + ') from ?.');
+    console.log('Disconnected (' + reason + ').');
   });
 }
