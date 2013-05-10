@@ -119,9 +119,9 @@ MemoryStore.prototype.deleteModel = function (model, callBack) {
   }
   // Splice out the stored values then prepare that Model for callback with ID stripped
   //var storeValues = storedPair[instanceIndex][1];
-  var storeValues = storedPair.splice(instanceIndex,1)[0][1];
+  var storeValues = storedPair.splice(instanceIndex, 1)[0][1];
   for (var a in model.attributes) {
-    if (model.attributes[a].name=='id')
+    if (model.attributes[a].name == 'id')
       model.attributes[a].value = undefined;
     else
       model.attributes[a].value = storeValues[model.attributes[a].name];

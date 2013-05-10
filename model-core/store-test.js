@@ -83,7 +83,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
           });
         });
       } else {
-        test.paragraph('skipping tests since model is not ready');
+        test.paragraph('skipping tests since store is not ready');
       }
     } else {
       test.example('getModel() is not implemented', Error(new SurrogateStoreModel().modelType + ' does not provide getModel'), function () {
@@ -129,7 +129,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
           });
         });
       } else {
-        test.paragraph('skipping tests since model is not ready');
+        test.paragraph('skipping tests since store is not ready');
       }
     } else {
       test.example('putModel() is not implemented', Error('Store does not provide putModel'), function () {
@@ -165,7 +165,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
           });
         });
       } else {
-        test.paragraph('skipping tests since model is not ready');
+        test.paragraph('skipping tests since store is not ready');
       }
     } else {
       test.example('deleteModel() is not implemented', Error('Store does not provide deleteModel'), function () {

@@ -9,28 +9,42 @@ function Transport(location, callBack) {
   var self = this;
   self.connected = false;
   self.initialConnect = true;
+  self.location = location;
+  if (self.location=='') self.location='http host';
   self.socket = io.connect(location);
   self.socket.on('connect', function () {
     self.connected = true;
     self.initialConnect = false;
-    console.log('socket.io connected');
+    console.log('socket.io ('+self.location+') connected');
     callBack.call(self, new Message('Connected', ''));
+  });
+  self.socket.on('connecting', function () {
+    console.log('socket.io ('+self.location+') connecting');
   });
   self.socket.on('error', function (reason) {
     var theReason = reason;
     if (theReason.length < 1) theReason = "(unknown)";
-    console.error('socket.io error: ' + theReason + '.');
+    console.error('socket.io ('+self.location+') error: ' + theReason + '.');
+    // If have not ever connected then signal error
+    if (self.initialConnect) {
+      callBack.call(self, new Message('Error', 'cannot connect'));
+    }
+  });
+  self.socket.on('connect_failed', function (reason) {
+    var theReason = reason;
+    if (theReason.length < 1) theReason = "(unknown)";
+    console.error('socket.io ('+self.location+') connect_failed: ' + theReason + '.');
     // If have not ever connected then signal error
     if (self.initialConnect) {
       callBack.call(self, new Message('Error', 'cannot connect'));
     }
   });
   self.socket.on('message', function (obj) {
-    console.log('socket.io message: ' + obj);
+    console.log('socket.io ('+self.location+') message: ' + obj);
   });
   self.socket.on('disconnect', function (reason) {
     self.connected = false;
-    console.log('socket.io disconnect: ' + reason);
+    console.log('socket.io ('+self.location+') disconnect: ' + reason);
   });
 }
 /*

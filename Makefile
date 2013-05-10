@@ -22,8 +22,9 @@ test-spec/node-test-runner.js: test-spec/node-test-header.js test-spec/test-runn
         model-core/user-test.js \
         model-core/store-test.js \
         model-core/memory-store-test.js \
+        model-core/remote-store-test.js \
         test-spec/integration/test-store-integration.js \
-        test-remoteStore-integration \
+        test-spec/integration/test-remoteStore-integration.js \
 	    test-spec/tequila-spec.js \
 	    test-spec/node-test-tail.js \
 	        >> test-spec/node-test-runner.js
@@ -40,5 +41,6 @@ make.lib:
         model-core/user-model.js \
         model-core/store-model.js \
         model-core/memory-store-model.js \
+        model-core/remote-store-model.js \
 	        >> tequila.js
 
