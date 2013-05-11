@@ -11,8 +11,6 @@ test.runnerRemoteStoreModel = function () {
       });
       test.runnerStoreConstructor(RemoteStore);
     });
-    test.heading('METHODS', function () {
-      test.runnerStoreMethods(RemoteStore);
-    });
+    test.runnerStoreMethods(RemoteStore);
   });
 };

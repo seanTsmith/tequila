@@ -11,8 +11,6 @@ test.runnerMemoryStoreModel = function () {
       });
       test.runnerStoreConstructor(MemoryStore);
     });
-    test.heading('METHODS', function () {
-      test.runnerStoreMethods(MemoryStore);
-    });
+    test.runnerStoreMethods(MemoryStore);
   });
 };

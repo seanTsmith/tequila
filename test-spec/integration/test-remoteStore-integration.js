@@ -5,7 +5,7 @@
 test.runnerRemoteStoreIntegration = function () {
   test.heading('RemoteStore Integration', function () {
     test.paragraph('This test establishes a RemoteStore and runs Store tests against it.');
-    test.example('Connect to RemoteStore and apply all Store tests.', test.AsyncResponse(true), function (testNode, returnResponse) {
+    test.xexample('Connect to RemoteStore and apply all Store tests.', test.asyncResponse(true), function (testNode, returnResponse) {
       var self = this;
       self.store = new RemoteStore();
       self.store.onConnect('',storeConnected);

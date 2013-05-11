@@ -34,6 +34,9 @@ var Tequila = (function () {
         }
         return props;
       },
+      getRegisteredStores: function () {
+        return [];
+      },
       inheritPrototype: function (p) {
         if (p == null) throw TypeError();
         if (Object.create) return Object.create(p);

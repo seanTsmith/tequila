@@ -3,19 +3,22 @@
  * tequila-spec
  */
 test.start();
-test.heading('CORE CLASSES', function () {
-  test.paragraph('The core classes provide a abstract interface that are subclassed via prototypical inheritance.');
+test.heading('Classes', function () {
+  test.paragraph('These objects are make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerTequila();
-  test.runnerMessage();
-  //test.runnerTransport();
   test.runnerAttribute();
-  test.runnerModel(Model,false);
   test.runnerList(List,false);
-});
-test.heading('CORE MODELS', function () {
-  test.paragraph('The core models inherit from the core classes and provide the framework structure.');
-  test.runnerUserModel();
+  test.runnerMessage();
+  test.runnerModel(Model,false);
   test.runnerStoreModel();
+  test.runnerTransport();
+});
+test.heading('Models', function () {
+  test.paragraph('These core models are used by the library.');
+  test.runnerUserModel();
+});
+test.heading('Stores', function () {
+  test.paragraph('The core stores implemented in the library.');
   test.runnerMemoryStoreModel();
   test.runnerRemoteStoreModel();
 });

@@ -1,8 +1,8 @@
 /**
  * tequila
- * test-tequila
+ * test-runner
  */
-var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func, exampleNumber, deferedExample, expectedValue) {
+var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func, exampleNumber, deferredExample, expectedValue) {
   this.inheritanceTest = inheritanceTest;
   this.nodeType = nodeType; // nodeType 1 char string: H)eading P)aragraph E)xample E(X)eption
   this.level = level;
@@ -14,7 +14,7 @@ var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func
   if (func) {
     funcText = test.formatCode(func, false);
   }
-  this.deferedExample = (funcText && funcText.length > 0) ? deferedExample : true;
+  this.deferedExample = (funcText && funcText.length > 0) ? deferredExample : true;
   this.expectedValue = expectedValue;
   return this;
 };
@@ -22,8 +22,8 @@ var test = {};
 test.converter = new Markdown.Converter();
 test.showWork = [];
 test.examplesDisabled = false;
-test.AsyncResponse = function (wut) {
-  return 'test.AsyncResponse: ' + wut;
+test.asyncResponse = function (wut) {
+  return 'test.asyncResponse: ' + wut;
 };
 test.start = function (options) {
   this.nodes = [];
@@ -228,6 +228,13 @@ test.render = function (isBrowser) {
         test.filterTest = false;
         test.refresh();
       });
+    // Host Status
+    test.helpHost = 'Connection Status to host<br>click to configure';
+    test.textHost = 'pass<br>' + '<code class="counter_green">$1</code>';
+    test.btnHost = buttonControl(test.textHost, test.helpHost, function(){
+      console.log('host');
+    });
+
     // Hide / Show Tests
     test.helpTestPass = 'passing tests<br>click to filter';
     test.textTestPass = 'pass<br>' + '<code class="counter_green">$1</code>';
@@ -345,7 +352,7 @@ test.render = function (isBrowser) {
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.nodes[i].asyncTest = false;
           if (typeof (test.nodes[i].expectedValue) != 'undefined') {
-            if (test.nodes[i].expectedValue.toString().indexOf('test.AsyncResponse') == 0)
+            if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
               test.nodes[i].asyncTest = true;
           }
           test.showWork = [];
@@ -408,7 +415,7 @@ test.render = function (isBrowser) {
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.nodes[i].asyncTest = false;
           if (typeof (test.nodes[i].expectedValue) != 'undefined') {
-            if (test.nodes[i].expectedValue.toString().indexOf('test.AsyncResponse') == 0)
+            if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
               test.nodes[i].asyncTest = true;
           }
           test.showWork = [];
@@ -477,7 +484,7 @@ test.render = function (isBrowser) {
         }
         var showExample = test.showExamples;
         if (isFiltered) showExample = false;
-        if (ranTest && !testPassed) showExample = true;
+        if (ranTest && (!testPassed || gotFailedAssertions)) showExample = true;
         if (test.nodes[i].asyncTest) {
           if (!showExample) pre.style.display = "none";
           if (!showExample) caption.style.display = "none";

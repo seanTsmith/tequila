@@ -5,13 +5,24 @@
 // Constructor
 var MemoryStore = function (args) {
   if (false === (this instanceof MemoryStore)) throw new Error('new operator required');
-  Store.call(this, args);
-  this.modelType = "MemoryStore";
-  this.interface.canGetModel = true;
-  this.interface.canPutModel = true;
-  this.interface.canDeleteModel = true;
+  args = args || [];
+  this.storeType = args.storeType || "MemoryStore";
+  this.name = args.name || 'a ' + this.storeType;
+  this.storeInterface = {
+    isReady: false,
+    canGetModel: true,
+    canPutModel: true,
+    canDeleteModel: true
+  };
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
+
+  var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
+  var badJooJoo = [];
+  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+
 };
 MemoryStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
@@ -22,7 +33,7 @@ MemoryStore.prototype.getModel = function (model, callBack) {
   if (typeof callBack != "function") throw new Error('callback required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
-  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
+  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
   if (modelIndex < 0) {
     callBack(model, new Error('model not found in store'));
     return;
@@ -52,7 +63,7 @@ MemoryStore.prototype.putModel = function (model, callBack) {
   if (id) {
     // Find model in memorystore, error out if can't find
     var modelIndex = -1;
-    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
+    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
     if (modelIndex < 0) {
       callBack(model, new Error('model not found in store'));
       return;
@@ -78,9 +89,9 @@ MemoryStore.prototype.putModel = function (model, callBack) {
   } else {
     // Find model in memorystore, add if not found
     var modelIndex = -1;
-    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
+    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
     if (modelIndex < 0) {
-      this.data.push([model.modelType, [] ]);
+      this.data.push([model.storeType, [] ]);
       modelIndex = this.data.length - 1;
     }
     // Add the id and model to memory store
@@ -103,7 +114,7 @@ MemoryStore.prototype.deleteModel = function (model, callBack) {
   if (typeof callBack != "function") throw new Error('callback required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
-  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
+  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
   if (modelIndex < 0) {
     callBack(model, new Error('model not found in store'));
     return;

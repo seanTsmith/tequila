@@ -5,14 +5,20 @@
 // Constructor
 var RemoteStore = function (args) {
   if (false === (this instanceof RemoteStore)) throw new Error('new operator required');
-  Store.call(this, args);
-  this.modelType = "RemoteStore";
-  this.interface = {
+  args = args || [];
+  this.storeType = args.storeType || "RemoteStore";
+  this.name = args.name || 'a ' + this.storeType;
+  this.storeInterface = {
     isReady: false,
     canGetModel: true,
     canPutModel: true,
     canDeleteModel: true
   };
+  var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
+  var badJooJoo = [];
+  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
 };
 RemoteStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods

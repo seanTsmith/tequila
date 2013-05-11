@@ -27,7 +27,7 @@ test.runnerTransport = function () {
       test.example('must pass callback function', Error('argument must a callback'), function () {
         new Transport('');
       });
-      test.example('url must be valid', test.AsyncResponse('Error Message: cannot connect'), function (testNode, returnResponse) {
+      test.example('url must be valid', test.asyncResponse('Error Message: cannot connect'), function (testNode, returnResponse) {
         new Transport('*url*', function (message) {
           returnResponse(testNode, message);
         }, this);
@@ -46,7 +46,7 @@ test.runnerTransport = function () {
           new Transport("", function () {
           }).send('money');
         });
-        test.example('Transport must be connected (async error message)', test.AsyncResponse('Error Message: not connected'), function (testNode, returnResponse) {
+        test.example('Transport must be connected (async error message)', test.asyncResponse('Error Message: not connected'), function (testNode, returnResponse) {
           new Transport("*bad*", function () {
             this.send(new Message('Null'), function (msg) {
               returnResponse(testNode, msg);
@@ -57,7 +57,7 @@ test.runnerTransport = function () {
           new Transport("", function () {
           }).send(new Message('Null'), Infinity);
         });
-        test.example('if callback used messages sent are acknowledged', test.AsyncResponse('Ack'), function (testNode, returnResponse) {
+        test.example('if callback used messages sent are acknowledged', test.asyncResponse('Ack'), function (testNode, returnResponse) {
           new Transport("", function () {
             this.send(new Message('Null'), function (msg) {
               returnResponse(testNode, msg);
@@ -66,7 +66,7 @@ test.runnerTransport = function () {
         });
       });
       test.heading('close()', function () {
-        test.example('Transport must be connected (async error message)', test.AsyncResponse('jobs done'), function (testNode, returnResponse) {
+        test.example('Transport must be connected (async error message)', test.asyncResponse('jobs done'), function (testNode, returnResponse) {
           new Transport("", function () {
             this.close();
             returnResponse(testNode, "jobs done");
