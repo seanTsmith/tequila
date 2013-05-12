@@ -22,85 +22,23 @@ var test = {};
 test.converter = new Markdown.Converter();
 test.showWork = [];
 test.examplesDisabled = false;
-test.asyncResponse = function (wut) {
-  return 'test.asyncResponse: ' + wut;
-};
-test.start = function (options) {
-  this.nodes = [];
-  this.exampleNumber = 0;
-  this.headingLevel = 0;
-  this.levels = [0];
-};
-test.heading = function (text, func) {
-  this.levels[this.headingLevel]++;
-  this.outlineLabel = '';
-  for (var i in this.levels) this.outlineLabel += this.levels[i].toString() + '.';
-  this.nodes.push(new TestNode(T.inheritanceTest, 'h', this.headingLevel + 1, this.outlineLabel, text, func));
-  if (func) {
-    this.headingLevel++;
-    this.levels[this.headingLevel] = 0;
-    func();
-    this.headingLevel--;
-    this.levels.pop();
-  }
-};
-test.paragraph = function (text) {
-  this.nodes.push(new TestNode(T.inheritanceTest, 'p', this.headingLevel + 1, this.outlineLabel, text));
-};
-test.example = function (text, expect, func) {
-  this.exampleNumber++;
-  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, test.examplesDisabled, expect));
-};
-test.xexample = function (text, expect, func) {
-  this.exampleNumber++;
-  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
-};
-test.assertion = function (truDat) {
-  test.assertions.push(truDat);
-};
-test.show = function (value) {
-  try {
-    if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
-      test.showWork.push(value);
-      return;
+test.runner = function (isBrowser) {
+  test.hostStore = new RemoteStore();
+  test.hostStore.onConnect('http://localhost', function (store, err) {
+    if (err) {
+      test.hostStore.available = false;
+      console.log('Cannot load hostStore('+err+')');
+    } else {
+      test.hostStore.available = true;
     }
-    if (value !== undefined) {
-      test.showWork.push(JSON.stringify(value));
-      return;
-    }
-    test.showWork.push(value);
-  } catch (e) {
-    test.showWork.push(e);
-  }
+    test.renderHead(isBrowser);
+    test.renderDetail(isBrowser);
+    test.renderCloser(isBrowser);
+  });
 
 };
-test.stop = function () {
-};
-test.run = function (resultsCallback) {
-};
-test.getParam = function (name) {
-  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-  var regexS = "[\\?&]" + name + "=([^&#]*)";
-  var regex = new RegExp(regexS);
-  var results = regex.exec(window.location.href);
-  if (results == null)
-    return "";
-  else
-    return results[1];
-};
-test.refresh = function () {
-//  test.filterLevel='All';
-  var vars = '';
-  if (test.showExamples) vars += (vars ? '&' : '') + '?se=Y';
-  if (test.filterSection) vars += (vars ? '&' : '') + '?fs=' + test.filterSection;
-  if (test.filterLevel) vars += (vars ? '&' : '') + '?fl=' + test.filterLevel;
-  var rootPath = window.location.href;
-  if (rootPath.indexOf('#') > 0) rootPath = rootPath.substring(0, rootPath.indexOf('#'))
-  window.location.href = rootPath + vars ? ("#" + vars) : '';
-  window.location.reload();
-};
-test.render = function (isBrowser) {
-  var i, j;
+test.renderHead = function (isBrowser) {
+  test.scrollFirstError = 0;
   test.isBrowser = isBrowser;
   test.countUnique = 0;
   test.countTests = 0;
@@ -109,76 +47,6 @@ test.render = function (isBrowser) {
   test.countDefer = 0;
   test.countPending = 0;
   test.testsLaunched = false;
-  // function to evaluate results of async
-  var asyncCallback = function (node, test_Results) {
-    if (node.errorThrown) return;
-    var testPassed = false;
-    test.wasThrown = false;
-    var expectedValue = node.expectedValue.substr(20, 999);
-    exampleCode = test.formatCode(node.func, true);
-    if (typeof test_Results == 'undefined') {
-      if (typeof expectedValue == 'undefined') testPassed = true;
-    } else {
-      if (typeof expectedValue != 'undefined' && test_Results.toString() === expectedValue.toString()) testPassed = true;
-    }
-    // Check assertions
-    var gotFailedAssertions = false;
-    for (var j in test.assertions) {
-      if (!test.assertions[j]) gotFailedAssertions = true;
-    }
-    //gotFailedAssertions = true; /////////////////////////////////// FORCE
-    test.countPending--;
-    if (test.isBrowser) {
-      if (testPassed && !gotFailedAssertions) {
-        test.countPass++;
-        node.examplePre.style.background = "#cfc"; // green
-        if (test.wasThrown) {
-          exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
-        } else {
-          if (typeof test_Results == 'undefined') {
-            exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
-          } else {
-            exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
-          }
-        }
-      } else {
-        // clear invisible attribute if failed
-        node.examplePre.style.display = "";
-        node.exampleCaption.style.display = "";
-        test.countFail++;
-        node.examplePre.style.background = "#fcc"; // red
-        if (test.wasThrown) {
-          if (node.expectedValue === undefined) {
-            exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
-          } else {
-            exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>';
-          }
-        } else if (testPassed && gotFailedAssertions) {
-          exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
-        } else {
-          exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>'; // ✘
-        }
-      }
-      node.examplePre.innerHTML = '<code>' + exampleCode + '</code>';
-      test.updateStats();
-    } else {
-      if (testPassed && !gotFailedAssertions) {
-        test.countPass++;
-        process.stdout.write(colors.green('✓'));
-      } else {
-        test.countFail++;
-        var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
-        if (test.wasThrown) {
-          process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: idk'));
-        } else {
-          process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
-            'RETURNED: ' + test.expressionInfo(test_Results) +
-              ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
-        }
-
-      }
-    }
-  };
   // Browser Dressing
   if (isBrowser) {
     // Get vars from URL
@@ -230,11 +98,10 @@ test.render = function (isBrowser) {
       });
     // Host Status
     test.helpHost = 'Connection Status to host<br>click to configure';
-    test.textHost = 'pass<br>' + '<code class="counter_green">$1</code>';
-    test.btnHost = buttonControl(test.textHost, test.helpHost, function(){
+    test.textHost = 'Host<br>' + '<code class="counter_yellow">...</code>';
+    test.btnHost = buttonControl(test.textHost, test.helpHost, function () {
       console.log('host');
     });
-
     // Hide / Show Tests
     test.helpTestPass = 'passing tests<br>click to filter';
     test.textTestPass = 'pass<br>' + '<code class="counter_green">$1</code>';
@@ -275,17 +142,22 @@ test.render = function (isBrowser) {
       test.refresh();
     });
     // Outer & Inner Div to center content
-    var outerDiv = document.createElement("div");
-    outerDiv.style.width = "100%";
-    document.body.appendChild(outerDiv);
-    var innerDiv = document.createElement("div");
-    innerDiv.style.width = "1000px";
-    innerDiv.style.margin = "0 auto";
-    outerDiv.appendChild(innerDiv);
+    test.outerDiv = document.createElement("div");
+    test.outerDiv.style.width = "100%";
+    document.body.appendChild(test.outerDiv);
+    test.innerDiv = document.createElement("div");
+    test.innerDiv.style.width = "1000px";
+    test.innerDiv.style.margin = "0 auto";
+    test.outerDiv.appendChild(test.innerDiv);
+
+    test.updateStats();
+
   } else {
     process.stdout.write('Testing 123');
   }
-  var scrollFirstError = 0;
+
+};
+test.renderDetail = function (isBrowser) {
   for (i in test.nodes) {
     // Check filters
     var filterSection = (test.filterSection + '.');
@@ -337,14 +209,14 @@ test.render = function (isBrowser) {
               test.filterSection = words[0];
             test.refresh();
           };
-          innerDiv.appendChild(p);
+          test.innerDiv.appendChild(p);
         }
         break;
       case 'p':
         if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
           var p = document.createElement("p");
           p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
-          innerDiv.appendChild(p);
+          test.innerDiv.appendChild(p);
         }
         break;
       case '.':
@@ -361,7 +233,7 @@ test.render = function (isBrowser) {
           if (test.nodes[i].asyncTest) {
             test.countPending++;
             test.nodes[i].errorThrown = false;
-            var err = test.callTestCode(test.nodes[i], asyncCallback);
+            var err = test.callTestCode(test.nodes[i], test.asyncCallback);
             if (test.wasThrown) {
               process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: ' + err));
               test.countPending--;
@@ -427,7 +299,7 @@ test.render = function (isBrowser) {
             test.countPending++;
             pre.style.background = "#ffa500"; // oranges
           } else {
-            var test_Results = test.callTestCode(test.nodes[i], asyncCallback);
+            var test_Results = test.callTestCode(test.nodes[i], test.asyncCallback);
             ranTest = true;
             exampleCode += test.formatCode(test.nodes[i].func, true);
             if (typeof test_Results == 'undefined') {
@@ -488,19 +360,19 @@ test.render = function (isBrowser) {
         if (test.nodes[i].asyncTest) {
           if (!showExample) pre.style.display = "none";
           if (!showExample) caption.style.display = "none";
-          innerDiv.appendChild(caption);
-          innerDiv.appendChild(pre);
+          test.innerDiv.appendChild(caption);
+          test.innerDiv.appendChild(pre);
         } else {
-          if (showExample) innerDiv.appendChild(caption);
-          if (showExample) innerDiv.appendChild(pre);
+          if (showExample) test.innerDiv.appendChild(caption);
+          if (showExample) test.innerDiv.appendChild(pre);
         }
         test.updateStats();
-        if (ranTest && !testPassed && scrollFirstError < 1) {
-          scrollFirstError = document.height - document.documentElement.clientHeight;
+        if (ranTest && !testPassed && test.scrollFirstError < 1) {
+          test.scrollFirstError = document.height - document.documentElement.clientHeight;
         }
         if (test.nodes[i].asyncTest) {
           test.nodes[i].errorThrown = false;
-          var err = test.callTestCode(test.nodes[i], asyncCallback);
+          var err = test.callTestCode(test.nodes[i], test.asyncCallback);
           if (test.wasThrown) {
             test.countPending--;
             test.countFail++;
@@ -518,13 +390,161 @@ test.render = function (isBrowser) {
     }
   }
   test.testsLaunched = true;
+
+}
+test.renderCloser = function (isBrowser) {
   if (isBrowser) {
     test.updateStats();
-    if (scrollFirstError > 0)
-      window.scroll(0, scrollFirstError);
+    if (test.scrollFirstError > 0)
+      window.scroll(0, test.scrollFirstError);
   } else {
     test.closerCalled = false;
     test.cliCloser();
+  }
+}
+test.asyncResponse = function (wut) {
+  return 'test.asyncResponse: ' + wut;
+};
+test.start = function (options) {
+  this.nodes = [];
+  this.exampleNumber = 0;
+  this.headingLevel = 0;
+  this.levels = [0];
+};
+test.heading = function (text, func) {
+  this.levels[this.headingLevel]++;
+  this.outlineLabel = '';
+  for (var i in this.levels) this.outlineLabel += this.levels[i].toString() + '.';
+  this.nodes.push(new TestNode(T.inheritanceTest, 'h', this.headingLevel + 1, this.outlineLabel, text, func));
+  if (func) {
+    this.headingLevel++;
+    this.levels[this.headingLevel] = 0;
+    func();
+    this.headingLevel--;
+    this.levels.pop();
+  }
+};
+test.paragraph = function (text) {
+  this.nodes.push(new TestNode(T.inheritanceTest, 'p', this.headingLevel + 1, this.outlineLabel, text));
+};
+test.example = function (text, expect, func) {
+  this.exampleNumber++;
+  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, test.examplesDisabled, expect));
+};
+test.xexample = function (text, expect, func) {
+  this.exampleNumber++;
+  this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
+};
+test.assertion = function (truDat) {
+  test.assertions.push(truDat);
+};
+test.show = function (value) {
+  try {
+    if (value == null || value instanceof Date || typeof value == 'number' || typeof value == 'function' || value instanceof RegExp) {
+      test.showWork.push(value);
+      return;
+    }
+    if (value !== undefined) {
+      test.showWork.push(JSON.stringify(value));
+      return;
+    }
+    test.showWork.push(value);
+  } catch (e) {
+    test.showWork.push(e);
+  }
+
+};
+test.stop = function () {
+};
+test.getParam = function (name) {
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.href);
+  if (results == null)
+    return "";
+  else
+    return results[1];
+};
+test.refresh = function () {
+//  test.filterLevel='All';
+  var vars = '';
+  if (test.showExamples) vars += (vars ? '&' : '') + '?se=Y';
+  if (test.filterSection) vars += (vars ? '&' : '') + '?fs=' + test.filterSection;
+  if (test.filterLevel) vars += (vars ? '&' : '') + '?fl=' + test.filterLevel;
+  var rootPath = window.location.href;
+  if (rootPath.indexOf('#') > 0) rootPath = rootPath.substring(0, rootPath.indexOf('#'))
+  window.location.href = rootPath + vars ? ("#" + vars) : '';
+  window.location.reload();
+};
+test.asyncCallback = function (node, test_Results) {
+  // function to evaluate results of async
+  if (node.errorThrown) return;
+  var testPassed = false;
+  test.wasThrown = false;
+  var expectedValue = node.expectedValue.substr(20, 999);
+  exampleCode = test.formatCode(node.func, true);
+  if (typeof test_Results == 'undefined') {
+    if (typeof expectedValue == 'undefined') testPassed = true;
+  } else {
+    if (typeof expectedValue != 'undefined' && test_Results.toString() === expectedValue.toString()) testPassed = true;
+  }
+  // Check assertions
+  var gotFailedAssertions = false;
+  for (var j in test.assertions) {
+    if (!test.assertions[j]) gotFailedAssertions = true;
+  }
+  //gotFailedAssertions = true; /////////////////////////////////// FORCE
+  test.countPending--;
+  if (test.isBrowser) {
+    if (testPassed && !gotFailedAssertions) {
+      test.countPass++;
+      node.examplePre.style.background = "#cfc"; // green
+      if (test.wasThrown) {
+        exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
+      } else {
+        if (typeof test_Results == 'undefined') {
+          exampleCode += '✓<b>returns without harming any kittens</b>'; // ✘
+        } else {
+          exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
+        }
+      }
+    } else {
+      // clear invisible attribute if failed
+      node.examplePre.style.display = "";
+      node.exampleCaption.style.display = "";
+      test.countFail++;
+      node.examplePre.style.background = "#fcc"; // red
+      if (test.wasThrown) {
+        if (node.expectedValue === undefined) {
+          exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+        } else {
+          exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>';
+        }
+      } else if (testPassed && gotFailedAssertions) {
+        exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
+      } else {
+        exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(node.expectedValue) + '</b>'; // ✘
+      }
+    }
+    node.examplePre.innerHTML = '<code>' + exampleCode + '</code>';
+    test.updateStats();
+  } else {
+    if (testPassed && !gotFailedAssertions) {
+      test.countPass++;
+      process.stdout.write(colors.green('✓'));
+    } else {
+      test.countFail++;
+      var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+      if (test.wasThrown) {
+        process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: idk'));
+      } else {
+        process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+          'RETURNED: ' + test.expressionInfo(test_Results) +
+            ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+      }
+
+    }
   }
 };
 test.cliCloser = function () {
@@ -542,7 +562,7 @@ test.cliCloser = function () {
     else
       console.log(colors.inverse(colors.green(results)));
   }
-}
+};
 test.updateStats = function () {
   var miniPad, i;
   newtequilaStats = '☠';
@@ -554,6 +574,19 @@ test.updateStats = function () {
     for (miniPad = '', i = 0; i < (3 - myName.toString().length); i++) miniPad += '&nbsp;'
     test.btnTequila.innerHTML = 'tequila<br><code class="counter">' + miniPad + myName + '</code>' + '<span class="classic">' + test.helpTestTequila + '</span>';
   }
+
+  // Host Status
+  if (undefined == test.hostStore.available) {
+    test.btnHost.innerHTML = 'Host<br><code class="counter_yellow">...</code>' + '<span class="classic">' + test.helpHost + '</span>';
+  } else {
+    if (test.hostStore.available)
+      test.btnHost.innerHTML = 'Host<br><code class="counter_green">OK&nbsp;</code>' + '<span class="classic">' + test.helpHost + '</span>';
+    else
+      test.btnHost.innerHTML = 'Host<br><code class="counter_red">Err</code>' + '<span class="classic">' + test.helpHost + '</span>';
+  }
+
+  //
+
   if (!test.lastCountPass || test.lastCountPass != test.countPass) {
     test.lastCountPass = test.countPass;
     for (miniPad = '', i = 0; i < (3 - test.countPass.toString().length); i++) miniPad += '&nbsp;'
@@ -573,13 +606,13 @@ test.updateStats = function () {
     if (test.countFail) test.headerDiv.style.background = '#F33'; // fail color color
     if (!test.countFail) test.headerDiv.style.background = '#6C7'; // pass color
   }
-}
+};
 test.expressionInfo = function (expr) {
   if (typeof expr == 'string') {
     return '"' + expr.replace(/"/g, '\\\"') + '"';
   }
   return expr;
-}
+};
 test.shouldThrow = function (err, func) {
   try {
     func();
@@ -587,7 +620,7 @@ test.shouldThrow = function (err, func) {
     if (err !== undefined)
       if (err.toString() != e.toString() && err.toString() != '*') throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
   }
-}
+};
 test.callTestCode = function (node, funkytown) {
   try {
     test.wasThrown = false;
@@ -596,7 +629,7 @@ test.callTestCode = function (node, funkytown) {
     test.wasThrown = true;
     return e;
   }
-}
+};
 test.formatCode = function (txt, rancode) {
   var lines = [];
   var spaces = [];
@@ -644,10 +677,10 @@ test.formatCode = function (txt, rancode) {
       }
     }
   }
-  var adjustspace = spaces[1];
+  var adjustSpace = spaces[1];
   var output = '';
   for (i = 1; i < lines.length; i++) { // skip 'function'
-    var spaceOut = spaces[i] - adjustspace;
+    var spaceOut = spaces[i] - adjustSpace;
     for (j = 1; j < spaceOut; j++) output += ' ';
     output += marks[i] + lines[i] + '\n';
   }

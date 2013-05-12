@@ -26,17 +26,25 @@ RemoteStore.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
   var store = this;
-  this.transport = new Transport(location, function (msg) {
-    if (msg.type == 'Error') {
-      callBack(undefined, new Error(msg.contents));
-      return;
-    }
-    if (msg.type == 'Connected') {
-      callBack(store);
-      return;
-    }
-    callBack(undefined, new Error('unexpected message type: '+msg.type));
-  });
+  try {
+    this.transport = new Transport(location, function (msg) {
+      if (msg.type == 'Error') {
+        console.log('Transport connect error: ' + store.name);
+        callBack(undefined, new Error(msg.contents));
+        return;
+      }
+      if (msg.type == 'Connected') {
+        console.log('Transport connected: ' + store.name);
+        callBack(store);
+        return;
+      }
+      console.log('Transport unexpected message type: ' + store.name);
+      callBack(undefined, new Error('unexpected message type: ' + msg.type));
+    });
+  }
+  catch (err) {
+    callBack(undefined, err);
+  }
 };
 RemoteStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
