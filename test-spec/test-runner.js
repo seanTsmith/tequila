@@ -26,16 +26,16 @@ test.runner = function (isBrowser) {
   test.hostStore = new RemoteStore();
   test.hostStore.onConnect('http://localhost', function (store, err) {
     if (err) {
-      test.hostStore.available = false;
+      test.hostStoreAvailable = false;
       console.log('Cannot load hostStore('+err+')');
     } else {
-      test.hostStore.available = true;
+      test.hostStoreAvailable = true;
     }
     test.renderHead(isBrowser);
     test.renderDetail(isBrowser);
     test.renderCloser(isBrowser);
+    test.updateStats();
   });
-
 };
 test.renderHead = function (isBrowser) {
   test.scrollFirstError = 0;
@@ -155,7 +155,6 @@ test.renderHead = function (isBrowser) {
   } else {
     process.stdout.write('Testing 123');
   }
-
 };
 test.renderDetail = function (isBrowser) {
   for (i in test.nodes) {
@@ -390,7 +389,6 @@ test.renderDetail = function (isBrowser) {
     }
   }
   test.testsLaunched = true;
-
 }
 test.renderCloser = function (isBrowser) {
   if (isBrowser) {
@@ -452,7 +450,6 @@ test.show = function (value) {
   } catch (e) {
     test.showWork.push(e);
   }
-
 };
 test.stop = function () {
 };
@@ -576,10 +573,10 @@ test.updateStats = function () {
   }
 
   // Host Status
-  if (undefined == test.hostStore.available) {
+  if (undefined == test.hostStoreAvailable) {
     test.btnHost.innerHTML = 'Host<br><code class="counter_yellow">...</code>' + '<span class="classic">' + test.helpHost + '</span>';
   } else {
-    if (test.hostStore.available)
+    if (test.hostStoreAvailable)
       test.btnHost.innerHTML = 'Host<br><code class="counter_green">OK&nbsp;</code>' + '<span class="classic">' + test.helpHost + '</span>';
     else
       test.btnHost.innerHTML = 'Host<br><code class="counter_red">Err</code>' + '<span class="classic">' + test.helpHost + '</span>';
