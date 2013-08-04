@@ -66,8 +66,6 @@ Transport.prototype.send = function (message, callBack) {
   } else {
     self.socket.send(message);
   }
-  //callBack.call(self, new Message('Error', 'not connected'));
-
 };
 Transport.prototype.close = function () {
   if (!this.connected)

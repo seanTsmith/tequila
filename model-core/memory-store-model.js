@@ -58,7 +58,6 @@ MemoryStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
-
   var id = model.get('ID');
   if (id) {
     // Find model in memorystore, error out if can't find

@@ -377,7 +377,7 @@ test.renderDetail = function (isBrowser) {
             test.countFail++;
             test.nodes[i].errorThrown = true;
             exampleCode = test.formatCode(test.nodes[i].func, true);
-            exampleCode += '<b>✘ERROR THROWN: ' + err + '\n';
+            exampleCode += '<b>✘ERROR THROWN: ' + err.stack + '\n';
             pre.innerHTML = '<code>' + exampleCode + '</code>';
             test.nodes[i].examplePre.style.display = "";
             test.nodes[i].exampleCaption.style.display = "";

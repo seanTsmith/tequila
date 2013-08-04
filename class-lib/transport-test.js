@@ -22,8 +22,9 @@ test.runnerTransport = function () {
       test.example('must pass url string', Error('argument must a url string'), function () {
         new Transport();
       });
-      test.paragraph('The callback processes incoming messages and errors.' +
-        '  Further details on usage can ben seen in integration tests.');
+      test.paragraph('The connection success is signaled via callback. use function(msg){} for' +
+        'callback.  msg.Connection indications success, msg.Error for failure (msg.contents' +
+        'contains error).');
       test.example('must pass callback function', Error('argument must a callback'), function () {
         new Transport('');
       });

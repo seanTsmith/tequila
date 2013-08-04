@@ -6,19 +6,19 @@ test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {
     test.paragraph('');
     test.heading('CRUD (Create Read Update Delete)', function () {
-      test.example('MemoryStore CRUD.', undefined, function () {
-        test.CRUD(new MemoryStore());
+      test.example('MemoryStore CRUD.', test.asyncResponse(true), function (testNode, returnResponse) {
+        test.CRUD(new MemoryStore(), testNode, returnResponse);
       });
-      test.example('hostStore CRUD.', undefined, function () {
+      test.xexample('hostStore CRUD.', test.asyncResponse(true), function (testNode, returnResponse) {
         if (test.hostStoreAvailable) {
-          test.CRUD(test.hostStore);
+          test.CRUD(test.hostStore, testNode, returnResponse);
         }
       });
     });
   });
 };
 
-test.CRUD = function (testStore) {
+test.CRUD = function (testStore, testNode, returnResponse) {
   var self = this;
 
   // setup store and stooge class
@@ -49,7 +49,7 @@ test.CRUD = function (testStore) {
 
   // callback after storing stooges
   function stoogeStored(model, error) {
-    if (typeof error != 'undefined') throw error;
+    if (typeof error != 'undefined') returnResponse(testNode, error);
     self.stoogeIDsStored.push(model.get('id'));
     if (self.stoogeIDsStored.length == 3) {
       // Now that first 3 stooges are stored lets retrieve and verify
@@ -64,7 +64,7 @@ test.CRUD = function (testStore) {
 
   // callback after retrieving stored stooges
   function stoogeRetrieved(model, error) {
-    if (typeof error != 'undefined') throw error;
+    if (typeof error != 'undefined') returnResponse(testNode, error);
     self.stoogesRetrieved.push(model);
     if (self.stoogesRetrieved.length == 3) {
       // Now we have stored and retrieved (via IDs into new objects).  So verify the stooges made it
@@ -117,6 +117,7 @@ test.CRUD = function (testStore) {
   // callback after lookup of
   function hesDeadJim(model, error) {
     test.assertion(error == 'Error: id not found in store');
+    returnResponse(testNode, true);
   }
 
 };

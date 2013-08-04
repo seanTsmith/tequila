@@ -57,7 +57,15 @@ RemoteStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
-  callBack(undefined, new Error("not implemented"));
+  // this.transport
+  //callBack(model, new Error('model not found in store'));
+  this.transport.send(new Message('PutModel',model), function (msg) {
+    // if msg is Error
+
+    // callBack(model,Error('shit'));
+    callBack(model, msg);
+  });
+
 };
 RemoteStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
