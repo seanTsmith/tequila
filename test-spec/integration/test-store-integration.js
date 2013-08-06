@@ -9,7 +9,7 @@ test.runnerStoreIntegration = function () {
       test.example('MemoryStore CRUD.', test.asyncResponse(true), function (testNode, returnResponse) {
         test.CRUD(new MemoryStore(), testNode, returnResponse);
       });
-      test.xexample('hostStore CRUD.', test.asyncResponse(true), function (testNode, returnResponse) {
+      test.example('hostStore CRUD.', test.asyncResponse(true), function (testNode, returnResponse) {
         if (test.hostStoreAvailable) {
           test.CRUD(test.hostStore, testNode, returnResponse);
         }
@@ -75,7 +75,7 @@ test.CRUD = function (testStore, testNode, returnResponse) {
       test.show(s);
       test.assertion(T.contains(s, 'Moe') && T.contains(s, 'Larry') && T.contains(s, 'Shemp'));
       // Replace Shemp with Curly
-      for (var i = 0; i < 3; i++) {
+      for (i = 0; i < 3; i++) {
         if (self.stoogesRetrieved[i].get('name') == 'Shemp') {
           self.stoogesRetrieved[i].set('name', 'Curly');
           self.store.putModel(self.stoogesRetrieved[i], stoogeChanged);

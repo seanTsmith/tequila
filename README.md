@@ -1,6 +1,5 @@
 #tequila
-Tequila is a javascript application framework.  It has zero javascript dependencies for it's core.  It's interface
-is exposed via (design pattern) ...  TODO write good this
+Tequila is
 
 ## Project Root
 + **/bin** tequila command line interface
