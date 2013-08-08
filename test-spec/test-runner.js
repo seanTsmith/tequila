@@ -27,7 +27,7 @@ test.runner = function (isBrowser) {
   test.hostStore.onConnect('http://localhost', function (store, err) {
     if (err) {
       test.hostStoreAvailable = false;
-      console.log('Cannot load hostStore('+err+')');
+      console.warn('hostStore unavailable ('+err+')');
     } else {
       test.hostStoreAvailable = true;
     }
@@ -563,6 +563,7 @@ test.cliCloser = function () {
 };
 test.updateStats = function () {
   var miniPad, i;
+  if (!test.isBrowser) return;
   newtequilaStats = '☠';
   if (test.countPass > 0) newtequilaStats = '☺';
   if (test.countFail > 0) newtequilaStats = '☹';

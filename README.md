@@ -2,9 +2,8 @@
 Tequila es bueno!
 
 TODO:
-* fix make / node tests
 * get test-server to use library instead of cut and paste
-*
+* start on KeyValueFileStore (Static / Dynamic options?)
 
 ## Project Root
 + **/bin** tequila command line interface
