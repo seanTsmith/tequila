@@ -59,16 +59,20 @@ test.runnerAttribute = function () {
           // It's the default and it passes constructor validation
         });
         test.example('should accept assignment of correct type and validate incorrect attributeTypes', undefined, function () {
+          // Test all known attribute types (TODO ID type needs work)
           var myTypes = T.getAttributeTypes();
           test.show(myTypes);
-          // TODO ID
+
+          // Now create an array of matching values for each type into myValues
           var myModel = new Model();
           var myGroup = new Attribute({name: 'columns', type: 'Group', value: [new Attribute("Name")]});
           var myTable = new Attribute({name: 'bills', type: 'Table', group: myGroup });
-          var myValues = [null, 'Jane Doe', new Date, true, 18, new Model(), [], myTable]; // , [new Attribute('likes'), new Attribute('dislikes')]];
+          var myValues = [null, 'Jane Doe', new Date, true, 18, new Model(), [], myTable];
+
+          // Loop thru each type
           for (var i in myTypes)
             for (var j in myValues) {
-//              console.log(i + ',' + j);
+              // for the value that works it won't throw error just create and to test
               if (i == j) {
                 switch (myTypes[i]) {
                   case 'Model':

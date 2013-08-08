@@ -489,7 +489,8 @@ test.asyncCallback = function (node, test_Results) {
   // Check assertions
   var gotFailedAssertions = false;
   for (var j in test.assertions) {
-    if (!test.assertions[j]) gotFailedAssertions = true;
+    if (!test.assertions[j])
+      gotFailedAssertions = true;
   }
   //gotFailedAssertions = true; /////////////////////////////////// FORCE
   test.countPending--;
@@ -608,7 +609,9 @@ test.expressionInfo = function (expr) {
   if (typeof expr == 'string') {
     return '"' + expr.replace(/"/g, '\\\"') + '"';
   }
+
   return expr;
+  //return JSON.stringify(expr);
 };
 test.shouldThrow = function (err, func) {
   try {

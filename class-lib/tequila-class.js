@@ -13,7 +13,7 @@ var Tequila = (function () {
 //    }
 //    var privateVariable = "Im also private";
     var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table'];
-    var messageTypes = ['Null', 'Connected', 'Error', 'Sent', 'Ping', 'PutModel'];
+    var messageTypes = ['Null', 'Connected', 'Error', 'Sent', 'Ping', 'PutModel', 'PutModelAck', 'GetModel', 'GetModelAck', 'DeleteModel', 'DeleteModelAck'];
     return    {
       // Public methods and variables
       getVersion: function () {

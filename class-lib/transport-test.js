@@ -58,7 +58,7 @@ test.runnerTransport = function () {
           new Transport("", function () {
           }).send(new Message('Null'), Infinity);
         });
-        test.example('if callback used messages sent are acknowledged', test.asyncResponse('Ack'), function (testNode, returnResponse) {
+        test.example('if callback used messages sent are acknowledged', test.asyncResponse(true), function (testNode, returnResponse) {
           test.hostStore.transport.send(new Message('Null'), function (msg) {
             returnResponse(testNode, msg);
           });

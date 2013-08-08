@@ -46,30 +46,75 @@ RemoteStore.prototype.onConnect = function (location, callBack) {
     callBack(undefined, err);
   }
 };
-RemoteStore.prototype.getModel = function (model, callBack) {
-  if (!(model instanceof Model)) throw new Error('argument must be a Model');
-  if (model.getValidationErrors().length) throw new Error('model has validation errors');
-  if (!model.attributes[0].value) throw new Error('ID not set');
-  if (typeof callBack != "function") throw new Error('callback required');
-  callBack(undefined, new Error("not implemented"));
-};
 RemoteStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
-  // this.transport
-  //callBack(model, new Error('model not found in store'));
   this.transport.send(new Message('PutModel',model), function (msg) {
-    // if msg is Error
-
-    // callBack(model,Error('shit'));
-    callBack(model, msg);
+    if (msg == 'Ack') {
+      callBack(model);
+    } else if (msg.type == 'PutModelAck') {
+      var c = msg.contents;
+      model.attributes = [];
+      for (var a in c.attributes) {
+        var attrib = new Attribute(c.attributes[a].name,c.attributes[a].type);
+        attrib.value = c.attributes[a].value;
+        model.attributes.push(attrib);
+      }
+      console.log('putModel: ' + JSON.stringify(model));
+      callBack(model);
+    } else {
+      callBack(model, Error(msg));
+    }
   });
+};RemoteStore.prototype.getModel = function (model, callBack) {
+  if (!(model instanceof Model)) throw new Error('argument must be a Model');
+  if (model.getValidationErrors().length) throw new Error('model has validation errors');
+  if (!model.attributes[0].value) throw new Error('ID not set');
+  if (typeof callBack != "function") throw new Error('callback required');
+  this.transport.send(new Message('GetModel',model), function (msg) {
+    if (msg == 'Ack') {
+      callBack(model);
+    } else if (msg.type == 'GetModelAck') {
+      var c = msg.contents;
+      model.attributes = [];
+      for (var a in c.attributes) {
+        var attrib = new Attribute(c.attributes[a].name,c.attributes[a].type);
+        attrib.value = c.attributes[a].value;
+        model.attributes.push(attrib);
+      }
+      console.log('getModel model: ' + JSON.stringify(model));
+      console.log('getModel msg: ' + JSON.stringify(msg));
 
+      if (typeof c == 'string')
+        callBack(model, c);
+      else
+        callBack(model);
+    } else {
+      callBack(model, Error(msg));
+    }
+  });
 };
+
 RemoteStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
-  callBack(undefined, new Error("not implemented"));
+  this.transport.send(new Message('DeleteModel',model), function (msg) {
+    if (msg == 'Ack') {
+      callBack(model);
+    } else if (msg.type == 'DeleteModelAck') {
+      var c = msg.contents;
+      model.attributes = [];
+      for (var a in c.attributes) {
+        var attrib = new Attribute(c.attributes[a].name,c.attributes[a].type);
+        attrib.value = c.attributes[a].value;
+        model.attributes.push(attrib);
+      }
+      console.log('DeleteModel: ' + JSON.stringify(model));
+      callBack(model);
+    } else {
+      callBack(model, Error(msg));
+    }
+  });
 };
