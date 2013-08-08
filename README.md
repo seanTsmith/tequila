@@ -1,5 +1,10 @@
 #tequila
-Tequila is
+Tequila es bueno!
+
+TODO:
+* EAT
+* MORE
+* CHICKEN
 
 ## Project Root
 + **/bin** tequila command line interface
