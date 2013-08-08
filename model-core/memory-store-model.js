@@ -9,7 +9,7 @@ var MemoryStore = function (args) {
   this.storeType = args.storeType || "MemoryStore";
   this.name = args.name || 'a ' + this.storeType;
   this.storeInterface = {
-    isReady: false,
+    isReady: true,
     canGetModel: true,
     canPutModel: true,
     canDeleteModel: true

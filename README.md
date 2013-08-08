@@ -2,9 +2,9 @@
 Tequila es bueno!
 
 TODO:
-* EAT
-* MORE
-* CHICKEN
+* fix make / node tests
+* get test-server to use library instead of cut and paste
+*
 
 ## Project Root
 + **/bin** tequila command line interface

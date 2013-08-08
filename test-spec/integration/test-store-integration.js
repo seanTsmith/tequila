@@ -4,16 +4,28 @@
  */
 test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {
-    test.paragraph('');
     test.heading('CRUD (Create Read Update Delete)', function () {
       test.example('Excersize all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
 
         /*** UNCOMMENT ONE STORE TO TEST ***/
-        var testStore = test.hostStore;
-//        var testStore = new MemoryStore();
+//        var testStore = test.hostStore;
+        var testStore = new MemoryStore({name:'CRUD test MemoryStore'});
         /*** UNCOMMENT ONE STORE TO TEST ***/
 
         var self = this;
+
+        // Check store interface
+        var interface = testStore.getStoreInterface();
+        test.show(interface);
+        test.show(testStore.name);
+        test.show(testStore.storeType);
+        test.assertion(interface.isReady);
+
+        // If store is not ready then get out...
+        if (!interface.isReady) {
+          returnResponse(testNode, Error('Store is not ready.'));
+          return;
+        }
 
         // setup store and stooge class
         this.store = testStore;

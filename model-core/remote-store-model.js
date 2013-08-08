@@ -35,6 +35,7 @@ RemoteStore.prototype.onConnect = function (location, callBack) {
       }
       if (msg.type == 'Connected') {
         console.log('Transport connected: ' + store.name);
+        store.storeInterface.isReady = true;
         callBack(store);
         return;
       }

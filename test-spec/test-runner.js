@@ -23,7 +23,7 @@ test.converter = new Markdown.Converter();
 test.showWork = [];
 test.examplesDisabled = false;
 test.runner = function (isBrowser) {
-  test.hostStore = new RemoteStore();
+  test.hostStore = new RemoteStore({name:'hostStore (http://localhost)'});
   test.hostStore.onConnect('http://localhost', function (store, err) {
     if (err) {
       test.hostStoreAvailable = false;
