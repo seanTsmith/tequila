@@ -23,6 +23,7 @@ test.converter = new Markdown.Converter();
 test.showWork = [];
 test.examplesDisabled = false;
 test.runner = function (isBrowser) {
+  test.isBrowser = isBrowser;
   test.hostStore = new RemoteStore({name:'hostStore (http://localhost)'});
   test.hostStore.onConnect('http://localhost', function (store, err) {
     if (err) {
@@ -39,7 +40,6 @@ test.runner = function (isBrowser) {
 };
 test.renderHead = function (isBrowser) {
   test.scrollFirstError = 0;
-  test.isBrowser = isBrowser;
   test.countUnique = 0;
   test.countTests = 0;
   test.countPass = 0;

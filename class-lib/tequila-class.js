@@ -19,7 +19,11 @@ var Tequila = (function () {
       getVersion: function () {
         return version;
       },
-      contains: function (a, obj) {
+      isServer: function() {
+        return typeof exports !== 'undefined' && this.exports !== exports
+      },
+
+    contains: function (a, obj) {
         for (var i = 0; i < a.length; i++) {
           if (a[i] === obj) return true;
         }

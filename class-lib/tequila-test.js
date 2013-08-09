@@ -17,6 +17,13 @@ test.runnerTequila = function () {
       });
     });
     test.heading('METHODS', function () {
+      test.heading('isServer()');
+      test.paragraph('This method returns true running as server under node.');
+      test.example('check against known invocation', true, function (test) {
+        // When tests launch test.isBrowser is set - compare to library test for node
+        return test.isBrowser != Tequila().isServer();
+      });
+
       test.heading('contains(array,object)');
       test.paragraph('This method returns true or false as to whether object is contained in array.');
       test.example('object exists in array', true, function () {

@@ -23,6 +23,7 @@ test-spec/node-test-runner.js: test-spec/node-test-header.js test-spec/test-runn
         model-core/store-test.js \
         model-core/memory-store-test.js \
         model-core/remote-store-test.js \
+        model-core/mongo-store-test.js \
         test-spec/integration/test-store-integration.js \
 	    test-spec/tequila-spec.js \
 	    test-spec/node-test-tail.js \
@@ -41,5 +42,6 @@ make.lib:
         model-core/store-model.js \
         model-core/memory-store-model.js \
         model-core/remote-store-model.js \
+        model-core/mongo-store-model.js \
 	        >> tequila.js
 

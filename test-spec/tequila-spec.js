@@ -20,6 +20,7 @@ test.heading('Models', function () {
 test.heading('Stores', function () {
   test.paragraph('The core stores implemented in the library.');
   test.runnerMemoryStoreModel();
+  test.runnerMongoStoreModel();
   test.runnerRemoteStoreModel();
 });
 test.heading('SYSTEM INTEGRATION', function () {
