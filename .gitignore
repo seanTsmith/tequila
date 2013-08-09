@@ -21,3 +21,5 @@ Icon?
 ehthumbs.db
 Thumbs.db
 test-spec/node-test-runner.js
+tequila.js
+tequila-server.js

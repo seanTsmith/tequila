@@ -24,6 +24,22 @@ test.showWork = [];
 test.examplesDisabled = false;
 test.runner = function (isBrowser) {
   test.isBrowser = isBrowser;
+
+  // After stores loaded run tests
+  var storeLoader = {};
+  storeLoader.countNeeded = 2;
+  storeLoader.countDone = 0;
+  storeLoader.callback = function() {
+    storeLoader.countDone++;
+    if (storeLoader.countDone==storeLoader.countNeeded) {
+      test.renderHead(isBrowser);
+      test.renderDetail(isBrowser);
+      test.renderCloser(isBrowser);
+      test.updateStats();
+    }
+  };
+
+  // try to create a hostStore
   test.hostStore = new RemoteStore({name:'hostStore (http://localhost)'});
   test.hostStore.onConnect('http://localhost', function (store, err) {
     if (err) {
@@ -32,11 +48,22 @@ test.runner = function (isBrowser) {
     } else {
       test.hostStoreAvailable = true;
     }
-    test.renderHead(isBrowser);
-    test.renderDetail(isBrowser);
-    test.renderCloser(isBrowser);
-    test.updateStats();
+    storeLoader.callback();
   });
+
+  // try to create a mongoStore
+  test.mongoStore = new MongoStore({name:'mongoStore'});
+  test.mongoStore.onConnect('http://localhost', function (store, err) {
+    if (err) {
+      test.mongoStoreAvailable = false;
+      console.warn('mongoStore unavailable ('+err+')');
+    } else {
+      test.mongoStoreAvailable = true;
+    }
+    storeLoader.callback();
+  });
+
+
 };
 test.renderHead = function (isBrowser) {
   test.scrollFirstError = 0;

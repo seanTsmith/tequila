@@ -11,6 +11,7 @@ test-spec/node-test-runner.js: test-spec/node-test-header.js test-spec/test-runn
 	@cat \
 	    test-spec/Markdown.Converter.js \
 	    tequila.js \
+	    tequila-server.js \
 	    test-spec/node-test-header.js \
 	    test-spec/test-runner.js \
         class-lib/tequila-test.js \
@@ -44,4 +45,9 @@ make.lib:
         model-core/remote-store-model.js \
         model-core/mongo-store-model.js \
 	        >> tequila.js
+
+	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > tequila-server.js
+	@cat \
+        model-core/mongo-store-model-server.js \
+	        >> tequila-server.js
 
