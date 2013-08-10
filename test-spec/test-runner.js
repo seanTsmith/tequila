@@ -29,22 +29,31 @@ test.runner = function (isBrowser) {
   var storeLoader = {};
   storeLoader.countNeeded = 2;
   storeLoader.countDone = 0;
-  storeLoader.callback = function() {
+  storeLoader.timedOut = false;
+  storeLoader.callback = function (force) {
     storeLoader.countDone++;
-    if (storeLoader.countDone==storeLoader.countNeeded) {
+    if (force || (!storeLoader.timedOut && storeLoader.countDone == storeLoader.countNeeded)) {
       test.renderHead(isBrowser);
       test.renderDetail(isBrowser);
       test.renderCloser(isBrowser);
       test.updateStats();
+      clearInterval(storeLoader.watchdog);
     }
   };
 
+  // watchdog timer
+  storeLoader.watchdog = setInterval(function () {
+    console.warn('Stores took too long to load');
+    storeLoader.callback(true);
+    storeLoader.timedOut = true;
+  }, 3000);
+
   // try to create a hostStore
-  test.hostStore = new RemoteStore({name:'hostStore (http://localhost)'});
+  test.hostStore = new RemoteStore({name: 'hostStore (http://localhost)'});
   test.hostStore.onConnect('http://localhost', function (store, err) {
     if (err) {
       test.hostStoreAvailable = false;
-      console.warn('hostStore unavailable ('+err+')');
+      console.warn('hostStore unavailable (' + err + ')');
     } else {
       test.hostStoreAvailable = true;
     }
@@ -52,11 +61,11 @@ test.runner = function (isBrowser) {
   });
 
   // try to create a mongoStore
-  test.mongoStore = new MongoStore({name:'mongoStore'});
+  test.mongoStore = new MongoStore({name: 'mongoStore'});
   test.mongoStore.onConnect('http://localhost', function (store, err) {
     if (err) {
       test.mongoStoreAvailable = false;
-      console.warn('mongoStore unavailable ('+err+')');
+      console.warn('mongoStore unavailable (' + err + ')');
     } else {
       test.mongoStoreAvailable = true;
     }
@@ -256,6 +265,9 @@ test.renderDetail = function (isBrowser) {
           test.showWork = [];
           test.assertions = [];
           var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+          var indent = '';
+          for (j = 0; j < ref.length; j++)
+            indent += ' ';
           if (test.nodes[i].asyncTest) {
             test.countPending++;
             test.nodes[i].errorThrown = false;
@@ -287,7 +299,8 @@ test.renderDetail = function (isBrowser) {
               } else {
                 process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
                   'RETURNED: ' + test.expressionInfo(test_Results) +
-                    ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+                    '\n' + indent +
+                    'EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '\n'));
               }
             } else {
               test.countPass++;
@@ -586,6 +599,16 @@ test.cliCloser = function () {
       console.log(colors.inverse(colors.red(results)));
     else
       console.log(colors.inverse(colors.green(results)));
+
+    // Close mongo store
+    if (test.mongoStore.mongoDatabaseOpened) {
+      try {
+        test.mongoStore.mongoDatabase.close();
+      }
+      catch (err) {
+        console.log('err: ' + err);
+      }
+    }
   }
 };
 test.updateStats = function () {

@@ -4,3 +4,4 @@
  */
 
 var colors = require('colors');
+var mongo = require('mongodb');

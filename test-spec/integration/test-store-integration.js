@@ -7,9 +7,11 @@ test.runnerStoreIntegration = function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
       test.example('Excersize all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
 
+
         /*** UNCOMMENT ONE STORE TO TEST ***/
-//        var testStore = test.hostStore;
-        var testStore = new MemoryStore({name:'CRUD test MemoryStore'});
+        var testStore = test.hostStore;
+//        var testStore = new MemoryStore({name:'CRUD test MemoryStore'});
+//        var testStore = test.mongoStore;
         /*** UNCOMMENT ONE STORE TO TEST ***/
 
         var self = this;
@@ -67,6 +69,7 @@ test.runnerStoreIntegration = function () {
               for (var i = 0; i < 3; i++) {
                 actors.push(new self.Stooge());
                 actors[i].set('id', self.stoogeIDsStored[i]);
+                console.log('self.store.getModel: '+JSON.stringify(actors[i]));
                 self.store.getModel(actors[i], stoogeRetrieved);
               }
             }
@@ -78,12 +81,15 @@ test.runnerStoreIntegration = function () {
 
         // callback after retrieving stored stooges
         function stoogeRetrieved(model, error) {
+          console.log('suck my tit juice' + self.stoogesRetrieved.length);
           if (typeof error != 'undefined') {
+            console.log('stoogeRetrieved ' + error);
             returnResponse(testNode, error);
             return;
           }
           self.stoogesRetrieved.push(model);
           if (self.stoogesRetrieved.length == 3) {
+
             // Now we have stored and retrieved (via IDs into new objects).  So verify the stooges made it
             test.assertion(self.stoogesRetrieved[0] !== self.moe && // Make sure not a reference but a copy
               self.stoogesRetrieved[0] !== self.larry && self.stoogesRetrieved[0] !== self.shemp);
@@ -92,18 +98,26 @@ test.runnerStoreIntegration = function () {
             test.show(s);
             test.assertion(T.contains(s, 'Moe') && T.contains(s, 'Larry') && T.contains(s, 'Shemp'));
             // Replace Shemp with Curly
+            var didPutCurly = false
             for (i = 0; i < 3; i++) {
               if (self.stoogesRetrieved[i].get('name') == 'Shemp') {
+                didPutCurly = true;
                 self.stoogesRetrieved[i].set('name', 'Curly');
                 self.store.putModel(self.stoogesRetrieved[i], stoogeChanged);
               }
+            }
+            if (!didPutCurly) {
+              returnResponse(testNode, Error("Can't find Shemp!"));
             }
           }
         }
 
         // callback after storing changed stooge
         function stoogeChanged(model, error) {
-          if (typeof error != 'undefined') throw error;
+          if (typeof error != 'undefined') {
+            returnResponse(testNode, error);
+            return;
+          }
           test.assertion(model.get('name') == 'Curly');
           var curly = new self.Stooge();
           curly.set('id', model.get('id'));
@@ -112,7 +126,10 @@ test.runnerStoreIntegration = function () {
 
         // callback after retrieving changed stooge
         function storeChangedShempToCurly(model, error) {
-          if (typeof error != 'undefined') throw error;
+          if (typeof error != 'undefined') {
+            returnResponse(testNode, error);
+            return;
+          }
           test.assertion(model.get('name') == 'Curly');
           // Now test delete
           self.deletedModelId = model.get('id'); // Remember this

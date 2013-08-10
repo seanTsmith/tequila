@@ -1,6 +1,15 @@
 /**
  * tequila
  * mongo-store-model-server
+ *
+ * MongoDB goodies
+ *
+ * db.testData.find() // return cursor with all docs in testData collection
+ * db.testData.find( { x : 18 } ) // cursor with all docs where x = 18
+ * db.testData.find().limit(3) // limit cursor
+ * db.testData.findOne() // return document not cursor
+ *
+ *
  */
 
 // Methods (Server Side Only)
@@ -8,14 +17,157 @@
 MongoStore.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
-  callBack(this, undefined);
+
+  // Open mongo database
+  var store = this;
+  try {
+    this.mongoServer = new mongo.Server('127.0.0.1', 27017, {auto_reconnect: true});
+    this.mongoDatabase = new mongo.Db('tequilaStore', this.mongoServer, {safe: true});
+    this.mongoDatabaseOpened = false;
+    this.mongoDatabase.open(function (err, db) {
+      if (err) {
+        console.log('MongoStore Connect error: ' + err);
+        callBack(store, err);
+        try {
+          store.mongoDatabase.close();  // Error will retry till close with auto_reconnect: true
+        }
+        catch (err) {
+          console.log('error closing when fail open: ' + err);
+        }
+      } else {
+        store.mongoDatabaseOpened = true;
+        store.storeInterface.isReady = true;
+        store.storeInterface.canGetModel = true;
+        store.storeInterface.canPutModel= true;
+        store.storeInterface.canDeleteModel = true;
+        callBack(store);
+      }
+    });
+  }
+  catch (err) {
+    callBack(store, err);
+  }
+
 };
-MongoStore.prototype.getModel = function (parm) {
-  throw new Error(this.storeType + ' does not prodvide getModel');
+
+MongoStore.prototype.putModel = function (model, callBack) {
+  if (!(model instanceof Model)) throw new Error('argument must be a Model');
+  if (model.getValidationErrors().length) throw new Error('model has validation errors');
+  if (typeof callBack != "function") throw new Error('callback required');
+  var store = this;
+  var a;
+  store.mongoDatabase.collection(model.modelType, function (err, collection) {
+    if (err) {
+      console.log('putModel collection error: ' + err);
+      callBack(model, err);
+      return;
+    }
+    // put name value pairs into modelData
+    var modelData = {};
+    var newModel = false;
+    var id = model.attributes[0].value;
+    for (a in model.attributes) {
+      if (model.attributes[a].name == 'id') {
+        modelData['_id'] = model.attributes[a].value;
+        if (!model.attributes[a].value)
+          newModel = true;
+      } else {
+        modelData[model.attributes[a].name] = model.attributes[a].value;
+      }
+    }
+    if (newModel) {
+      collection.insert(modelData, {safe: true}, function (err, result) {
+        if (err) {
+          console.log('putModel insert error: ' + err);
+          callBack(model, err);
+        } else {
+          // Get resulting data
+          for (a in model.attributes) {
+            if (model.attributes[a].name == 'id')
+              model.attributes[a].value = modelData['_id'];
+            else
+              model.attributes[a].value = modelData[model.attributes[a].name];
+          }
+          callBack(model);
+        }
+      });
+    } else {
+      collection.update({'_id': id}, modelData, {safe:true}, function(err, result) {
+        if(err) {
+          console.log('putModel udpate error: ' + err);
+          callBack(model, err);
+        } else {
+          // Get resulting data
+          for (a in model.attributes) {
+            if (model.attributes[a].name=='id')
+              model.attributes[a].value = modelData['_id'];
+            else
+              model.attributes[a].value = modelData[model.attributes[a].name];
+          }
+          callBack(model);
+        }
+      });
+    }
+  });
 };
-MongoStore.prototype.putModel = function (parm) {
-  throw new Error('Store does not provide pdutModel');
+MongoStore.prototype.getModel = function (model, callBack) {
+  if (!(model instanceof Model)) throw new Error('argument must be a Model');
+  if (model.getValidationErrors().length) throw new Error('model has validation errors');
+  if (!model.attributes[0].value) throw new Error('ID not set');
+  if (typeof callBack != "function") throw new Error('callback required');
+  var store = this;
+  var a;
+  var id = model.attributes[0].value;
+  store.mongoDatabase.collection(model.modelType, function (err, collection) {
+    if (err) {
+      console.log('getModel collection error: ' + err);
+      callBack(model, err);
+      return;
+    }
+    collection.findOne({'_id': id}, function (err, item) {
+      if (err) {
+        console.log('getModel findOne ERROR: ' + err);
+        callBack(model, err);
+        return;
+      }
+      if (item == null) {
+        callBack(model,Error('id not found in store'));
+      } else {
+        for (a in model.attributes) {
+          if (model.attributes[a].name == 'id')
+            model.attributes[a].value = item['_id'];
+          else
+            model.attributes[a].value = item[model.attributes[a].name];
+        }
+        callBack(model);
+      }
+    });
+  });
 };
-MongoStore.prototype.deleteModel = function (parm) {
-  throw new Error('Store does not provide deletdeModel');
+MongoStore.prototype.deleteModel = function (model, callBack) {
+  if (!(model instanceof Model)) throw new Error('argument must be a Model');
+  if (model.getValidationErrors().length) throw new Error('model has validation errors');
+  if (typeof callBack != "function") throw new Error('callback required');
+  var store = this;
+  var a;
+  var id = model.attributes[0].value;
+  store.mongoDatabase.collection(model.modelType, function (err, collection) {
+    if (err) {
+      console.log('deleteModel collection error: ' + err);
+      callBack(model, err);
+      return;
+    }
+    collection.remove({'_id': id}, function (err, item) {
+      if (err) {
+        console.log('deleteModel remove ERROR: ' + err);
+        callBack(model, err);
+        return;
+      }
+      for (a in model.attributes) {
+        if (model.attributes[a].name == 'id')
+          model.attributes[a].value = null;
+      }
+      callBack(model);
+    });
+  });
 };

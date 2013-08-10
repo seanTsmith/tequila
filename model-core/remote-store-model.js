@@ -62,7 +62,6 @@ RemoteStore.prototype.putModel = function (model, callBack) {
         attrib.value = c.attributes[a].value;
         model.attributes.push(attrib);
       }
-      console.log('putModel: ' + JSON.stringify(model));
       callBack(model);
     } else {
       callBack(model, Error(msg));
@@ -84,8 +83,6 @@ RemoteStore.prototype.putModel = function (model, callBack) {
         attrib.value = c.attributes[a].value;
         model.attributes.push(attrib);
       }
-      console.log('getModel model: ' + JSON.stringify(model));
-      console.log('getModel msg: ' + JSON.stringify(msg));
 
       if (typeof c == 'string')
         callBack(model, c);
