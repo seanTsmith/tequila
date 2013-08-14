@@ -4,7 +4,75 @@
  */
 
 // Constructor
-var List = function () {
+var List = function (model) {
   if (false === (this instanceof List)) throw new Error('new operator required');
-  this.items = [];
+  if (false === (model instanceof Model)) throw new Error('argument required: model');
+  this.model = model;
+  this._items = [];
+  this._itemIndex = -1;
+};
+List.prototype.length = function () {
+  return this._items.length;
+};
+List.prototype.addItem = function (item) {
+  var values = [];
+  for (var i in item.attributes) {
+    values.push(item.attributes[i].value);
+  }
+  this._items.push(values);
+  this._itemIndex = this._items.length - 1;
+  return this;
+};
+List.prototype.removeItem = function (item) {
+  this._items.splice(this._itemIndex, 1);
+  this._itemIndex--;
+  return this;
+};
+List.prototype.indexedItem = function (index) {
+  if (this._items.length < 1) throw new Error('list is empty');
+  if (index < 0) throw new Error('item not found');
+  this._itemIndex = index;
+  for (var i in this.model.attributes) {
+    this.model.attributes[i].value = this._items[this._itemIndex][i];
+  }
+};
+List.prototype.nextItem = function () {
+  if (this._items.length < 1) throw new Error('list is empty');
+  this.indexedItem(this._itemIndex + 1);
+};
+List.prototype.previousItem = function () {
+  if (this._items.length < 1) throw new Error('list is empty');
+  this.indexedItem(this._itemIndex - 1);
+};
+List.prototype.firstItem = function () {
+  if (this._items.length < 1) throw new Error('list is empty');
+  this.indexedItem(0);
+};
+List.prototype.lastItem = function () {
+  if (this._items.length < 1) throw new Error('list is empty');
+  this.indexedItem(this._items.length - 1);
+};
+List.prototype.sort = function (key) {
+  var i = 0;
+  var keyvalue;
+  for (var keyName in key) {
+    if (!keyvalue) keyvalue = keyName;
+  }
+  if (!keyvalue) throw new Error('sort order required');
+  var ascendingSort = (key[keyvalue] == 1);
+  while (i < this.model.attributes.length && this.model.attributes[i].name != keyvalue) i++;
+  this._items.sort(function (a, b) {
+    if (ascendingSort) {
+      if (a[i] < b[i])
+        return -1;
+      if (a[i] > b[i])
+        return 1;
+    } else {
+      if (a[i] > b[i])
+        return -1;
+      if (a[i] < b[i])
+        return 1;
+    }
+    return 0;
+  });
 };

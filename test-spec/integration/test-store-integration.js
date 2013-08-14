@@ -9,8 +9,8 @@ test.runnerStoreIntegration = function () {
 
 
         /*** UNCOMMENT ONE STORE TO TEST ***/
-        var testStore = test.hostStore;
-//        var testStore = new MemoryStore({name:'CRUD test MemoryStore'});
+//        var testStore = test.hostStore;
+        var testStore = new MemoryStore({name:'CRUD test MemoryStore'});
 //        var testStore = test.mongoStore;
         /*** UNCOMMENT ONE STORE TO TEST ***/
 
@@ -69,7 +69,6 @@ test.runnerStoreIntegration = function () {
               for (var i = 0; i < 3; i++) {
                 actors.push(new self.Stooge());
                 actors[i].set('id', self.stoogeIDsStored[i]);
-                console.log('self.store.getModel: '+JSON.stringify(actors[i]));
                 self.store.getModel(actors[i], stoogeRetrieved);
               }
             }
@@ -81,9 +80,7 @@ test.runnerStoreIntegration = function () {
 
         // callback after retrieving stored stooges
         function stoogeRetrieved(model, error) {
-          console.log('suck my tit juice' + self.stoogesRetrieved.length);
           if (typeof error != 'undefined') {
-            console.log('stoogeRetrieved ' + error);
             returnResponse(testNode, error);
             return;
           }

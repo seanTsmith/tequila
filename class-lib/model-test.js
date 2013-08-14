@@ -55,7 +55,7 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
     });
     test.heading('METHODS', function () {
       test.heading('toString()', function () {
-        test.example('should return a description of the attribute', 'a ' + new SurrogateModelClass().modelType, function () {
+        test.example('should return a description of the model', 'a ' + new SurrogateModelClass().modelType, function () {
           return new SurrogateModelClass().toString();
         });
       });

@@ -24,7 +24,8 @@ test.heading('Stores', function () {
   test.runnerRemoteStoreModel();
 });
 test.heading('SYSTEM INTEGRATION', function () {
-  test.paragraph('The system functionality and requirements for the library as a whole is contained in this section.');
+  test.paragraph('These tests provide good working examples of library usage.');
+  test.runnerListIntegration();
   test.runnerStoreIntegration();
 });
 test.stop();
