@@ -32,8 +32,19 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
       test.assertion(typeof interface['canGetModel'] == 'boolean'); // define all allowed methods...
       test.assertion(typeof interface['canPutModel'] == 'boolean');
       test.assertion(typeof interface['canDeleteModel'] == 'boolean');
+      test.assertion(typeof interface['canGetList'] == 'boolean');
     });
-    test.heading('onConnect', function () {
+    test.heading('toString()', function () {
+      test.example('should return a description of the Store', "ConvenienceStore: 7-Eleven", function () {
+        var cStore = new SurrogateStoreModel();
+        test.show(cStore.toString());
+        cStore.name = '7-Eleven';
+        cStore.storeType = 'ConvenienceStore';
+        test.show(cStore.toString());
+        return cStore.toString();
+      });
+    });
+    test.heading('onConnect()', function () {
       test.example('must pass url string', Error('argument must a url string'), function () {
         new SurrogateStoreModel().onConnect();
       });
@@ -54,7 +65,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         test.paragraph('see integration test for ' + new SurrogateStoreModel().storeType);
       }
     });
-    test.heading('getModel', function () {
+    test.heading('getModel()', function () {
       if (interface['canGetModel']) {
         test.example('must pass valid model', Error('argument must be a Model'), function () {
           new SurrogateStoreModel().getModel();
@@ -93,7 +104,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         });
       }
     });
-    test.heading('putModel', function () {
+    test.heading('putModel(model)', function () {
       if (interface['canPutModel']) {
         test.example('must pass valid model', Error('argument must be a Model'), function () {
           new SurrogateStoreModel().putModel();
@@ -139,7 +150,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         });
       }
     });
-    test.heading('deleteModel', function () {
+    test.heading('deleteModel(model)', function () {
       if (interface['canDeleteModel']) {
         test.example('must pass valid model', Error('argument must be a Model'), function () {
           new SurrogateStoreModel().deleteModel();
@@ -175,15 +186,26 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         });
       }
     });
-    test.heading('toString()', function () {
-      test.example('should return a description of the Store', "ConvenienceStore: 7-Eleven", function () {
-        var cStore = new SurrogateStoreModel();
-        test.show(cStore.toString());
-        cStore.name = '7-Eleven';
-        cStore.storeType = 'ConvenienceStore';
-        test.show(cStore.toString());
-        return cStore.toString();
-      });
+    test.heading('getList(model,filter)', function () {
+      if (interface['canGetList']) {
+        test.example('returns a List populated from store', undefined, function () {
+          test.shouldThrow(Error('argument must be a List'),function(){
+            new SurrogateStoreModel().getList();
+          })
+          test.shouldThrow(Error('argument must be array'),function(){
+            new SurrogateStoreModel().getList(new List(new Model()));
+          })
+          test.shouldThrow(Error('callback required'),function(){
+            new SurrogateStoreModel().getList(new List(new Model()),[]);
+          })
+          // See integration tests for examples of usage
+        });
+
+      } else {
+        test.example('returns a List populated from store', Error('Store does not provide getList'), function () {
+          return new SurrogateStoreModel().getList();
+        });
+      }
     });
   });
   test.heading('PROPERTIES', function () {

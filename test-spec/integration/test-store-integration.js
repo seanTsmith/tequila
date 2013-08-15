@@ -5,12 +5,12 @@
 test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
-      test.example('Excersize all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
+      test.example('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
 
 
         /*** UNCOMMENT ONE STORE TO TEST ***/
 //        var testStore = test.hostStore;
-        var testStore = new MemoryStore({name:'CRUD test MemoryStore'});
+        var testStore = new MemoryStore({name: 'CRUD test MemoryStore'});
 //        var testStore = test.mongoStore;
         /*** UNCOMMENT ONE STORE TO TEST ***/
 
@@ -51,7 +51,7 @@ test.runnerStoreIntegration = function () {
         this.stoogesRetrieved = [];
 
         // store the stooges
-        this.store.putModel(this.moe, stoogeStored, this); // todo unit test this / self
+        this.store.putModel(this.moe, stoogeStored, this);
         this.store.putModel(this.larry, stoogeStored, this);
         this.store.putModel(this.shemp, stoogeStored, this);
 
@@ -148,12 +148,30 @@ test.runnerStoreIntegration = function () {
           self.store.getModel(curly, hesDeadJim);
         }
 
-        // callback after lookup of
+        // callback after lookup of dead stooge
         function hesDeadJim(model, error) {
-          test.show(error);
-          test.assertion(error == 'Error: id not found in store');
+          if (typeof error != 'undefined') {
+            if (error != 'Error: id not found in store') {
+              returnResponse(testNode, error);
+              return;
+            }
+          }
+          // Now create a list from the stooge store
+          var list = new List(model);
+          self.store.getList(list, [], listReady);
+        }
+
+        // callback after list created from store
+        function listReady(list, error) {
+          if (typeof error != 'undefined') {
+            returnResponse(testNode, error);
+            return;
+          }
+          test.assertion(list instanceof List);
+          test.assertion(list.length() == 2);
           returnResponse(testNode, true);
         }
+
       });
     });
   });

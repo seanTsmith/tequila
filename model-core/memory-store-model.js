@@ -12,17 +12,16 @@ var MemoryStore = function (args) {
     isReady: true,
     canGetModel: true,
     canPutModel: true,
-    canDeleteModel: true
+    canDeleteModel: true,
+    canGetList: true
   };
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
-
   var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
   var badJooJoo = [];
   for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
   if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
-
 };
 MemoryStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
@@ -33,7 +32,7 @@ MemoryStore.prototype.getModel = function (model, callBack) {
   if (typeof callBack != "function") throw new Error('callback required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
-  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
+  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
   if (modelIndex < 0) {
     callBack(model, new Error('model not found in store'));
     return;
@@ -62,7 +61,7 @@ MemoryStore.prototype.putModel = function (model, callBack) {
   if (id) {
     // Find model in memorystore, error out if can't find
     var modelIndex = -1;
-    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
+    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
     if (modelIndex < 0) {
       callBack(model, new Error('model not found in store'));
       return;
@@ -88,9 +87,9 @@ MemoryStore.prototype.putModel = function (model, callBack) {
   } else {
     // Find model in memorystore, add if not found
     var modelIndex = -1;
-    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
+    for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
     if (modelIndex < 0) {
-      this.data.push([model.storeType, [] ]);
+      this.data.push([model.modelType, [] ]);
       modelIndex = this.data.length - 1;
     }
     // Add the id and model to memory store
@@ -113,7 +112,7 @@ MemoryStore.prototype.deleteModel = function (model, callBack) {
   if (typeof callBack != "function") throw new Error('callback required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
-  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.storeType) modelIndex = i;
+  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
   if (modelIndex < 0) {
     callBack(model, new Error('model not found in store'));
     return;
@@ -128,7 +127,6 @@ MemoryStore.prototype.deleteModel = function (model, callBack) {
     return;
   }
   // Splice out the stored values then prepare that Model for callback with ID stripped
-  //var storeValues = storedPair[instanceIndex][1];
   var storeValues = storedPair.splice(instanceIndex, 1)[0][1];
   for (var a in model.attributes) {
     if (model.attributes[a].name == 'id')
@@ -137,4 +135,22 @@ MemoryStore.prototype.deleteModel = function (model, callBack) {
       model.attributes[a].value = storeValues[model.attributes[a].name];
   }
   callBack(model, undefined);
+};
+MemoryStore.prototype.getList = function (list, filter, callBack) {
+  if (!(list instanceof List)) throw new Error('argument must be a List');
+  if (!(filter instanceof Array)) throw new Error('argument must be array');
+  if (typeof callBack != "function") throw new Error('callback required');
+  // Find model in memorystore, error out if can't find
+  var modelIndex = -1;
+  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == list.model.modelType) modelIndex = i;
+  if (modelIndex < 0) {
+    callBack(list, new Error('model not found in store'));
+    return;
+  }
+  var storedPair = this.data[modelIndex][1];
+  for (var i=0; i<storedPair.length; i++) {
+    list._items.push(storedPair[i][1]);
+  }
+  list._itemIndex = list._items.length - 1;
+  callBack(list);
 };

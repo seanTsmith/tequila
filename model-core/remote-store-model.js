@@ -12,7 +12,8 @@ var RemoteStore = function (args) {
     isReady: false,
     canGetModel: true,
     canPutModel: true,
-    canDeleteModel: true
+    canDeleteModel: true,
+    canGetList: false
   };
   var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
   var badJooJoo = [];

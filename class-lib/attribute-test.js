@@ -90,9 +90,11 @@ test.runnerAttribute = function () {
                 }
               } else {
                 // mismatches bad so should throw error (is caught unless no error or different error)
-                test.shouldThrow('*', function () {
-                  new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
-                });
+                if (j > 0) { // null in id will be valid for others so skip
+                  test.shouldThrow('*', function () {
+                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
+                  });
+                }
               }
               // other objects should throw always
               test.shouldThrow('*', function () {
@@ -238,7 +240,7 @@ test.runnerAttribute = function () {
           test.assertion(!((myBool.coerce('') || (myBool.coerce('yep')))));
           // TODO
           test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
-            new Attribute('TODO','Date').coerce();
+            new Attribute('TODO', 'Date').coerce();
           });
           test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
             new Attribute({name: 'Twiggy', type: 'Model', modelType: new Model()}).coerce();

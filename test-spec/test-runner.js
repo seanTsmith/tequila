@@ -665,11 +665,16 @@ test.expressionInfo = function (expr) {
   //return JSON.stringify(expr);
 };
 test.shouldThrow = function (err, func) {
+  var gotError = false;
   try {
     func();
   } catch (e) {
+    gotError = true;
     if (err !== undefined)
       if (err.toString() != e.toString() && err.toString() != '*') throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
+  }
+  if (!gotError) {
+    throw('EXPECTED ERROR(' + err + ')');
   }
 };
 test.callTestCode = function (node, funkytown) {

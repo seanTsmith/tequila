@@ -32,7 +32,7 @@ test.runnerTequila = function () {
       test.example('object does not exist in array', false, function () {
         return Tequila().contains(['moe', 'larry', 'curley'], 'shemp');
       });
-      test.heading('getRegisteredStores');
+      test.heading('getRegisteredStores()');
       test.paragraph('This method returns an array of registered stores.');
       test.example('must be an array', '[object Array]', function () {
         return Object.prototype.toString.call( Tequila().getRegisteredStores() );
