@@ -13,7 +13,6 @@
  */
 
 // Methods (Server Side Only)
-
 MongoStore.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
@@ -49,7 +48,6 @@ MongoStore.prototype.onConnect = function (location, callBack) {
   }
 
 };
-
 MongoStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');

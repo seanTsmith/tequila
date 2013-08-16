@@ -13,7 +13,7 @@ var RemoteStore = function (args) {
     canGetModel: true,
     canPutModel: true,
     canDeleteModel: true,
-    canGetList: false
+    canGetList: true
   };
   var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
   var badJooJoo = [];
@@ -52,14 +52,14 @@ RemoteStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
-  this.transport.send(new Message('PutModel',model), function (msg) {
-    if (msg == 'Ack') {
+  this.transport.send(new Message('PutModel', model), function (msg) {
+    if (false && msg == 'Ack') { // todo wtf is this
       callBack(model);
     } else if (msg.type == 'PutModelAck') {
       var c = msg.contents;
       model.attributes = [];
       for (var a in c.attributes) {
-        var attrib = new Attribute(c.attributes[a].name,c.attributes[a].type);
+        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
         attrib.value = c.attributes[a].value;
         model.attributes.push(attrib);
       }
@@ -68,23 +68,23 @@ RemoteStore.prototype.putModel = function (model, callBack) {
       callBack(model, Error(msg));
     }
   });
-};RemoteStore.prototype.getModel = function (model, callBack) {
+};
+RemoteStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (!model.attributes[0].value) throw new Error('ID not set');
   if (typeof callBack != "function") throw new Error('callback required');
-  this.transport.send(new Message('GetModel',model), function (msg) {
-    if (msg == 'Ack') {
+  this.transport.send(new Message('GetModel', model), function (msg) {
+    if (false && msg == 'Ack') { // todo wtf is this
       callBack(model);
     } else if (msg.type == 'GetModelAck') {
       var c = msg.contents;
       model.attributes = [];
       for (var a in c.attributes) {
-        var attrib = new Attribute(c.attributes[a].name,c.attributes[a].type);
+        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
         attrib.value = c.attributes[a].value;
         model.attributes.push(attrib);
       }
-
       if (typeof c == 'string')
         callBack(model, c);
       else
@@ -94,26 +94,48 @@ RemoteStore.prototype.putModel = function (model, callBack) {
     }
   });
 };
-
 RemoteStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (typeof callBack != "function") throw new Error('callback required');
-  this.transport.send(new Message('DeleteModel',model), function (msg) {
-    if (msg == 'Ack') {
+  this.transport.send(new Message('DeleteModel', model), function (msg) {
+    if (false && msg == 'Ack') { // todo wtf is this
       callBack(model);
     } else if (msg.type == 'DeleteModelAck') {
       var c = msg.contents;
       model.attributes = [];
       for (var a in c.attributes) {
-        var attrib = new Attribute(c.attributes[a].name,c.attributes[a].type);
+        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
         attrib.value = c.attributes[a].value;
         model.attributes.push(attrib);
       }
-      console.log('DeleteModel: ' + JSON.stringify(model));
+//      console.log('DeleteModel: ' + JSON.stringify(model));
       callBack(model);
     } else {
       callBack(model, Error(msg));
     }
   });
+};
+RemoteStore.prototype.getList = function (list, filter, callBack) {
+  if (!(list instanceof List)) throw new Error('argument must be a List');
+  if (!(filter instanceof Array)) throw new Error('argument must be array');
+  if (typeof callBack != "function") throw new Error('callback required');
+  this.transport.send(new Message('GetList', [list, filter]), function (msg) {
+    if (false && msg == 'Ack') { // todo wtf is this
+      callBack(list);
+    } else if (msg.type == 'GetListAck') {
+//      var c = msg.contents;
+//      model.attributes = [];
+//      for (var a in c.attributes) {
+//        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
+//        attrib.value = c.attributes[a].value;
+//        model.attributes.push(attrib);
+//      }
+      console.log('getList: ' + JSON.stringify(list));
+      callBack(list);
+    } else {
+      callBack(list, Error(msg));
+    }
+  });
+
 };

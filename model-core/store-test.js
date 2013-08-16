@@ -188,7 +188,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
     });
     test.heading('getList(model,filter)', function () {
       if (interface['canGetList']) {
-        test.example('returns a List populated from store', undefined, function () {
+        test.xexample('returns a List populated from store', undefined, function () {
           test.shouldThrow(Error('argument must be a List'),function(){
             new SurrogateStoreModel().getList();
           })
@@ -200,9 +200,8 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
           })
           // See integration tests for examples of usage
         });
-
       } else {
-        test.example('returns a List populated from store', Error('Store does not provide getList'), function () {
+        test.xexample('returns a List populated from store', Error('Store does not provide getList'), function () {
           return new SurrogateStoreModel().getList();
         });
       }

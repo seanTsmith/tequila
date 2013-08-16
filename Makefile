@@ -3,15 +3,15 @@ all: test
 test: make.test
 	@bin/tequila test
 
-make.test: make.lib test-spec/node-test-runner.js
+make.test: make.lib test.lib
 
-test-spec/node-test-runner.js: test-spec/node-test-header.js test-spec/test-runner.js test-spec/tequila-spec.js test-spec/node-test-tail.js test-spec/Markdown.Converter.js
+test.lib:
 	@echo building test-spec/node-test-runner.js...
-	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > test-spec/node-test-runner.js
+	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > node-test-cli.js
 	@cat \
 	    test-spec/Markdown.Converter.js \
 	    tequila.js \
-	    tequila-server.js \
+        model-core/mongo-store-model-server.js \
 	    test-spec/node-test-header.js \
 	    test-spec/test-runner.js \
         class-lib/tequila-test.js \
@@ -29,9 +29,10 @@ test-spec/node-test-runner.js: test-spec/node-test-header.js test-spec/test-runn
         test-spec/integration/test-store-integration.js \
 	    test-spec/tequila-spec.js \
 	    test-spec/node-test-tail.js \
-	        >> test-spec/node-test-runner.js
+	        >> node-test-cli.js
 
 make.lib:
+	@echo Making library
 	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > tequila.js
 	@cat \
 	    class-lib/tequila-class.js \
@@ -47,8 +48,9 @@ make.lib:
         model-core/mongo-store-model.js \
 	        >> tequila.js
 
-	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > tequila-server.js
+	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > node-test-host.js
 	@cat \
+        tequila.js \
         model-core/mongo-store-model-server.js \
-	        >> tequila-server.js
-
+        test-spec/test-runner-node-server.js \
+	        >> node-test-host.js

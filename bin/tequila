@@ -12,7 +12,7 @@ tequilaCli.out('tequila 0.0.1');
 tequilaCli.command = process.argv[2] || "help"
 switch (tequilaCli.command) {
 case 'test':
-    var testRunner = require('../test-spec/node-test-runner.js');
+    var testRunner = require('../node-test-cli.js');
     break;
 default:
     tequilaCli.out('unknown command: '+tequilaCli.command);

@@ -20,6 +20,6 @@ npm-debug.log
 Icon?
 ehthumbs.db
 Thumbs.db
-test-spec/node-test-runner.js
 tequila.js
-tequila-server.js
+node-test-host.js
+node-test-cli.js
