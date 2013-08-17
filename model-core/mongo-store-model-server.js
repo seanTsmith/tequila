@@ -37,7 +37,7 @@ MongoStore.prototype.onConnect = function (location, callBack) {
         store.mongoDatabaseOpened = true;
         store.storeInterface.isReady = true;
         store.storeInterface.canGetModel = true;
-        store.storeInterface.canPutModel= true;
+        store.storeInterface.canPutModel = true;
         store.storeInterface.canDeleteModel = true;
         callBack(store);
       }
@@ -90,14 +90,14 @@ MongoStore.prototype.putModel = function (model, callBack) {
         }
       });
     } else {
-      collection.update({'_id': id}, modelData, {safe:true}, function(err, result) {
-        if(err) {
+      collection.update({'_id': id}, modelData, {safe: true}, function (err, result) {
+        if (err) {
           console.log('putModel udpate error: ' + err);
           callBack(model, err);
         } else {
           // Get resulting data
           for (a in model.attributes) {
-            if (model.attributes[a].name=='id')
+            if (model.attributes[a].name == 'id')
               model.attributes[a].value = modelData['_id'];
             else
               model.attributes[a].value = modelData[model.attributes[a].name];
@@ -129,7 +129,7 @@ MongoStore.prototype.getModel = function (model, callBack) {
         return;
       }
       if (item == null) {
-        callBack(model,Error('id not found in store'));
+        callBack(model, Error('id not found in store'));
       } else {
         for (a in model.attributes) {
           if (model.attributes[a].name == 'id')
@@ -156,7 +156,8 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
       return;
     }
     collection.remove({'_id': id}, function (err, item) {
-      if (err) {
+      if (err || item != 1) {
+        if (!err) err = 'error deleting: item is not equal to 1'
         console.log('deleteModel remove ERROR: ' + err);
         callBack(model, err);
         return;

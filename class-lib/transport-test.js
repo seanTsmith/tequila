@@ -5,10 +5,11 @@
 
 test.runnerTransport = function () {
   test.heading('Transport Class', function () {
-    if (typeof io == 'undefined') {
+//    if (typeof io == 'undefined') {
       test.examplesDisabled = true;
-      test.paragraph('tests disabled socket.io not detected');
-    }
+      test.paragraph('tests disabled socket.io too spammy in console');
+//      test.paragraph('tests disabled socket.io not detected');
+//    }
     test.paragraph('Handle message passing between host and UI.');
     test.heading('CONSTRUCTOR', function () {
       test.example('objects created should be an instance of Transport', true, function () {

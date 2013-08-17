@@ -63,7 +63,10 @@ RemoteStore.prototype.putModel = function (model, callBack) {
         attrib.value = c.attributes[a].value;
         model.attributes.push(attrib);
       }
-      callBack(model);
+      if (typeof c == 'string')
+        callBack(model, c);
+      else
+        callBack(model);
     } else {
       callBack(model, Error(msg));
     }
@@ -110,7 +113,10 @@ RemoteStore.prototype.deleteModel = function (model, callBack) {
         model.attributes.push(attrib);
       }
 //      console.log('DeleteModel: ' + JSON.stringify(model));
-      callBack(model);
+      if (typeof c == 'string')
+        callBack(model, c);
+      else
+        callBack(model);
     } else {
       callBack(model, Error(msg));
     }

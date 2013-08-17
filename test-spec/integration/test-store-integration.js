@@ -6,31 +6,18 @@ test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
       test.example('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
-
-
-        /*** UNCOMMENT ONE STORE TO TEST ***/
-//        var testStore = test.hostStore;
-        var testStore = new MemoryStore({name: 'CRUD test MemoryStore'});
-//        var testStore = test.mongoStore;
-        /*** UNCOMMENT ONE STORE TO TEST ***/
-
         var self = this;
-
-        // Check store interface
-        var interface = testStore.getStoreInterface();
-        test.show(interface);
-        test.show(testStore.name);
-        test.show(testStore.storeType);
-        test.assertion(interface.isReady);
+        var storeBeingTested  = test.integrationStore.name + ' ' + test.integrationStore.storeType;
+        test.show(storeBeingTested);
 
         // If store is not ready then get out...
-        if (!interface.isReady) {
+        if (!test.integrationStore.getStoreInterface().isReady) {
           returnResponse(testNode, Error('Store is not ready.'));
           return;
         }
 
         // setup store and stooge class
-        this.store = testStore;
+        this.store = test.integrationStore;
         this.Stooge = function (args) {
           Model.call(this, args);
           this.modelType = "Stooge";
@@ -55,6 +42,7 @@ test.runnerStoreIntegration = function () {
         this.store.putModel(this.larry, stoogeStored, this);
         this.store.putModel(this.shemp, stoogeStored, this);
 
+
         // callback after storing stooges
         function stoogeStored(model, error) {
           if (typeof error != 'undefined') {
@@ -64,6 +52,7 @@ test.runnerStoreIntegration = function () {
           try {
             self.stoogeIDsStored.push(model.get('id'));
             if (self.stoogeIDsStored.length == 3) {
+              test.assertion(true); // Show we made it this far
               // Now that first 3 stooges are stored lets retrieve and verify
               var actors = [];
               for (var i = 0; i < 3; i++) {
@@ -86,7 +75,7 @@ test.runnerStoreIntegration = function () {
           }
           self.stoogesRetrieved.push(model);
           if (self.stoogesRetrieved.length == 3) {
-
+            test.assertion(true); // Show we made it this far
             // Now we have stored and retrieved (via IDs into new objects).  So verify the stooges made it
             test.assertion(self.stoogesRetrieved[0] !== self.moe && // Make sure not a reference but a copy
               self.stoogesRetrieved[0] !== self.larry && self.stoogesRetrieved[0] !== self.shemp);

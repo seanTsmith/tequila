@@ -33,11 +33,19 @@ test.runner = function (isBrowser) {
   storeLoader.callback = function (force) {
     storeLoader.countDone++;
     if (force || (!storeLoader.timedOut && storeLoader.countDone == storeLoader.countNeeded)) {
+      clearInterval(storeLoader.watchdog);
+      if (test.hostStoreAvailable) {
+        test.integrationStore = test.hostStore;
+      } else if (test.mongoStoreAvailable) {
+        test.integrationStore = test.mongoStore;
+      } else {
+        test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
+      }
+      console.log(test.integrationStore.name + ' is a ' + test.integrationStore.storeType);
       test.renderHead(isBrowser);
       test.renderDetail(isBrowser);
       test.renderCloser(isBrowser);
       test.updateStats();
-      clearInterval(storeLoader.watchdog);
     }
   };
 
@@ -49,24 +57,26 @@ test.runner = function (isBrowser) {
   }, 3000);
 
   // try to create a hostStore
-  test.hostStore = new RemoteStore({name: 'hostStore (http://localhost)'});
+  test.hostStore = new RemoteStore({name: 'Integration Test Store'});
   test.hostStore.onConnect('http://localhost', function (store, err) {
     if (err) {
       test.hostStoreAvailable = false;
       console.warn('hostStore unavailable (' + err + ')');
     } else {
+      console.warn('hostStore connected.');
       test.hostStoreAvailable = true;
     }
     storeLoader.callback();
   });
 
   // try to create a mongoStore
-  test.mongoStore = new MongoStore({name: 'mongoStore'});
+  test.mongoStore = new MongoStore({name: 'Integration Test Store'});
   test.mongoStore.onConnect('http://localhost', function (store, err) {
     if (err) {
       test.mongoStoreAvailable = false;
       console.warn('mongoStore unavailable (' + err + ')');
     } else {
+      console.warn('mongoStore connected.');
       test.mongoStoreAvailable = true;
     }
     storeLoader.callback();

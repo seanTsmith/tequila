@@ -43,20 +43,23 @@ console.log(JSON.stringify(T.getVersion()))
 
 // try to create a mongoStore
 var mongo = require('mongodb');
-var hostStore; // = new MemoryStore(); // start hoststore with memory TODO wtf?
-var mongoStore = new MongoStore({name: 'mongoStore'});
+var hostStore = new MemoryStore({name: 'Host Test Store'}); // start hoststore with memory
+var mongoStore = new MongoStore({name: 'Host Test Store'});
 mongoStore.onConnect('http://localhost', function (store, err) {
   if (err) {
     console.warn('mongoStore unavailable (' + err + ')');
   } else {
     console.log('mongoStore connected');
-    hostStore = mongoStore;
+    hostStore = mongoStore; // use mongoDB for hostStore
   }
+  console.log(hostStore.name + ' ' + hostStore.storeType);
+
 });
 
 //io.set('log level', 1);
 io.set('log', false);
 io.on('connection', function (socket) {
+  console.log('socket.io connection: ' + socket.id);
   socket.on('ackmessage', function (obj, fn) {
     var pm;
     var msg;
@@ -67,19 +70,27 @@ io.on('connection', function (socket) {
         var ProxyPutModel = function (args) {
           Model.call(this, args);
           this.modelType = obj.contents.modelType;
+          this.attributes = [];
           for (var a in obj.contents.attributes) {
-            var attrib = new Attribute(obj.contents.attributes[a].name);
-            if (attrib.name != 'id') {
+            var attrib = new Attribute(obj.contents.attributes[a].name, obj.contents.attributes[a].type);
+            if (attrib.name == 'id') { // TODO only If mongo! or refactor mongo to normalize IDs
+              if (attrib.value != obj.contents.attributes[a].value)
+                attrib.value = mongo.ObjectID.createFromHexString(obj.contents.attributes[a].value);
+            } else {
               attrib.value = obj.contents.attributes[a].value;
-              this.attributes.push(attrib);
             }
+            this.attributes.push(attrib);
           }
         };
-        ProxyPutModel.prototype = T.inheritPrototype(Model.prototype);
+        ProxyPutModel.prototype = T.inheritPrototype(Model.prototype); // Todo this is not a real class object may need to make factory builder
         pm = new ProxyPutModel();
-        console.log('fucking hostStore: ' + JSON.stringify(hostStore));
         hostStore.putModel(pm, function (model, error) {
-          msg = new Message('PutModelAck', model);
+          if (typeof error == 'undefined') {
+            msg = new Message('PutModelAck', model);
+          } else {
+            console.log('ERROR: ' + error + "");
+            msg = new Message('PutModelAck', error + "");
+          }
           fn(msg);
         }, this);
         break;
@@ -92,7 +103,11 @@ io.on('connection', function (socket) {
           this.attributes = [];
           for (var a in obj.contents.attributes) {
             var attrib = new Attribute(obj.contents.attributes[a].name, obj.contents.attributes[a].type);
-            attrib.value = obj.contents.attributes[a].value;
+            if (attrib.name == 'id') { // TODO only If mongo! or refactor mongo to normalize IDs
+              attrib.value = mongo.ObjectID.createFromHexString(obj.contents.attributes[a].value);
+            } else {
+              attrib.value = obj.contents.attributes[a].value;
+            }
             this.attributes.push(attrib);
           }
         };
@@ -116,7 +131,11 @@ io.on('connection', function (socket) {
           this.attributes = [];
           for (var a in obj.contents.attributes) {
             var attrib = new Attribute(obj.contents.attributes[a].name, obj.contents.attributes[a].type);
-            attrib.value = obj.contents.attributes[a].value;
+            if (attrib.name == 'id') { // TODO only If mongo! or refactor mongo to normalize IDs
+              attrib.value = mongo.ObjectID.createFromHexString(obj.contents.attributes[a].value);
+            } else {
+              attrib.value = obj.contents.attributes[a].value;
+            }
             this.attributes.push(attrib);
           }
         };
@@ -132,7 +151,7 @@ io.on('connection', function (socket) {
         break;
 
       case 'GetList': // Delete model in store
-        console.log('GetList: ' + JSON.stringify(obj));
+//        console.log('GetList: ' + JSON.stringify(obj));
         msg = new Message('DeleteModelAck', 'penis');
         fn(msg);
         break;
@@ -144,24 +163,23 @@ io.on('connection', function (socket) {
     }
   });
   socket.on('message', function (obj) {
-    console.log('socket.io message: ' + obj);
+    console.log('message socket.io message: ' + obj);
   });
   socket.on('disconnect', function (reason) {
-    console.log('socket.io disconnect: ' + reason);
+    console.log('message socket.io disconnect: ' + reason);
   });
-  console.log('connect: ' + socket);
 });
 
 io.of('hostStore').on('connection', function (socket) {
+  console.log('hostStore socket.io connection: ' + socket.id);
   socket.on('ackmessage', function (obj, fn) {
-    console.log('socket.io ackmessage: ' + obj);
+    console.log('hostStore socket.io ackmessage: ' + obj);
     fn('Ack');
   });
   socket.on('message', function (obj) {
-    console.log('socket.io message: ' + obj);
+    console.log('hostStore socket.io message: ' + obj);
   });
   socket.on('disconnect', function (reason) {
-    console.log('socket.io disconnect: ' + reason);
+    console.log('hostStore socket.io disconnect: ' + reason);
   });
-  console.log('connect: ' + socket);
 });

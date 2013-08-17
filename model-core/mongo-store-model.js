@@ -27,3 +27,8 @@ MongoStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
 
 // See mongo-store-model-server... stub for client here
+MongoStore.prototype.onConnect = function (location, callBack) {
+  if (typeof location != 'string') throw new Error('argument must a url string');
+  if (typeof callBack != 'function') throw new Error('argument must a callback');
+  callBack(this, Error('mongoStore unavailable in client'));
+};
