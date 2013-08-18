@@ -170,3 +170,64 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
     });
   });
 };
+MongoStore.prototype.getList = function (list, filter, callBack) {
+  if (!(list instanceof List)) throw new Error('argument must be a List');
+  if (!(filter instanceof Array)) throw new Error('argument must be array');
+  if (typeof callBack != "function") throw new Error('callback required');
+//  // Find model in memorystore, error out if can't find
+//  var modelIndex = -1;
+//  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == list.model.modelType) modelIndex = i;
+//  if (modelIndex < 0) {
+//    callBack(list, new Error('model not found in store'));
+//    return;
+//  }
+//  var storedPair = this.data[modelIndex][1];
+//  for (var i=0; i<storedPair.length; i++) {
+//    list._items.push(storedPair[i][1]);
+//  }
+//  list._itemIndex = list._items.length - 1;
+//  callBack(list);
+
+
+//  collection.find({'_id':o_id}, function(err, cursor){
+//    cursor.toArray(callback);
+//    db.close();
+//  });
+
+  var store = this;
+  store.mongoDatabase.collection(list.model.modelType, function (err, collection) {
+    if (err) {
+      console.log('getList collection error: ' + err);
+      callBack(list, err);
+      return;
+    }
+    collection.find({}, function (err, cursor) {
+      if (err) {
+        console.log('getList find error: ' + err);
+        callBack(list, err);
+        return;
+      }
+      cursor.toArray(function (err, documents) {
+        if (err) {
+          console.log('getList toArray error: ' + err);
+          callBack(list, err);
+          return;
+        }
+//        console.log('collection.find cursor: ' + JSON.stringify(documents));
+        for (var i = 0; i < documents.length; i++) {
+//          console.log('documents: ' + JSON.stringify(documents[i]));
+          list._items.push(documents[i]);
+//          for (var j in documents[i]) {
+//            console.log('documents ' + j + ': ' + JSON.stringify(documents[i][j]));
+//          }
+        }
+        list._itemIndex = list._items.length - 1;
+        callBack(list);
+        // cursor.toArray(callback);
+        // db.close();
+      });
+    });
+//    callBack(list, Error('dick licker'));
+  });
+
+};

@@ -27,7 +27,7 @@ test.runner = function (isBrowser) {
 
   // After stores loaded run tests
   var storeLoader = {};
-  storeLoader.countNeeded = 2;
+  storeLoader.countNeeded = 3; // total anync events
   storeLoader.countDone = 0;
   storeLoader.timedOut = false;
   storeLoader.callback = function (force) {
@@ -75,11 +75,25 @@ test.runner = function (isBrowser) {
     if (err) {
       test.mongoStoreAvailable = false;
       console.warn('mongoStore unavailable (' + err + ')');
+      storeLoader.callback();
+      storeLoader.callback(); // Call for each collection wipe (below)
     } else {
       console.warn('mongoStore connected.');
       test.mongoStoreAvailable = true;
+
+      // wipe test collections
+      store.mongoDatabase.collection('Stooge', function (err, collection) {
+        collection.drop(function(err, reply) {
+          storeLoader.callback();
+        });
+      });
+      store.mongoDatabase.collection('Bullshit', function (err, collection) {
+        collection.drop(function(err, reply) {
+          storeLoader.callback();
+        });
+      });
+
     }
-    storeLoader.callback();
   });
 
 
@@ -304,7 +318,7 @@ test.renderDetail = function (isBrowser) {
             if (test_Value !== expected_Value || gotFailedAssertions) {
               test.countFail++; // TODO if console is white this is invisible ink...
               if (gotFailedAssertions) {
-                process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+                process.stdout.write( '\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
                   'ASSERTION(s) failed'));
               } else {
                 process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
@@ -584,12 +598,21 @@ test.asyncCallback = function (node, test_Results) {
     } else {
       test.countFail++;
       var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+      var indent = '';
+      for (j = 0; j < ref.length; j++)
+        indent += ' ';
       if (test.wasThrown) {
         process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: idk'));
       } else {
-        process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
-          'RETURNED: ' + test.expressionInfo(test_Results) +
-            ' EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue)));
+        if (gotFailedAssertions) {
+          process.stdout.write(colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
+            'ASSERTION(s) failed'));
+        } else {
+          process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+            'RETURNED: ' + test.expressionInfo(test_Results) +
+              '\n' + indent +
+              'EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '\n'));
+        }
       }
 
     }

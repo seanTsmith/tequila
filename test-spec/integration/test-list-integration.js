@@ -4,8 +4,7 @@
  */
 test.runnerListIntegration = function () {
   test.heading('List Integration', function () {
-    test.example('Excersize liste methods', undefined, function () {
-
+    test.example('Exercise list methods', undefined, function () {
       // Create actor class
       var Actor = function (args) {
         Model.call(this, args);
@@ -19,17 +18,28 @@ test.runnerListIntegration = function () {
       var actor = new Actor();
       var actors = new List(actor);
       var actorsInfo = [
-        ['Jack Nicholson', 1937],
-        ['Marlon Brando', 1924],
-        ['Robert De Niro', 1943],
-        ['Al Pacino', 1940],
-        ['Daniel Day-Lewis', 1957],
-        ['Dustin Hoffman', 1937],
-        ['Tom Hanks', 1956],
-        ['Anthony Hopkins', 1937],
-        ['Paul Newman', 1925],
-        ['Denzel Washington', 1954]
+        ['Jack Nicholson', 1937, true],
+        ['Meryl Streep',	1949, false],
+        ['Marlon Brando', 1924, true],
+        ['Cate Blanchett',	1969, false],
+        ['Robert De Niro', 1943, true],
+        ['Judi Dench',	1934, false],
+        ['Al Pacino', 1940, true],
+        ['Nicole Kidman',	1967, false],
+        ['Daniel Day-Lewis', 1957, true],
+        ['Shirley MacLaine',	1934, false],
+        ['Dustin Hoffman', 1937, true],
+        ['Jodie Foster',	1962, false],
+        ['Tom Hanks', 1956, true],
+        ['Kate Winslet',	1975, false],
+        ['Anthony Hopkins', 1937, true],
+        ['Angelina Jolie',	1975, false],
+        ['Paul Newman', 1925, true],
+        ['Sandra Bullock',	1964, false],
+        ['Denzel Washington', 1954, true],
+        ['Renée Zellweger',	1969, false]
       ];
+
 
       // Build List
       for (var i in actorsInfo) {
@@ -45,14 +55,14 @@ test.runnerListIntegration = function () {
         actors.previousItem();  // can't go past top
       });
       actors.nextItem();
-      test.assertion(actor.get('name') == 'Marlon Brando');
+      test.assertion(actor.get('name') == 'Meryl Streep');
       actors.lastItem();
-      test.assertion(actor.get('name') == 'Denzel Washington');
+      test.assertion(actor.get('name') == 'Renée Zellweger');
 
       // Sort the list
       actors.sort({born: -1});  // Youngest actor
       actors.firstItem();
-      test.assertion(actor.get('name') == 'Daniel Day-Lewis');
+      test.assertion(actor.get('name') == 'Kate Winslet' || actor.get('name') == 'Angelina Jolie');
       actors.sort({born: 1});  // Oldest actor
       actors.firstItem();
       test.assertion(actor.get('name') == 'Marlon Brando');

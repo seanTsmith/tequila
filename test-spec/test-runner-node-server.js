@@ -151,8 +151,8 @@ io.on('connection', function (socket) {
         break;
 
       case 'GetList': // Delete model in store
-//        console.log('GetList: ' + JSON.stringify(obj));
-        msg = new Message('DeleteModelAck', 'penis');
+        console.log('GetList: ' + JSON.stringify(obj));
+        msg = new Message('GetListAck', 'penis');
         fn(msg);
         break;
 

@@ -2,7 +2,10 @@
 Tequila es bueno!
 
 TODO:
-* finish getList
+* refactor test-runner-node-server to put processing inside class files
+* finish getList remote
+* createFromHexString needs to be inside mongo class code keep IDs as strings all times
+* make filter work in getList
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
 

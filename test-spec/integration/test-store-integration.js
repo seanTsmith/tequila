@@ -145,22 +145,27 @@ test.runnerStoreIntegration = function () {
               return;
             }
           }
-          returnResponse(testNode, true);
-//          // Now create a list from the stooge store
-//          var list = new List(model);
-//          self.store.getList(list, [], listReady);
+//          returnResponse(testNode, true);
+          // Now create a list from the stooge store
+          var list = new List(new self.Stooge());
+          try {
+            self.store.getList(list, [], listReady);
+          }
+          catch (err) {
+            returnResponse(testNode, err);
+          }
         }
 
-//        // callback after list created from store
-//        function listReady(list, error) {
-//          if (typeof error != 'undefined') {
-//            returnResponse(testNode, error);
-//            return;
-//          }
-//          test.assertion(list instanceof List);
-//          test.assertion(list.length() == 2);
-//          returnResponse(testNode, true);
-//        }
+        // callback after list created from store
+        function listReady(list, error) {
+          if (typeof error != 'undefined') {
+            returnResponse(testNode, error);
+            return;
+          }
+          test.assertion(list instanceof List);
+          test.assertion(list.length() == 2);
+          returnResponse(testNode, true);
+        }
 
       });
     });
