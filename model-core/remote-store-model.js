@@ -112,7 +112,6 @@ RemoteStore.prototype.deleteModel = function (model, callBack) {
         attrib.value = c.attributes[a].value;
         model.attributes.push(attrib);
       }
-//      console.log('DeleteModel: ' + JSON.stringify(model));
       if (typeof c == 'string')
         callBack(model, c);
       else
@@ -126,17 +125,13 @@ RemoteStore.prototype.getList = function (list, filter, callBack) {
   if (!(list instanceof List)) throw new Error('argument must be a List');
   if (!(filter instanceof Array)) throw new Error('argument must be array');
   if (typeof callBack != "function") throw new Error('callback required');
-  this.transport.send(new Message('GetList', [list, filter]), function (msg) {
+  this.transport.send(new Message('GetList', {list:list, filter:filter}), function (msg) {
     if (false && msg == 'Ack') { // todo wtf is this
       callBack(list);
     } else if (msg.type == 'GetListAck') {
-//      var c = msg.contents;
-//      model.attributes = [];
-//      for (var a in c.attributes) {
-//        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
-//        attrib.value = c.attributes[a].value;
-//        model.attributes.push(attrib);
-//      }
+      list._items = msg.contents._items;
+      list._itemIndex = msg.contents._itemIndex;
+        console.log('msg.contents: ' + JSON.stringify(msg.contents));
       console.log('getList: ' + JSON.stringify(list));
       callBack(list);
     } else {

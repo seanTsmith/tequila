@@ -27,7 +27,7 @@ test.runner = function (isBrowser) {
 
   // After stores loaded run tests
   var storeLoader = {};
-  storeLoader.countNeeded = 3; // total anync events
+  storeLoader.countNeeded = 2; // total anync events
   storeLoader.countDone = 0;
   storeLoader.timedOut = false;
   storeLoader.callback = function (force) {
@@ -76,26 +76,24 @@ test.runner = function (isBrowser) {
       test.mongoStoreAvailable = false;
       console.warn('mongoStore unavailable (' + err + ')');
       storeLoader.callback();
-      storeLoader.callback(); // Call for each collection wipe (below)
     } else {
       console.warn('mongoStore connected.');
       test.mongoStoreAvailable = true;
 
+      storeLoader.callback(); // not
       // wipe test collections
-      store.mongoDatabase.collection('Stooge', function (err, collection) {
-        collection.drop(function(err, reply) {
-          storeLoader.callback();
-        });
-      });
-      store.mongoDatabase.collection('Bullshit', function (err, collection) {
-        collection.drop(function(err, reply) {
-          storeLoader.callback();
-        });
-      });
-
+//      store.mongoDatabase.collection('Stooge', function (err, collection) {
+//        collection.drop(function(err, reply) {
+//          storeLoader.callback();
+//        });
+//      });
+//      store.mongoDatabase.collection('Bullshit', function (err, collection) {
+//        collection.drop(function(err, reply) {
+//          storeLoader.callback();
+//        });
+//      });
     }
   });
-
 
 };
 test.renderHead = function (isBrowser) {

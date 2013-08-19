@@ -25,7 +25,6 @@ MongoStore.prototype.onConnect = function (location, callBack) {
     this.mongoDatabaseOpened = false;
     this.mongoDatabase.open(function (err, db) {
       if (err) {
-        console.log('MongoStore Connect error: ' + err);
         callBack(store, err);
         try {
           store.mongoDatabase.close();  // Error will retry till close with auto_reconnect: true
@@ -66,7 +65,6 @@ MongoStore.prototype.putModel = function (model, callBack) {
     var id = model.attributes[0].value;
     for (a in model.attributes) {
       if (model.attributes[a].name == 'id') {
-        modelData['_id'] = model.attributes[a].value;
         if (!model.attributes[a].value)
           newModel = true;
       } else {
@@ -81,25 +79,25 @@ MongoStore.prototype.putModel = function (model, callBack) {
         } else {
           // Get resulting data
           for (a in model.attributes) {
-            if (model.attributes[a].name == 'id')
-              model.attributes[a].value = modelData['_id'];
-            else
+            if (model.attributes[a].name == 'id') {
+              model.attributes[a].value = modelData['_id'].toString();
+            } else {
               model.attributes[a].value = modelData[model.attributes[a].name];
+            }
           }
           callBack(model);
         }
       });
     } else {
+      id = mongo.ObjectID.createFromHexString(id);
       collection.update({'_id': id}, modelData, {safe: true}, function (err, result) {
         if (err) {
-          console.log('putModel udpate error: ' + err);
+          console.log('putModel update error: ' + err);
           callBack(model, err);
         } else {
           // Get resulting data
           for (a in model.attributes) {
-            if (model.attributes[a].name == 'id')
-              model.attributes[a].value = modelData['_id'];
-            else
+            if (model.attributes[a].name != 'id') // Keep original ID intact
               model.attributes[a].value = modelData[model.attributes[a].name];
           }
           callBack(model);
@@ -116,6 +114,7 @@ MongoStore.prototype.getModel = function (model, callBack) {
   var store = this;
   var a;
   var id = model.attributes[0].value;
+  id = mongo.ObjectID.createFromHexString(id);
   store.mongoDatabase.collection(model.modelType, function (err, collection) {
     if (err) {
       console.log('getModel collection error: ' + err);
@@ -133,7 +132,7 @@ MongoStore.prototype.getModel = function (model, callBack) {
       } else {
         for (a in model.attributes) {
           if (model.attributes[a].name == 'id')
-            model.attributes[a].value = item['_id'];
+            model.attributes[a].value = item['_id'].toString();
           else
             model.attributes[a].value = item[model.attributes[a].name];
         }
@@ -149,6 +148,7 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
   var store = this;
   var a;
   var id = model.attributes[0].value;
+  id = mongo.ObjectID.createFromHexString(id);
   store.mongoDatabase.collection(model.modelType, function (err, collection) {
     if (err) {
       console.log('deleteModel collection error: ' + err);
@@ -174,26 +174,6 @@ MongoStore.prototype.getList = function (list, filter, callBack) {
   if (!(list instanceof List)) throw new Error('argument must be a List');
   if (!(filter instanceof Array)) throw new Error('argument must be array');
   if (typeof callBack != "function") throw new Error('callback required');
-//  // Find model in memorystore, error out if can't find
-//  var modelIndex = -1;
-//  for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == list.model.modelType) modelIndex = i;
-//  if (modelIndex < 0) {
-//    callBack(list, new Error('model not found in store'));
-//    return;
-//  }
-//  var storedPair = this.data[modelIndex][1];
-//  for (var i=0; i<storedPair.length; i++) {
-//    list._items.push(storedPair[i][1]);
-//  }
-//  list._itemIndex = list._items.length - 1;
-//  callBack(list);
-
-
-//  collection.find({'_id':o_id}, function(err, cursor){
-//    cursor.toArray(callback);
-//    db.close();
-//  });
-
   var store = this;
   store.mongoDatabase.collection(list.model.modelType, function (err, collection) {
     if (err) {
@@ -213,21 +193,14 @@ MongoStore.prototype.getList = function (list, filter, callBack) {
           callBack(list, err);
           return;
         }
-//        console.log('collection.find cursor: ' + JSON.stringify(documents));
         for (var i = 0; i < documents.length; i++) {
-//          console.log('documents: ' + JSON.stringify(documents[i]));
+          documents[i].ID = documents[i]._id.toString();
+          delete documents[i]._id;
           list._items.push(documents[i]);
-//          for (var j in documents[i]) {
-//            console.log('documents ' + j + ': ' + JSON.stringify(documents[i][j]));
-//          }
         }
         list._itemIndex = list._items.length - 1;
         callBack(list);
-        // cursor.toArray(callback);
-        // db.close();
       });
     });
-//    callBack(list, Error('dick licker'));
   });
-
 };

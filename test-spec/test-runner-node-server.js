@@ -75,7 +75,7 @@ io.on('connection', function (socket) {
             var attrib = new Attribute(obj.contents.attributes[a].name, obj.contents.attributes[a].type);
             if (attrib.name == 'id') { // TODO only If mongo! or refactor mongo to normalize IDs
               if (attrib.value != obj.contents.attributes[a].value)
-                attrib.value = mongo.ObjectID.createFromHexString(obj.contents.attributes[a].value);
+                attrib.value = obj.contents.attributes[a].value;
             } else {
               attrib.value = obj.contents.attributes[a].value;
             }
@@ -104,7 +104,7 @@ io.on('connection', function (socket) {
           for (var a in obj.contents.attributes) {
             var attrib = new Attribute(obj.contents.attributes[a].name, obj.contents.attributes[a].type);
             if (attrib.name == 'id') { // TODO only If mongo! or refactor mongo to normalize IDs
-              attrib.value = mongo.ObjectID.createFromHexString(obj.contents.attributes[a].value);
+              attrib.value = obj.contents.attributes[a].value;
             } else {
               attrib.value = obj.contents.attributes[a].value;
             }
@@ -132,7 +132,7 @@ io.on('connection', function (socket) {
           for (var a in obj.contents.attributes) {
             var attrib = new Attribute(obj.contents.attributes[a].name, obj.contents.attributes[a].type);
             if (attrib.name == 'id') { // TODO only If mongo! or refactor mongo to normalize IDs
-              attrib.value = mongo.ObjectID.createFromHexString(obj.contents.attributes[a].value);
+              attrib.value = obj.contents.attributes[a].value;
             } else {
               attrib.value = obj.contents.attributes[a].value;
             }
@@ -151,9 +151,16 @@ io.on('connection', function (socket) {
         break;
 
       case 'GetList': // Delete model in store
-        console.log('GetList: ' + JSON.stringify(obj));
-        msg = new Message('GetListAck', 'penis');
-        fn(msg);
+        var proxyList = new List(new Model());
+        proxyList.model.modelType = obj.contents.list.model.modelType;
+        proxyList.model.attributes = obj.contents.list.model.attributes;
+        hostStore.getList(proxyList,obj.contents.filter,function(list, error){
+          if (typeof error == 'undefined')
+            msg = new Message('GetListAck', list);
+          else
+            msg = new Message('GetListAck', error);
+          fn(msg);
+        });
         break;
 
       default:

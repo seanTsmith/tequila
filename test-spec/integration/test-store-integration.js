@@ -7,7 +7,7 @@ test.runnerStoreIntegration = function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
       test.example('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
         var self = this;
-        var storeBeingTested  = test.integrationStore.name + ' ' + test.integrationStore.storeType;
+        var storeBeingTested = test.integrationStore.name + ' ' + test.integrationStore.storeType;
         test.show(storeBeingTested);
 
         // If store is not ready then get out...
@@ -17,31 +17,69 @@ test.runnerStoreIntegration = function () {
         }
 
         // setup store and stooge class
-        this.store = test.integrationStore;
-        this.Stooge = function (args) {
+        self.store = test.integrationStore;
+        self.Stooge = function (args) {
           Model.call(this, args);
           this.modelType = "Stooge";
           this.attributes.push(new Attribute('name'));
         };
-        this.Stooge.prototype = T.inheritPrototype(Model.prototype);
+        self.Stooge.prototype = T.inheritPrototype(Model.prototype);
 
         // create initial stooges
-        this.moe = new this.Stooge();
-        this.moe.set('name', 'Moe');
-        this.larry = new this.Stooge();
-        this.larry.set('name', 'Larry');
-        this.shemp = new this.Stooge();
-        this.shemp.set('name', 'Shemp');
+        self.moe = new self.Stooge();
+        self.moe.set('name', 'Moe');
+        self.larry = new self.Stooge();
+        self.larry.set('name', 'Larry');
+        self.shemp = new self.Stooge();
+        self.shemp.set('name', 'Shemp');
 
         // IDs after stored will be here
-        this.stoogeIDsStored = [];
-        this.stoogesRetrieved = [];
+        self.stoogeIDsStored = [];
+        self.stoogesRetrieved = [];
+        self.oldStoogesFound = 0;
+        self.oldStoogesKilled = 0;
 
-        // store the stooges
-        this.store.putModel(this.moe, stoogeStored, this);
-        this.store.putModel(this.larry, stoogeStored, this);
-        this.store.putModel(this.shemp, stoogeStored, this);
+        // Get a list of stooges already in the store, after deleting then store new stooges
+        var list = new List(new self.Stooge());
+        try {
+          self.killhim = new self.Stooge();
+          self.store.getList(list, [], function (list, error) {
+            if (typeof error != 'undefined') {
+              returnResponse(testNode, error);
+              return;
+            }
+            if (list._items.length < 1)
+              storeStooges();
+            else
+              self.oldStoogesFound = list._items.length;
+              for (var i = 0; i < list._items.length; i++) {
+                console.log(list._items[i].ID);
+                self.killhim.set('id', list._items[i].ID);
+                console.log('killhim: ' + JSON.stringify(self.killhim));
+                // model.attributes[0].value;
+                self.store.deleteModel(self.killhim, function (model, error) {
+                  if (typeof error != 'undefined') {
+                    console.log('error deleting: ' + JSON.stringify(error));
+                  }
+                  if (++self.oldStoogesKilled >= self.oldStoogesFound) {
+                    storeStooges();
+                  }
+                })
+              }
+          });
+        }
+        catch (err) {
+          returnResponse(testNode, err);
+        }
 
+        // Callback to store new stooges
+        function storeStooges() {
+          test.show(self.oldStoogesFound);
+          test.show(self.oldStoogesKilled);
+          self.store.putModel(self.moe, stoogeStored, self);
+          self.store.putModel(self.larry, stoogeStored, self);
+          self.store.putModel(self.shemp, stoogeStored, self);
+        }
 
         // callback after storing stooges
         function stoogeStored(model, error) {
@@ -89,7 +127,12 @@ test.runnerStoreIntegration = function () {
               if (self.stoogesRetrieved[i].get('name') == 'Shemp') {
                 didPutCurly = true;
                 self.stoogesRetrieved[i].set('name', 'Curly');
-                self.store.putModel(self.stoogesRetrieved[i], stoogeChanged);
+                try {
+                  self.store.putModel(self.stoogesRetrieved[i], stoogeChanged);
+                }
+                catch (err) {
+                  returnResponse(testNode, err);
+                }
               }
             }
             if (!didPutCurly) {
@@ -107,7 +150,12 @@ test.runnerStoreIntegration = function () {
           test.assertion(model.get('name') == 'Curly');
           var curly = new self.Stooge();
           curly.set('id', model.get('id'));
-          self.store.getModel(curly, storeChangedShempToCurly);
+          try {
+            self.store.getModel(curly, storeChangedShempToCurly);
+          }
+          catch (err) {
+            returnResponse(testNode, err);
+          }
         }
 
         // callback after retrieving changed stooge
@@ -144,8 +192,10 @@ test.runnerStoreIntegration = function () {
               returnResponse(testNode, error);
               return;
             }
+          } else {
+            returnResponse(testNode, Error('no error deleting stooge when expected'));
+            return;
           }
-//          returnResponse(testNode, true);
           // Now create a list from the stooge store
           var list = new List(new self.Stooge());
           try {
@@ -166,7 +216,6 @@ test.runnerStoreIntegration = function () {
           test.assertion(list.length() == 2);
           returnResponse(testNode, true);
         }
-
       });
     });
   });

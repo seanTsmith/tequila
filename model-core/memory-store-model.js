@@ -144,7 +144,7 @@ MemoryStore.prototype.getList = function (list, filter, callBack) {
   var modelIndex = -1;
   for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == list.model.modelType) modelIndex = i;
   if (modelIndex < 0) {
-    callBack(list, new Error('model not found in store'));
+    callBack(list);
     return;
   }
   var storedPair = this.data[modelIndex][1];
