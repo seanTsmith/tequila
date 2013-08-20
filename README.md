@@ -2,7 +2,6 @@
 Tequila es bueno!
 
 TODO:
-* refactor test-runner-node-server to put processing inside class files
 * make filter work in getList
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design

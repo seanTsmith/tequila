@@ -2,28 +2,25 @@
  * tequila
  * tequila-class.js
  */
+
 var Tequila = (function () {
   var singletonInstance;
 
   function init() {
     // Private methods and variables
     var version = '0.0.1';
-//    function privateMethod() {
-//      console.log("I am private");
-//    }
-//    var privateVariable = "Im also private";
     var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table'];
     var messageTypes = ['Null', 'Connected', 'Error', 'Sent', 'Ping', 'PutModel', 'PutModelAck', 'GetModel', 'GetModelAck', 'DeleteModel', 'DeleteModelAck', 'GetList', 'GetListAck'];
+    var messageHandlers = {};
     return    {
       // Public methods and variables
       getVersion: function () {
         return version;
       },
-      isServer: function() {
+      isServer: function () {
         return typeof exports !== 'undefined' && this.exports !== exports
       },
-
-    contains: function (a, obj) {
+      contains: function (a, obj) {
         for (var i = 0; i < a.length; i++) {
           if (a[i] === obj) return true;
         }
@@ -56,7 +53,19 @@ var Tequila = (function () {
       },
       getMessageTypes: function () {
         return messageTypes;
+      },
+      setMessageHandler: function (message, handler) {
+        messageHandlers[message] = handler;
+      },
+      hostMessageProcess: function (obj, fn) {
+        if (messageHandlers[obj.type]) {
+          messageHandlers[obj.type](obj.contents, fn);
+        } else {
+          console.log('socket.io ackmessage: ' + JSON.stringify(obj));
+          fn(true); // todo should this be an error?
+        }
       }
+
     };
   };
   return function () {
@@ -66,3 +75,4 @@ var Tequila = (function () {
 })();
 // Library scoped ref to singleton
 var T = Tequila();
+
