@@ -53,10 +53,7 @@ test.runnerStoreIntegration = function () {
             else
               self.oldStoogesFound = list._items.length;
               for (var i = 0; i < list._items.length; i++) {
-                console.log(list._items[i].ID);
-                self.killhim.set('id', list._items[i].ID);
-                console.log('killhim: ' + JSON.stringify(self.killhim));
-                // model.attributes[0].value;
+                self.killhim.set('id', list._items[i][0]);
                 self.store.deleteModel(self.killhim, function (model, error) {
                   if (typeof error != 'undefined') {
                     console.log('error deleting: ' + JSON.stringify(error));
@@ -214,6 +211,10 @@ test.runnerStoreIntegration = function () {
           }
           test.assertion(list instanceof List);
           test.assertion(list.length() == 2);
+          list.firstItem();
+          test.assertion(list.get('name') == 'Moe');
+          list.nextItem();
+          test.assertion(list.get('name') == 'Larry');
           returnResponse(testNode, true);
         }
       });

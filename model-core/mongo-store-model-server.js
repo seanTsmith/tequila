@@ -194,9 +194,15 @@ MongoStore.prototype.getList = function (list, filter, callBack) {
           return;
         }
         for (var i = 0; i < documents.length; i++) {
-          documents[i].ID = documents[i]._id.toString();
+          documents[i].id = documents[i]._id.toString();
           delete documents[i]._id;
-          list._items.push(documents[i]);
+          var dataPart = [];
+          dataPart.push(documents[i].id);
+          for (var j in documents[i]) {
+            if (j!='id')
+              dataPart.push(documents[i][j]);
+          }
+          list._items.push(dataPart);
         }
         list._itemIndex = list._items.length - 1;
         callBack(list);

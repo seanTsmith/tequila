@@ -149,7 +149,11 @@ MemoryStore.prototype.getList = function (list, filter, callBack) {
   }
   var storedPair = this.data[modelIndex][1];
   for (var i=0; i<storedPair.length; i++) {
-    list._items.push(storedPair[i][1]);
+    var dataPart = [];
+    for (var j in storedPair[i][1]) {
+      dataPart.push(storedPair[i][1][j]);
+    }
+    list._items.push(dataPart);
   }
   list._itemIndex = list._items.length - 1;
   callBack(list);

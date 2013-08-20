@@ -131,8 +131,6 @@ RemoteStore.prototype.getList = function (list, filter, callBack) {
     } else if (msg.type == 'GetListAck') {
       list._items = msg.contents._items;
       list._itemIndex = msg.contents._itemIndex;
-        console.log('msg.contents: ' + JSON.stringify(msg.contents));
-      console.log('getList: ' + JSON.stringify(list));
       callBack(list);
     } else {
       callBack(list, Error(msg));

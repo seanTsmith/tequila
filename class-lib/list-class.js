@@ -14,10 +14,33 @@ var List = function (model) {
 List.prototype.length = function () {
   return this._items.length;
 };
+List.prototype.get = function (attribute) {
+  if (this._items.length < 1) throw new Error('list is empty');
+  for (var i = 0; i < this.model.attributes.length; i++) {
+    if (this.model.attributes[i].name.toUpperCase() == attribute.toUpperCase())
+      return this._items[this._itemIndex][i];
+  }
+};
+List.prototype.set = function (attribute,value) {
+  if (this._items.length < 1) throw new Error('list is empty');
+  for (var i = 0; i < this.model.attributes.length; i++) {
+    if (this.model.attributes[i].name.toUpperCase() == attribute.toUpperCase()) {
+      this._items[this._itemIndex][i] = value;
+      return;
+    }
+  }
+  throw new Error('attribute not valid for list model');
+};
 List.prototype.addItem = function (item) {
   var values = [];
-  for (var i in item.attributes) {
-    values.push(item.attributes[i].value);
+  if (item) {
+    for (var i in item.attributes) {
+      values.push(item.attributes[i].value);
+    }
+  } else {
+    for (var i in this.model.attributes) {
+      values.push(undefined);
+    }
   }
   this._items.push(values);
   this._itemIndex = this._items.length - 1;
@@ -32,9 +55,6 @@ List.prototype.indexedItem = function (index) {
   if (this._items.length < 1) throw new Error('list is empty');
   if (index < 0) throw new Error('item not found');
   this._itemIndex = index;
-  for (var i in this.model.attributes) {
-    this.model.attributes[i].value = this._items[this._itemIndex][i];
-  }
 };
 List.prototype.nextItem = function () {
   if (this._items.length < 1) throw new Error('list is empty');

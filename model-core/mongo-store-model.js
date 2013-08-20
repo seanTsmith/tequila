@@ -15,7 +15,7 @@ var MongoStore = function (args) {
     canGetModel: T.isServer(),
     canPutModel: T.isServer(),
     canDeleteModel: T.isServer(),
-    canGetList: T.isServer(),
+    canGetList: T.isServer()
   };
   var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
   var badJooJoo = [];

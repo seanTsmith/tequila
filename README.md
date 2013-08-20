@@ -2,9 +2,6 @@
 Tequila es bueno!
 
 TODO:
-
-* change id field name to _id for primarykey
-* need to fix how getlist stores data to be just array and not paired values
 * refactor test-runner-node-server to put processing inside class files
 * make filter work in getList
 * add visible attribute to attribute and default by type on creation

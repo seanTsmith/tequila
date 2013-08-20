@@ -7,7 +7,7 @@ test.runnerList = function (SurrogateListClass, inheritanceTest) {
   var inheritanceTestWas = T.inheritanceTest;
   T.inheritanceTest = inheritanceTest;
   test.heading('List Class', function () {
-    test.paragraph('Lists are used to store');
+    test.paragraph('Lists are an ordered collection of items.  Each item is an array of values that correspond to the attributes for model used in constructor.');
     test.heading('CONSTRUCTOR', function () {
       test.paragraph('Creation of all Collections must adhere to following examples:');
       test.example('objects created should be an instance of List', true, function () {
@@ -26,6 +26,23 @@ test.runnerList = function (SurrogateListClass, inheritanceTest) {
       test.heading('length()', function () {
         test.example('length method returns the number of items in the list.', 0, function () {
           return new List(new Model).length();
+        });
+      });
+      test.heading('get(attributeName)', function () {
+        test.paragraph('Gets value of attribute for given item.');
+        test.example('throws error if no current item', Error('list is empty'), function () {
+          new List(new Model()).get('id'); // see integration tests
+        });
+      });
+      test.heading('set(attributeName,value)', function () {
+        test.paragraph('Sets value of attribute for given item.');
+        test.example('throws error if no current item', Error('list is empty'), function () {
+          new List(new Model()).set('id'); // see integration tests
+        });
+        test.example('throws an error if the attribute does not exists', Error('attribute not valid for list model'), function () {
+          var list = new List(new Model);
+          list.addItem(new Model);
+          list.set('whatever');
         });
       });
       test.heading('addItem()', function () {
