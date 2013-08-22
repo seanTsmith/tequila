@@ -23,8 +23,9 @@ test.heading('Stores', function () {
   test.runnerMongoStoreModel();
   test.runnerRemoteStoreModel();
 });
-test.heading('SYSTEM INTEGRATION', function () {
-  test.paragraph('These tests provide good working examples of library usage.');
+test.heading('Integration Tests', function () {
+  test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
+    'If any assertion fails the test is failed.');
   test.runnerListIntegration();
   test.runnerStoreIntegration();
 });
