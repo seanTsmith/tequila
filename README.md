@@ -2,7 +2,8 @@
 Tequila es bueno!
 
 DOUG TODO:
-* make test into app and make the store connect to server
+* make test(/test-spec/test-runner.html) into app
+* and make the store connect to server
 
 TODO:
 

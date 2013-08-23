@@ -58,7 +58,7 @@ test.runner = function (isBrowser) {
 
   // try to create a hostStore
   test.hostStore = new RemoteStore({name: 'Integration Test Store'});
-  test.hostStore.onConnect('http://localhost', function (store, err) {
+  test.hostStore.onConnect('http://localhost', function (store, err) { // DOUG CHANGE HERE
     if (err) {
       test.hostStoreAvailable = false;
       console.warn('hostStore unavailable (' + err + ')');
