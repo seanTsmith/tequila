@@ -186,13 +186,17 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         });
       }
     });
-    test.heading('getList(model,filter)', function () {
-      if (interface['canGetList']) {
-        test.xexample('returns a List populated from store', undefined, function () {
+    test.heading('getList(model, filter, order)', function () {
+      test.paragraph('This method will clear and populate the list with collection from store.  ' +
+        'The **filter** property can be used to query the store.  ' +
+        'The **order** property can specify the sort order of the list.  ' +
+        '_See integration test for more info._');
+      if (interface['isReady'] && interface['canGetList']) {
+        test.example('returns a List populated from store', undefined, function () {
           test.shouldThrow(Error('argument must be a List'),function(){
             new SurrogateStoreModel().getList();
           })
-          test.shouldThrow(Error('argument must be array'),function(){
+          test.shouldThrow(Error('filter argument must be Object'),function(){
             new SurrogateStoreModel().getList(new List(new Model()));
           })
           test.shouldThrow(Error('callback required'),function(){

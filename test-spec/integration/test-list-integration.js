@@ -200,7 +200,7 @@ test.runnerListIntegration = function () {
         // only one Tom Hanks
         function getTomHanks() {
           try {
-            test.integrationStore.getList(self.list, {name:"Tom Hanks"}, function (list, error) {
+            test.integrationStore.getList(self.list, {name: "Tom Hanks"}, function (list, error) {
               if (typeof error != 'undefined') {
                 returnResponse(testNode, error);
                 return;
@@ -216,14 +216,59 @@ test.runnerListIntegration = function () {
         }
 
         // 3 names begin with D
+        // test RegExp
         function getD() {
           try {
-            test.integrationStore.getList(self.list, {name:/^D/}, function (list, error) {
+            test.integrationStore.getList(self.list, {name: /^D/}, function (list, error) {
               if (typeof error != 'undefined') {
                 returnResponse(testNode, error);
                 return;
               }
               test.assertion(list._items.length == 3);
+              getRZ();
+            });
+          }
+          catch (err) {
+            returnResponse(testNode, err);
+            return;
+          }
+        }
+
+        // Renée Zellweger only female starting name with 'R'
+        // test filter 2 properties (logical AND)
+        function getRZ() {
+          try {
+            test.integrationStore.getList(self.list, {name: /^R/, isMale: false}, function (list, error) {
+              if (typeof error != 'undefined') {
+                returnResponse(testNode, error);
+                return;
+              }
+              test.assertion(list._items.length == 1);
+              test.assertion(list.get('name') == 'Renée Zellweger');
+              getAlphabetical();
+            });
+          }
+          catch (err) {
+            returnResponse(testNode, err);
+            return;
+          }
+        }
+
+        // Retrieve list alphabetically by name
+        // test order parameter
+        function getAlphabetical() {
+          try {
+            test.integrationStore.getList(self.list, {}, { name : 1 }, function (list, error) {
+              if (typeof error != 'undefined') {
+                returnResponse(testNode, error);
+                return;
+              }
+              list.firstItem();
+              console.log(list.get('name'));
+              test.assertion(list.get('name') == 'Al Pacino');
+              list.lastItem();
+              console.log(list.get('name'));
+              test.assertion(list.get('name') == 'Tom Hanks');
               returnResponse(testNode, true);
             });
           }

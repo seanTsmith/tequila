@@ -157,7 +157,7 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
     }
     collection.remove({'_id': id}, function (err, item) {
       if (err || item != 1) {
-        if (!err) err = 'error deleting: item is not equal to 1'
+        if (!err) err = 'error deleting: item is not equal to 1';
         console.log('deleteModel remove ERROR: ' + err);
         callBack(model, err);
         return;
@@ -170,7 +170,14 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
     });
   });
 };
-MongoStore.prototype.getList = function (list, filter, callBack) {
+MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
+  var callBack, order;
+  if (typeof(arg4) == 'function') {
+    callBack = arg4;
+    order = arg3;
+  } else {
+    callBack = arg3;
+  }
   if (!(list instanceof List)) throw new Error('argument must be a List');
   if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
   if (typeof callBack != "function") throw new Error('callback required');
@@ -182,7 +189,15 @@ MongoStore.prototype.getList = function (list, filter, callBack) {
       callBack(list, err);
       return;
     }
-    collection.find(filter, function (err, cursor) {
+    if (order) {
+      console.log('find WITH order: ' + JSON.stringify(order));
+//      collection.find(filter, findCallback)._addSpecial("$orderby", order);
+      collection.find({ query: filter, $orderby: order}, findCallback);
+    } else {
+      console.log('find no order...');
+      collection.find(filter, findCallback);
+    }
+    function findCallback(err, cursor) {
       if (err) {
         console.log('getList find error: ' + err);
         callBack(list, err);
@@ -200,7 +215,7 @@ MongoStore.prototype.getList = function (list, filter, callBack) {
           var dataPart = [];
           dataPart.push(documents[i].id);
           for (var j in documents[i]) {
-            if (j!='id')
+            if (j != 'id')
               dataPart.push(documents[i][j]);
           }
           list._items.push(dataPart);
@@ -208,6 +223,6 @@ MongoStore.prototype.getList = function (list, filter, callBack) {
         list._itemIndex = list._items.length - 1;
         callBack(list);
       });
-    });
+    }
   });
 };

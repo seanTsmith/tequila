@@ -704,7 +704,8 @@ test.shouldThrow = function (err, func) {
   } catch (e) {
     gotError = true;
     if (err !== undefined)
-      if (err.toString() != e.toString() && err.toString() != '*') throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
+      if (err.toString() != e.toString() && err.toString() != '*')
+        throw('EXPECTED ERROR(' + err + ') GOT ERROR(' + e + ')');
   }
   if (!gotError) {
     throw('EXPECTED ERROR(' + err + ')');

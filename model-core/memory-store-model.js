@@ -136,7 +136,14 @@ MemoryStore.prototype.deleteModel = function (model, callBack) {
   }
   callBack(model, undefined);
 };
-MemoryStore.prototype.getList = function (list, filter, callBack) {
+MemoryStore.prototype.getList = function (list, filter, arg3, arg4) {
+  var callBack, order;
+  if (typeof(arg4) == 'function') {
+    callBack = arg4;
+    order = arg3;
+  } else {
+    callBack = arg3;
+  }
   if (!(list instanceof List)) throw new Error('argument must be a List');
   if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
   if (typeof callBack != "function") throw new Error('callback required');
@@ -170,5 +177,8 @@ MemoryStore.prototype.getList = function (list, filter, callBack) {
     }
   }
   list._itemIndex = list._items.length - 1;
+  if (order) {
+    list.sort(order);
+  }
   callBack(list);
 };
