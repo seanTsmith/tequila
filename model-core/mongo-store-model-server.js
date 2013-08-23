@@ -190,11 +190,8 @@ MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
       return;
     }
     if (order) {
-      console.log('find WITH order: ' + JSON.stringify(order));
-//      collection.find(filter, findCallback)._addSpecial("$orderby", order);
       collection.find({ query: filter, $orderby: order}, findCallback);
     } else {
-      console.log('find no order...');
       collection.find(filter, findCallback);
     }
     function findCallback(err, cursor) {

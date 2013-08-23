@@ -1,8 +1,12 @@
 #tequila
 Tequila es bueno!
 
+DOUG TODO:
+* make test into app and make the store connect to server
+
 TODO:
 
+* fix Test variations on getList method test for remote stores
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
 * why is store a model ? change to class ?

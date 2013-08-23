@@ -121,11 +121,18 @@ RemoteStore.prototype.deleteModel = function (model, callBack) {
     }
   });
 };
-RemoteStore.prototype.getList = function (list, filter, callBack) {
+RemoteStore.prototype.getList = function (list, filter, arg3, arg4) {
+  var callBack, order;
+  if (typeof(arg4) == 'function') {
+    callBack = arg4;
+    order = arg3;
+  } else {
+    callBack = arg3;
+  }
   if (!(list instanceof List)) throw new Error('argument must be a List');
-  if (!(filter instanceof Array)) throw new Error('argument must be array');
+  if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
   if (typeof callBack != "function") throw new Error('callback required');
-  this.transport.send(new Message('GetList', {list: list, filter: filter}), function (msg) {
+  this.transport.send(new Message('GetList', {list: list, filter: filter, order: order}), function (msg) {
     if (false && msg == 'Ack') { // todo wtf is this
       callBack(list);
     } else if (msg.type == 'GetListAck') {
@@ -222,18 +229,23 @@ T.setMessageHandler('DeleteModel', function deleteModelMessageHandler(messageCon
     else
       msg = new Message('DeleteModelAck', error);
     fn(msg);
-  }, this);  
+  }, this);
 });
 T.setMessageHandler('GetList', function getListMessageHandler(messageContents, fn) {
   var proxyList = new List(new Model());
   proxyList.model.modelType = messageContents.list.model.modelType;
   proxyList.model.attributes = messageContents.list.model.attributes;
   var msg;
-  hostStore.getList(proxyList, messageContents.filter, function (list, error) {
+  function messageCallback(list, error) {
     if (typeof error == 'undefined')
       msg = new Message('GetListAck', list);
     else
       msg = new Message('GetListAck', error);
     fn(msg);
-  });
+  }
+  if (messageContents.order) {
+    hostStore.getList(proxyList, messageContents.filter, messageContents.order, messageCallback);
+  } else {
+    hostStore.getList(proxyList, messageContents.filter, messageCallback);
+  }
 });
