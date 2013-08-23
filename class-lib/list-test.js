@@ -28,6 +28,11 @@ test.runnerList = function (SurrogateListClass, inheritanceTest) {
           return new List(new Model).length();
         });
       });
+      test.heading('clear()', function () {
+        test.example('clear the list.', 0, function () {
+          return new List(new Model).addItem(new Model).clear().length();
+        });
+      });
       test.heading('get(attributeName)', function () {
         test.paragraph('Gets value of attribute for given item.');
         test.example('throws error if no current item', Error('list is empty'), function () {

@@ -16,8 +16,7 @@ test.runnerStoreIntegration = function () {
           return;
         }
 
-        // setup store and stooge class
-        self.store = test.integrationStore;
+        // setup stooge class
         self.Stooge = function (args) {
           Model.call(this, args);
           this.modelType = "Stooge";
@@ -39,11 +38,12 @@ test.runnerStoreIntegration = function () {
         self.oldStoogesFound = 0;
         self.oldStoogesKilled = 0;
 
-        // Get a list of stooges already in the store, after deleting then store new stooges
+        // Make sure store starts in known state.  Stores such as mongoStore will retain test values.
+        // So... use getList to get all stooges then delete them from the Store
         var list = new List(new self.Stooge());
         try {
           self.killhim = new self.Stooge();
-          self.store.getList(list, [], function (list, error) {
+          test.integrationStore.getList(list, [], function (list, error) {
             if (typeof error != 'undefined') {
               returnResponse(testNode, error);
               return;
@@ -54,7 +54,7 @@ test.runnerStoreIntegration = function () {
               self.oldStoogesFound = list._items.length;
               for (var i = 0; i < list._items.length; i++) {
                 self.killhim.set('id', list._items[i][0]);
-                self.store.deleteModel(self.killhim, function (model, error) {
+                test.integrationStore.deleteModel(self.killhim, function (model, error) {
                   if (typeof error != 'undefined') {
                     console.log('error deleting: ' + JSON.stringify(error));
                   }
@@ -73,9 +73,9 @@ test.runnerStoreIntegration = function () {
         function storeStooges() {
           test.show(self.oldStoogesFound);
           test.show(self.oldStoogesKilled);
-          self.store.putModel(self.moe, stoogeStored, self);
-          self.store.putModel(self.larry, stoogeStored, self);
-          self.store.putModel(self.shemp, stoogeStored, self);
+          test.integrationStore.putModel(self.moe, stoogeStored);
+          test.integrationStore.putModel(self.larry, stoogeStored);
+          test.integrationStore.putModel(self.shemp, stoogeStored);
         }
 
         // callback after storing stooges
@@ -93,7 +93,7 @@ test.runnerStoreIntegration = function () {
               for (var i = 0; i < 3; i++) {
                 actors.push(new self.Stooge());
                 actors[i].set('id', self.stoogeIDsStored[i]);
-                self.store.getModel(actors[i], stoogeRetrieved);
+                test.integrationStore.getModel(actors[i], stoogeRetrieved);
               }
             }
           }
@@ -125,7 +125,7 @@ test.runnerStoreIntegration = function () {
                 didPutCurly = true;
                 self.stoogesRetrieved[i].set('name', 'Curly');
                 try {
-                  self.store.putModel(self.stoogesRetrieved[i], stoogeChanged);
+                  test.integrationStore.putModel(self.stoogesRetrieved[i], stoogeChanged);
                 }
                 catch (err) {
                   returnResponse(testNode, err);
@@ -148,7 +148,7 @@ test.runnerStoreIntegration = function () {
           var curly = new self.Stooge();
           curly.set('id', model.get('id'));
           try {
-            self.store.getModel(curly, storeChangedShempToCurly);
+            test.integrationStore.getModel(curly, storeChangedShempToCurly);
           }
           catch (err) {
             returnResponse(testNode, err);
@@ -164,7 +164,7 @@ test.runnerStoreIntegration = function () {
           test.assertion(model.get('name') == 'Curly');
           // Now test delete
           self.deletedModelId = model.get('id'); // Remember this
-          self.store.deleteModel(model, stoogeDeleted)
+          test.integrationStore.deleteModel(model, stoogeDeleted)
         }
 
         // callback when Curly is deleted
@@ -179,7 +179,7 @@ test.runnerStoreIntegration = function () {
           // Is it really dead?
           var curly = new self.Stooge();
           curly.set('id', self.deletedModelId);
-          self.store.getModel(curly, hesDeadJim);
+          test.integrationStore.getModel(curly, hesDeadJim);
         }
 
         // callback after lookup of dead stooge
@@ -196,7 +196,7 @@ test.runnerStoreIntegration = function () {
           // Now create a list from the stooge store
           var list = new List(new self.Stooge());
           try {
-            self.store.getList(list, [], listReady);
+            test.integrationStore.getList(list, [], listReady);
           }
           catch (err) {
             returnResponse(testNode, err);

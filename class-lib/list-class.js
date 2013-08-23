@@ -14,6 +14,11 @@ var List = function (model) {
 List.prototype.length = function () {
   return this._items.length;
 };
+List.prototype.clear = function () {
+  this._items = [];
+  this._itemIndex = -1;
+  return this;
+};
 List.prototype.get = function (attribute) {
   if (this._items.length < 1) throw new Error('list is empty');
   for (var i = 0; i < this.model.attributes.length; i++) {

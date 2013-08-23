@@ -138,7 +138,7 @@ MemoryStore.prototype.deleteModel = function (model, callBack) {
 };
 MemoryStore.prototype.getList = function (list, filter, callBack) {
   if (!(list instanceof List)) throw new Error('argument must be a List');
-  if (!(filter instanceof Array)) throw new Error('argument must be array');
+  if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
   if (typeof callBack != "function") throw new Error('callback required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
@@ -147,13 +147,27 @@ MemoryStore.prototype.getList = function (list, filter, callBack) {
     callBack(list);
     return;
   }
+  list.clear();
   var storedPair = this.data[modelIndex][1];
-  for (var i=0; i<storedPair.length; i++) {
-    var dataPart = [];
-    for (var j in storedPair[i][1]) {
-      dataPart.push(storedPair[i][1][j]);
+  for (var i = 0; i < storedPair.length; i++) {
+    var doIt = true;
+    for (var prop in filter) {
+      if (filter.hasOwnProperty(prop)) {
+        console.log(storedPair[i][1][prop]);
+        if (filter[prop] instanceof RegExp) {
+          if (!filter[prop].test(storedPair[i][1][prop])) doIt = false;
+        } else {
+          if (filter[prop] != storedPair[i][1][prop]) doIt = false;
+        }
+      }
     }
-    list._items.push(dataPart);
+    if (doIt) {
+      var dataPart = [];
+      for (var j in storedPair[i][1]) {
+        dataPart.push(storedPair[i][1][j]);
+      }
+      list._items.push(dataPart);
+    }
   }
   list._itemIndex = list._items.length - 1;
   callBack(list);

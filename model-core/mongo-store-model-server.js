@@ -172,16 +172,17 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
 };
 MongoStore.prototype.getList = function (list, filter, callBack) {
   if (!(list instanceof List)) throw new Error('argument must be a List');
-  if (!(filter instanceof Array)) throw new Error('argument must be array');
+  if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
   if (typeof callBack != "function") throw new Error('callback required');
   var store = this;
+  list.clear();
   store.mongoDatabase.collection(list.model.modelType, function (err, collection) {
     if (err) {
       console.log('getList collection error: ' + err);
       callBack(list, err);
       return;
     }
-    collection.find({}, function (err, cursor) {
+    collection.find(filter, function (err, cursor) {
       if (err) {
         console.log('getList find error: ' + err);
         callBack(list, err);

@@ -548,6 +548,8 @@ test.asyncCallback = function (node, test_Results) {
   } else {
     if (typeof expectedValue != 'undefined' && test_Results.toString() === expectedValue.toString()) testPassed = true;
   }
+  // If test did not pass then remember to we don't get multiple errors
+  node.errorThrown = !testPassed;
   // Check assertions
   var gotFailedAssertions = false;
   for (var j in test.assertions) {

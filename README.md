@@ -2,7 +2,9 @@
 Tequila es bueno!
 
 TODO:
+
 * make filter work in getList
+
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
 * why is store a model ? change to class ?
