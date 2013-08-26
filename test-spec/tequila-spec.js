@@ -5,12 +5,13 @@
 test.start();
 test.heading('Classes', function () {
   test.paragraph('These objects are make up the core "classes" and are extended via javascript prototype inheritance.');
-  test.runnerTequila();
   test.runnerAttribute();
+  test.runnerCommand();
   test.runnerList(List,false);
   test.runnerMessage();
   test.runnerModel(Model,false);
   test.runnerStoreModel();
+  test.runnerTequila();
   test.runnerTransport();
 });
 test.heading('Models', function () {

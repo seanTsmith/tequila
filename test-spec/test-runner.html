@@ -1,48 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>tequila test spec</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="test-runner.css" type="text/css" media="all">
-    <script type="text/javascript" src="../test-spec/google-code-prettify/run_prettify.js"></script>
-    <script type="text/javascript" src="../test-spec/Markdown.Converter.js"></script>
+  <meta charset="utf-8">
+  <title>tequila test spec</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="test-runner.css" type="text/css" media="all">
+  <script type="text/javascript" src="../test-spec/google-code-prettify/run_prettify.js"></script>
+  <script type="text/javascript" src="../test-spec/Markdown.Converter.js"></script>
 
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
 
-    <script type="text/javascript" src="../class-lib/tequila-class.js"></script>
-    <script type="text/javascript" src="../class-lib/message-class.js"></script>
-    <script type="text/javascript" src="../class-lib/transport-class.js"></script>
-    <script type="text/javascript" src="../class-lib/attribute-class.js"></script>
-    <script type="text/javascript" src="../class-lib/model-class.js"></script>
-    <script type="text/javascript" src="../class-lib/list-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/tequila-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/message-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/transport-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/attribute-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/command-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/model-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/list-class.js"></script>
+  <script type="text/javascript" src="../lib/classes/store-class.js"></script>
 
-    <script type="text/javascript" src="../model-core/user-model.js"></script>
-    <script type="text/javascript" src="../model-core/store-model.js"></script>
-    <script type="text/javascript" src="../model-core/memory-store-model.js"></script>
-    <script type="text/javascript" src="../model-core/remote-store-model.js"></script>
-    <script type="text/javascript" src="../model-core/mongo-store-model.js"></script>
+  <script type="text/javascript" src="../lib/models/user-model.js"></script>
+  <script type="text/javascript" src="../lib/stores/memory-store.js"></script>
+  <script type="text/javascript" src="../lib/stores/remote-store.js"></script>
+  <script type="text/javascript" src="../lib/stores/mongo-store.js"></script>
 
-    <script type="text/javascript" src="../test-spec/test-runner.js"></script>
+  <script type="text/javascript" src="../test-spec/test-runner.js"></script>
 
-    <script type="text/javascript" src="../class-lib/tequila-test.js"></script>
-    <script type="text/javascript" src="../class-lib/message-test.js"></script>
-    <script type="text/javascript" src="../class-lib/transport-test.js"></script>
-    <script type="text/javascript" src="../class-lib/attribute-test.js"></script>
-    <script type="text/javascript" src="../class-lib/model-test.js"></script>
-    <script type="text/javascript" src="../class-lib/list-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/tequila-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/message-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/transport-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/attribute-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/command-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/model-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/list-test.js"></script>
 
-    <script type="text/javascript" src="../model-core/user-test.js"></script>
-    <script type="text/javascript" src="../model-core/store-test.js"></script>
-    <script type="text/javascript" src="../model-core/memory-store-test.js"></script>
-    <script type="text/javascript" src="../model-core/remote-store-test.js"></script>
-    <script type="text/javascript" src="../model-core/mongo-store-test.js"></script>
+  <script type="text/javascript" src="../lib/models/user-test.js"></script>
+  <script type="text/javascript" src="../lib/classes/store-test.js"></script>
+  <script type="text/javascript" src="../lib/stores/memory-test.js"></script>
+  <script type="text/javascript" src="../lib/stores/remote-test.js"></script>
+  <script type="text/javascript" src="../lib/stores/mongo-test.js"></script>
 
-    <script type="text/javascript" src="integration/test-list-integration.js"></script>
-    <script type="text/javascript" src="integration/test-store-integration.js"></script>
+  <script type="text/javascript" src="integration/test-list-integration.js"></script>
+  <script type="text/javascript" src="integration/test-store-integration.js"></script>
 
-    <script type="text/javascript" src="../test-spec/tequila-spec.js"></script>
+  <script type="text/javascript" src="../test-spec/tequila-spec.js"></script>
 </head>
 <body>
 <script type="text/javascript">test.runner(true);</script>

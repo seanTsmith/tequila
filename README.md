@@ -6,6 +6,9 @@ DOUG TODO:
 * and make the store connect to server
 
 TODO:
+
+* make validation for types
+* have stores validate before saving
 * create json-file-store
 * create cookie-store
 * create local-store
@@ -14,38 +17,37 @@ TODO:
 * fix Test variations on getList method test for remote stores
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
-* why is store a model ? change to class ?
 
 CLASS DESIGN TODO:
 
 * App (Application)
     * execute(Command)
-    * Commands
-        * Label
-        * Function (ex:)
-            * ModelView
-                * ModelView(model,id) ...  standard CRUD Model processing
-                * Command(model,id) ... additional commands for this ModelView
-                * Command(model,id)
-            * DialogView
-                * Title
-                * Text
-                * Image
-                * Group
-                    * Control
-                * Command
-                * Process
-            * Javascript Code ... (anything)
 
-    * Structure
-        * SubMenu
+    * Commands
+        * Navigation ( Menu? )
+        * View(model,id) ...  standard CRUD Model processing
+            * Command(model,id) ... additional commands for this ModelView
+            * Command(model,id)
+        * Dialog
+            * Title
+            * Text
+            * Image
+            * Group
+                * Control
+            * Command
+        * Procedure
+            * Task
+            * Command
+
+    * Menu
+        * Menu
             * Command
             * Command
-        * SubMenu
-            * SubMenu
+        * Menu
+            * Menu
                 * Command
                 * Command
-            * SubMenu
+            * Menu
                 * Command
                 * Command
 
@@ -68,6 +70,12 @@ INTERFACE DESIGN (PART OF TEQUILA)
 
     * Present       -> (modelView)
     * callback      <- (modelView)      Update Single Model Changes
+
+concepts...
+
+
+
+
 
 ## Project Root
 + **/bin** tequila command line interface

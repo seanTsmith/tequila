@@ -79,19 +79,7 @@ test.runner = function (isBrowser) {
     } else {
       console.warn('mongoStore connected.');
       test.mongoStoreAvailable = true;
-
       storeLoader.callback(); // not
-      // wipe test collections
-//      store.mongoDatabase.collection('Stooge', function (err, collection) {
-//        collection.drop(function(err, reply) {
-//          storeLoader.callback();
-//        });
-//      });
-//      store.mongoDatabase.collection('Bullshit', function (err, collection) {
-//        collection.drop(function(err, reply) {
-//          storeLoader.callback();
-//        });
-//      });
     }
   });
 
@@ -479,7 +467,10 @@ test.heading = function (text, func) {
   if (func) {
     this.headingLevel++;
     this.levels[this.headingLevel] = 0;
-    func();
+    try {
+      func();
+    } catch (e) {
+    }
     this.headingLevel--;
     this.levels.pop();
   }
