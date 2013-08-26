@@ -23,37 +23,37 @@ function Attribute(args, arg2) {
   var unusedProperties = [];
   switch (this.type) {
     case 'ID':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       break;
     case 'String':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value', 'size']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value', 'size']);
       this.size = splitTypes[1] ? splitTypes[1] : typeof args.size == 'number' ? args.size : args.size || 50;
       this.value = args.value || null;
       break;
     case 'Date':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       break;
     case 'Boolean':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       break;
     case 'Number':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       break;
     case 'Model':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value', 'modelType']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value', 'modelType']);
       this.value = args.value || null;
       this.modelType = args.modelType || null;
       break;
     case 'Group':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       break;
     case 'Table':
-      unusedProperties = T.getUnusedProperties(args, ['name', 'type', 'label', 'value', 'group']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value', 'group']);
       this.value = args.value || null;
       this.group = args.group || null;
       break;
