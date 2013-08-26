@@ -17,7 +17,7 @@ var MongoStore = function (args) {
     canDeleteModel: T.isServer(),
     canGetList: T.isServer()
   };
-  var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
   var badJooJoo = [];
   for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');

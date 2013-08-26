@@ -8,7 +8,7 @@ var Tequila = (function () {
 
   function init() {
     // Private methods and variables
-    var version = '0.0.1';
+    var version = '0.1.0';
     var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table'];
     var messageTypes = ['Null', 'Connected', 'Error', 'Sent', 'Ping', 'PutModel', 'PutModelAck', 'GetModel', 'GetModelAck', 'DeleteModel', 'DeleteModelAck', 'GetList', 'GetListAck'];
     var messageHandlers = {};
@@ -26,17 +26,14 @@ var Tequila = (function () {
         }
         return false;
       },
-      getUnusedProperties: function (properties, allowedProperties) {
+      getInvalidProperties: function (args, allowedProperties) {
         var props = [];
-        for (var property in properties) {
+        for (var property in args) {
           if (!this.contains(allowedProperties, property)) {
             props.push(property);
           }
         }
         return props;
-      },
-      getRegisteredStores: function () {
-        return [];
       },
       inheritPrototype: function (p) {
         if (p == null) throw TypeError();
@@ -67,7 +64,7 @@ var Tequila = (function () {
       }
 
     };
-  };
+  }
   return function () {
     if (!singletonInstance) singletonInstance = init();
     return singletonInstance;

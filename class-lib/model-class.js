@@ -13,7 +13,7 @@ var Model = function (args) {
       this.attributes.push(args.attributes[i]);
     }
   }
-  var unusedProperties = T.getUnusedProperties(args, ['attributes']);
+  var unusedProperties = T.getInvalidProperties(args, ['attributes']);
   var badJooJoo = this.getValidationErrors(); // before leaving make sure valid Model
   for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1) throw new Error('error creating Attribute: multiple errors');

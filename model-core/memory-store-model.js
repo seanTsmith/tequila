@@ -17,7 +17,7 @@ var MemoryStore = function (args) {
   };
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
-  var unusedProperties = T.getUnusedProperties(args, ['name', 'storeType']);
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
   var badJooJoo = [];
   for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');

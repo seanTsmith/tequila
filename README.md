@@ -6,7 +6,11 @@ DOUG TODO:
 * and make the store connect to server
 
 TODO:
-
+* create json-file-store
+* create cookie-store
+* create local-store
+* create resource-file-store (sound, image, pdf, misc subclass resource-class make atribute type)
+* tequilaStore needs to be set not hard coded
 * fix Test variations on getList method test for remote stores
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
@@ -45,11 +49,11 @@ CLASS DESIGN TODO:
                 * Command
                 * Command
 
-INTERFACE DESIGN
+INTERFACE DESIGN (PART OF TEQUILA)
 
-* getApplicationStructure -- returns object with app structure
+* <- getApplicationStructure -- returns object with app structure
 
-* execute
+* -> execute(Command)
 
 * present -- method with function callback
 

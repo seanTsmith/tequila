@@ -32,25 +32,23 @@ test.runnerTequila = function () {
       test.example('object does not exist in array', false, function () {
         return Tequila().contains(['moe', 'larry', 'curley'], 'shemp');
       });
-      test.heading('getRegisteredStores()');
-      test.paragraph('This method returns an array of registered stores.');
-      test.example('must be an array', '[object Array]', function () {
-        return Object.prototype.toString.call( Tequila().getRegisteredStores() );
-      });
-      test.heading('getUnusedProperties(settings,allowedProperties)');
-      test.paragraph('This method is used to check parameter properties as being valid.  If invoked with unknown property it throws an error.');
-      test.example('valid property', 'occupation', function () {
-        // got occupation and value backwards so occupation is an unknown property
-        return Tequila().getUnusedProperties({name: 'name', occupation: 'value'}, ['name', 'value'])[0];
+      test.heading('getInvalidProperties(args,allowedProperties)');
+      test.paragraph('Functions that take an object as it\'s parameter use this to validate the ' +
+        'properties of the parameter by returning any invalid properties');
+      test.example('valid property', 'Kahn', function () {
+        // got Kahn and value backwards so Kahn is an unknown property
+        return Tequila().getInvalidProperties({name: 'name', Kahn: 'value'}, ['name', 'value'])[0];
       });
       test.example('invalid property', 0, function () {
         // no unknown properties
-        return Tequila().getUnusedProperties({name: 'name', value: 'occupation'}, ['name', 'value']).length;
+        return Tequila().getInvalidProperties({name: 'name', value: 'Kahn'}, ['name', 'value']).length;
       });
       test.heading('getVersion()');
       test.paragraph('This method returns the tequila library version.');
-      test.example('tequila library version', '0.0.1', function () {
-        return (Tequila().getVersion());
+      test.example('tequila library version', 2, function () {
+        var libraryVersion = Tequila().getVersion();
+        test.show(libraryVersion)
+        return (libraryVersion.split(".").length - 1);
       });
       test.heading('inheritPrototype(p)');
       test.paragraph('This method returns a object that inherits properties from the prototype object p');
@@ -59,12 +57,12 @@ test.runnerTequila = function () {
           this.name = name;
         };
         Car = function (name) {
-          Thing.call(this,name); // apply Thing constructor
+          Thing.call(this, name); // apply Thing constructor
           this.canBeDriven = true;
         };
         Car.prototype = T.inheritPrototype(Thing.prototype); // <- proper usage
         Food = function (name) {
-          Thing.call(this,name); // apply Thing constructor
+          Thing.call(this, name); // apply Thing constructor
           this.canBeEaten = true;
         };
         var thing = new Thing('rock'), car = new Car('mustang'), food = new Food('pizza');

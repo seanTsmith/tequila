@@ -115,6 +115,7 @@ test.runnerAttribute = function () {
           return new Attribute({name: 'Cheese', type: 'String'}).type;
         });
         test.example('should have size property', 10, function () {
+          // Note: size property is not "enforced" but for formatting purposes
           return new Attribute({name: 'zipCode', size: 10}).size;
         });
         test.example('size should default to 50', 50, function () {
@@ -177,6 +178,7 @@ test.runnerAttribute = function () {
           myVegs.value = [new Attribute('Carrot'), new Attribute('Beet')];
           myFood.value = [myFruit, myVegs];
           myStuff.value = [myFood, myCars, new Attribute('House'), new Attribute('Health')];
+          test.show(myStuff.getValidationErrors());
           badApple.value = -1; // One bad apple will spoil my stuff
           test.show(myStuff.getValidationErrors());
           return myStuff.getValidationErrors().length;
