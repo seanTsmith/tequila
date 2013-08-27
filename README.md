@@ -1,10 +1,6 @@
 #tequila
 Tequila es bueno!
 
-DOUG TODO:
-* make test(/test-spec/test-runner.html) into app
-* and make the store connect to server
-
 TODO:
 
 * make validation for types
@@ -17,6 +13,25 @@ TODO:
 * fix Test variations on getList method test for remote stores
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
+
+
+tequila library
+- view-model ... extend model with view state (CRUD)
+    - originalValue - property
+    - action - delete, update
+    - modified ... any values <> originalValues
+
+- interface-class
+    - present( view, callback(view, error) )
+
+- command-class
+
+- application-class
+    - execute ( command, store, interface, callback(command, error) )
+
+interfaces
+- bootstrap-interface
+- cli-interface
 
 CLASS DESIGN TODO:
 
@@ -35,7 +50,7 @@ CLASS DESIGN TODO:
             * Group
                 * Control
             * Command
-        * Procedure
+        * Procedure (Group of Commands)
             * Task
             * Command
 
@@ -53,7 +68,7 @@ CLASS DESIGN TODO:
 
 INTERFACE DESIGN (PART OF TEQUILA)
 
-* <- getApplicationStructure -- returns object with app structure
+* T.app.structure
 
 * -> execute(Command)
 

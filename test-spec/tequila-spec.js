@@ -7,6 +7,7 @@ test.heading('Classes', function () {
   test.paragraph('These objects are make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerAttribute();
   test.runnerCommand();
+  test.runnerDelta();
   test.runnerList(List,false);
   test.runnerMessage();
   test.runnerModel(Model,false);
