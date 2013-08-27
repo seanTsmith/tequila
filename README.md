@@ -3,6 +3,7 @@ Tequila es bueno!
 
 TODO:
 
+* create image attribute
 * make validation for types
 * have stores validate before saving
 * create json-file-store
@@ -13,7 +14,6 @@ TODO:
 * fix Test variations on getList method test for remote stores
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
-
 
 tequila library
 - view-model ... extend model with view state (CRUD)
@@ -44,12 +44,8 @@ CLASS DESIGN TODO:
             * Command(model,id) ... additional commands for this ModelView
             * Command(model,id)
         * Dialog
-            * Title
-            * Text
-            * Image
-            * Group
-                * Control
-            * Command
+            * Attributes
+            * Commands
         * Procedure (Group of Commands)
             * Task
             * Command
@@ -87,10 +83,6 @@ INTERFACE DESIGN (PART OF TEQUILA)
     * callback      <- (modelView)      Update Single Model Changes
 
 concepts...
-
-
-
-
 
 ## Project Root
 + **/bin** tequila command line interface
