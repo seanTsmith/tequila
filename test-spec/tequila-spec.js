@@ -8,15 +8,20 @@ test.heading('Classes', function () {
   test.runnerAttribute();
   test.runnerCommand();
   test.runnerDelta();
+  test.runnerInterface();
   test.runnerList(List,false);
   test.runnerMessage();
   test.runnerModel(Model,false);
+  test.runnerProcedure();
   test.runnerStoreModel();
   test.runnerTequila();
   test.runnerTransport();
+  test.runnerWorkspace();
 });
 test.heading('Models', function () {
-  test.paragraph('These core models are used by the library.');
+  test.paragraph('These core models are used by the library. suck it');
+  test.runnerLogModel();
+  test.runnerPresentation();
   test.runnerUserModel();
 });
 test.heading('Stores', function () {

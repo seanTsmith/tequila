@@ -6,6 +6,7 @@ TODO:
 * create image attribute
 * make validation for types
 * have stores validate before saving
+* create redis-store
 * create json-file-store
 * create cookie-store
 * create local-store
