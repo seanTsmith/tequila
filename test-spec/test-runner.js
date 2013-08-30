@@ -10,11 +10,7 @@ var TestNode = function (inheritanceTest, nodeType, level, levelText, text, func
   this.text = text;
   this.func = func;
   this.exampleNumber = exampleNumber;
-  var funcText;
-  if (func) {
-    funcText = test.formatCode(func, false);
-  }
-  this.deferedExample = (funcText && funcText.length > 0) ? deferredExample : true;
+  this.deferedExample = deferredExample;
   this.expectedValue = expectedValue;
   return this;
 };
