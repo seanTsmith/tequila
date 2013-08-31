@@ -45,4 +45,4 @@ a CLI project in git but for now just cut and paste into http://yuml.me/diagram/
 ```
 
 ## Diagram
-[yuml graphic](http://yuml.me/8388905c)
+![yuml graphic](http://yuml.me/8388905c)
