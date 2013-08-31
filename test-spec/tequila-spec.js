@@ -20,6 +20,7 @@ test.heading('Classes', function () {
 });
 test.heading('Models', function () {
   test.paragraph('These core models are used by the library. suck it');
+  test.runnerApplicationModel();
   test.runnerLogModel();
   test.runnerPresentation();
   test.runnerUserModel();
