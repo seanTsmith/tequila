@@ -4,7 +4,6 @@ Tequila es bueno!
 
 TODO:
 
-* fix node tests
 * check out instanbul for node test coverage
 * create image attribute
 * make validation for types
