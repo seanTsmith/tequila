@@ -12,3 +12,4 @@ a CLI project in git but for now just cut and paste into http://yuml.me/diagram/
 
 ## Diagram
 http://yuml.me/6ac95f9c
+![yuml.me image](http://yuml.me/6ac95f9c "Class Diagram")
