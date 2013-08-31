@@ -1,7 +1,7 @@
 {
   "name": "tequila",
   "version": "0.1.0",
-  "author": "tgiCloud <support@tgicloud.com>",
+  "author": "Sean Smith <support@dremoor@gmail.com>",
   "description": "tequila es muy bueno",
   "contributors": [
     {
@@ -13,6 +13,9 @@
     "connect": "*",
     "mongodb": "*",
     "socket.io": "*"
+  },
+  "scripts": {
+    "test": "make"
   },
   "devDependencies": {
     "colors": "*"
