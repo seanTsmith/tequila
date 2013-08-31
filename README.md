@@ -1,3 +1,4 @@
+[![Build Status](https://secure.travis-ci.org/visionmedia/mocha.png)](http://travis-ci.org/visionmedia/mocha)
 #tequila
 Tequila es bueno!
 
