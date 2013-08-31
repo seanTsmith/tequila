@@ -36,34 +36,8 @@ interfaces
 - bootstrap-interface
 - cli-interface
 
-CLASS DESIGN TODO:
 
-* App (Application)
-    * execute(Command)
 
-    * Commands
-        * Navigation ( Menu? )
-        * View(model,id) ...  standard CRUD Model processing
-            * Command(model,id) ... additional commands for this ModelView
-            * Command(model,id)
-        * Dialog
-            * Attributes
-            * Commands
-        * Procedure (Group of Commands)
-            * Task
-            * Command
-
-    * Menu
-        * Menu
-            * Command
-            * Command
-        * Menu
-            * Menu
-                * Command
-                * Command
-            * Menu
-                * Command
-                * Command
 
 INTERFACE DESIGN (PART OF TEQUILA)
 
