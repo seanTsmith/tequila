@@ -7,6 +7,11 @@ a CLI project in git but for now just cut and paste into http://yuml.me/diagram/
 ## yUML text
 ```
 [Application]uses -.->[Command]
+[Application]uses -.->[User]
+[Application]uses -.->[Interface]
+[Application]uses -.->[Store]
+[Application]uses -.->[Workspace]
+[Application]uses -.->[Log]
 [Attribute]
 [Command]
 [Command]uses -.->[Presentation]
@@ -15,6 +20,7 @@ a CLI project in git but for now just cut and paste into http://yuml.me/diagram/
 [Delta]uses -.->[Model]
 [Interface]
 [Interface]uses -.->[Model]
+[Interface]uses -.->[List]
 [Interface]uses -.->[Presentation]
 [Interface]^-[Cli]
 [Interface]^-[Bootstrap3]
@@ -34,6 +40,7 @@ a CLI project in git but for now just cut and paste into http://yuml.me/diagram/
 [Store]
 [Store]uses -.->[Model]
 [Store]uses -.->[List]
+[Store]uses -.->[Workspace]
 [Store]^-[Memory]
 [Store]^-[Mongo]
 [Store]^-[Remote]
@@ -45,4 +52,4 @@ a CLI project in git but for now just cut and paste into http://yuml.me/diagram/
 ```
 
 ## Diagram
-![yuml graphic](http://yuml.me/8388905c)
+![yuml graphic](http://yuml.me/a7902572)
