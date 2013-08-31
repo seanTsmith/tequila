@@ -5,6 +5,7 @@ This file houses UML markup for class design.  For help on notation see http://y
 a CLI project in git but for now just cut and paste into http://yuml.me/diagram/scruffy/class/draw.
 
 ## yUML text
+```
 [Application]uses -.->[Command]
 [Attribute]
 [Command]
@@ -41,6 +42,7 @@ a CLI project in git but for now just cut and paste into http://yuml.me/diagram/
 [Workspace]
 [Workspace]uses -.->[Delta]
 [Workspace]uses -.->[User]
+```
 
 ## Diagram
-http://yuml.me/8388905c
+[yuml graphic](http://yuml.me/8388905c)
