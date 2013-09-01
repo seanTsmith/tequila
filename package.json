@@ -20,6 +20,10 @@
   "devDependencies": {
     "colors": "*"
   },
+  "repository" :
+  { "type" : "git"
+    , "url" : "https://github.com/dremoor/tequila.git"
+  },
   "engines": {
     "node": ">=0.6.6"
   }
