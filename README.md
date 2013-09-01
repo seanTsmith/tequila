@@ -18,49 +18,6 @@ TODO:
 * add visible attribute to attribute and default by type on creation
 * Finish INTERFACE design
 
-tequila library
-- view-model ... extend model with view state (CRUD)
-    - originalValue - property
-    - action - delete, update
-    - modified ... any values <> originalValues
-
-- interface-class
-    - present( view, callback(view, error) )
-
-- command-class
-
-- application-class
-    - execute ( command, store, interface, callback(command, error) )
-
-interfaces
-- bootstrap-interface
-- cli-interface
-
-
-
-
-INTERFACE DESIGN (PART OF TEQUILA)
-
-* T.app.structure
-
-* -> execute(Command)
-
-* present -- method with function callback
-
-    * Present       -> (dialogView)
-    * callback      <- (dialogView)     Generic Response
-
-    * Present       -> (listView)
-    * callback      <- (listView)       Generic Response
-
-    * Present       -> (modelListView)
-    * callback      <- (modelListView)  Update Multiple Model Changes
-
-    * Present       -> (modelView)
-    * callback      <- (modelView)      Update Single Model Changes
-
-concepts...
-
 ## Project Root
 + **/bin** tequila command line interface
 + **/lib** tequila library source code
