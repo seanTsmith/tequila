@@ -1,5 +1,5 @@
-[![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila)
-#tequila
+# tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila)
+
 Tequila es bueno!
 
 TODO:
