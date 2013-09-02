@@ -42,6 +42,7 @@ make.lib:
 	@echo Making library
 	@echo '// FILE IS DESTROYED AND REBUILT IN MAKE' > tequila.js
 	@cat \
+	    lib/classes/tequila-singleton.js \
         lib/classes/attribute-class.js \
         lib/classes/command-class.js \
         lib/classes/delta-class.js \
@@ -51,7 +52,6 @@ make.lib:
         lib/classes/model-class.js \
         lib/classes/procedure-class.js \
         lib/classes/store-class.js \
-	    lib/classes/tequila-singleton.js \
 	    lib/classes/transport-class.js \
 	    lib/classes/workspace-class.js \
         lib/models/log-model.js \
