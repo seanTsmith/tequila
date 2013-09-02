@@ -1,7 +1,7 @@
 #tequila UML diagram
 
 ## Diagram
-![yuml graphic](http://yuml.me/9c071efa)
+![yuml graphic](http://yuml.me/e39f5fde)
 
 ## yUML text
 ```
@@ -11,8 +11,11 @@
 [Application]uses -.->[User]
 [Attribute{bg:cornsilk}]
 [Bootstrap3{bg:deepskyblue}]
+[Bootstrap3]-[note: User interface abstracted through Interface Class and implemented with subclasses or test script for Mock {bg:mistyrose}]
 [CLI{bg:deepskyblue}]
+[CLI]-[note: User interface abstracted through Interface Class and implemented with subclasses or test script for Mock {bg:mistyrose}]
 [PDF{bg:deepskyblue}]
+[PDF]-[note: User interface abstracted through Interface Class and implemented with subclasses or test script for Mock {bg:mistyrose}]
 [Command{bg:cornsilk}]
 [Command]uses -.->[Presentation]
 [Command]uses -.->[Procedure]
@@ -23,6 +26,7 @@
 [Interface]uses -.->[List]
 [Interface]uses -.->[Command]
 [Presentation]uses -.->[Interface]
+[Interface]^-[Mock]
 [Interface]^-[CLI]
 [Interface]^-[PDF]
 [Interface]^-[Bootstrap3]
@@ -30,7 +34,11 @@
 [List]uses -.->[Model]
 [Log{bg:palegreen}]
 [Memory{bg:orange}]
+[Memory]-[note: Store abstraction hides vendor implementation and location{bg:mistyrose}]
 [Message{bg:cornsilk}]
+[Message]-[note: Store abstraction hides vendor implementation and location{bg:mistyrose}]
+[Mock{bg:deepskyblue}]
+[Mock]-[note: User interface abstracted through Interface Class and implemented with subclasses or test script for Mock {bg:mistyrose}]
 [Model{bg:cornsilk}]
 [Model]uses -.->[Attribute]
 [Model]^-[Application]
@@ -38,6 +46,7 @@
 [Model]^-[Presentation]
 [Model]^-[User]
 [Mongo{bg:orange}]
+[Mongo]-[note: Store abstraction hides vendor implementation and location{bg:mistyrose}]
 [Procedure{bg:cornsilk}]
 [Procedure]uses -.->[Command]
 [Presentation{bg:palegreen}]
@@ -58,8 +67,6 @@
 [Workspace]uses -.->[Delta]
 [Workspace]uses -.->[User]
 ```
-
-
 
 ## Info
 This file houses UML markup for class design.  For help on notation see http://yuml.me/diagram/class/samples.  There is
