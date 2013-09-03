@@ -8,7 +8,7 @@ tequilaCli.out = function(parm) {
     console.log(parm);
 }
 
-tequilaCli.out('tequila 0.0.1');
+tequilaCli.out('tequila!');
 tequilaCli.command = process.argv[2] || "help"
 switch (tequilaCli.command) {
 case 'test':

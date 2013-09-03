@@ -9,7 +9,7 @@
       "email": "dremoor@gmail.com"
     }
   ],
-  "dependencies" : {
+  "dependencies": {
     "connect": "*",
     "mongodb": "*",
     "socket.io": "*"
@@ -18,11 +18,14 @@
     "test": "make"
   },
   "devDependencies": {
-    "colors": "*"
+    "colors": "*",
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-watch": "*"
   },
-  "repository" :
-  { "type" : "git"
-    , "url" : "https://github.com/dremoor/tequila.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dremoor/tequila.git"
   },
   "engines": {
     "node": ">=0.6.6"

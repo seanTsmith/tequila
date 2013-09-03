@@ -315,7 +315,7 @@ test.renderDetail = function (isBrowser) {
           }
         } else {
           test.countDefer++;
-          process.stdout.write(colors.yellow('✍'));
+          process.stdout.write(colors.yellow('⚑'));
         }
         break;
       case 'e':
@@ -340,7 +340,7 @@ test.renderDetail = function (isBrowser) {
           var exampleCode = '';
           if (test.nodes[i].asyncTest) {
             exampleCode += test.formatCode(test.nodes[i].func, true);
-            exampleCode += '✍<b>pending async results</b>';
+            exampleCode += '⚑<b>pending async results</b>';
             test.countPending++;
             pre.style.background = "#ffa500"; // oranges
           } else {
@@ -393,7 +393,7 @@ test.renderDetail = function (isBrowser) {
           pre.style.background = "#ffc"; // yellow
           if (test.nodes[i].func) {
             exampleCode = test.formatCode(test.nodes[i].func, false);
-            exampleCode += '✍ <b>(test disabled)</b>';
+            exampleCode += '⚑ <b>(test disabled)</b>';
             pre.innerHTML = exampleCode;
           } else {
             pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
