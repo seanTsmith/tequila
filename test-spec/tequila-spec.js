@@ -3,6 +3,10 @@
  * tequila-spec
  */
 test.start();
+test.heading('Library', function () {
+  test.runnerTequila();
+});
+
 test.heading('Classes', function () {
   test.paragraph('These objects are make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerAttribute();
@@ -14,7 +18,6 @@ test.heading('Classes', function () {
   test.runnerModel(Model,false);
   test.runnerProcedure();
   test.runnerStoreModel();
-  test.runnerTequila();
   test.runnerTransport();
   test.runnerWorkspace();
 });

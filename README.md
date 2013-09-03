@@ -4,7 +4,6 @@ Tequila es bueno!
 
 TODO:
 
-* check out instanbul for node test coverage
 * create image attribute
 * make validation for types
 * have stores validate before saving
@@ -12,7 +11,7 @@ TODO:
 * create json-file-store
 * create cookie-store
 * create local-store
-* create resource-file-store (sound, image, pdf, misc subclass resource-class make atribute type)
+* create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 * tequilaStore needs to be set not hard coded
 * fix Test variations on getList method test for remote stores
 * add visible attribute to attribute and default by type on creation

@@ -68,14 +68,11 @@ module.exports = function (grunt) {
         ],
         dest: 'dist/node-test-host.js'
       }
-    },
-    test: {
-
     }
   });
 
+  // node dist/node-test-cli.js
   grunt.registerTask('test', function () {
-
     var done = this.async();
     doneFunction = function (error, result, code) {
       grunt.log.write(error);
@@ -83,7 +80,6 @@ module.exports = function (grunt) {
       grunt.log.write(code);
       return done();
     };
-
     var child = grunt.util.spawn(
       {
         cmd: process.argv[0],
@@ -93,7 +89,20 @@ module.exports = function (grunt) {
     child.stderr.pipe(process.stderr);
     return child;
   });
+
+  // istanbul cover dist/node-test-cli.js
+  grunt.registerTask('helpme', function () {
+    grunt.log.subhead('GRUNT TASKS FOR TEQUILA\n');
+    grunt.log.writeln('make\t(default) make library and run tests');
+    grunt.log.writeln('cover\tgenerate coverage report');
+  });
+
+  // help
+
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.registerTask('cover', ['coverme']);
+  grunt.registerTask('help', ['helpme']);
   grunt.registerTask('default', ['concat', 'test']);
+  grunt.registerTask('make', ['concat', 'test']);
 };

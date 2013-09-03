@@ -4947,41 +4947,39 @@ test.runnerLogModel = function () {
  */
 test.runnerPresentation = function () {
   test.heading('Presentation Model', function () {
-    test.paragraph('This model represents the way in which a model is to be presented to the user.');
-    test.xexample('', false, function () {
-      /* TODO
-       CONSTRUCTOR
 
-       PROPERTIES
+    test.paragraph('The Presentation Model represents the way in which a model is to be presented to the user.  ' +
+      'The presentation is meant to be a "hint" to a Interface object.  ' +
+      'The specific Interface object will represent the model data according to the Presentation object.');
 
-       model - points to model from which presentation is created and CRUD op
-       ID - the ID of the model being presented - if null then new (n/a if no model)
-       attributes - if null then model-attributes used for presentation (one or other needed)
-       commands - commands available, built in predefined commands as follows:
-          store
-
-       METHODS
-
-       from command... check it ...
-
-         View - presents a model for display and CRUD purposes
-         contents is object with following properties:
-         model - the model being presented
-         ID - the ID of the model being presented - if null then new
-         viewModel - points to model used for presentation - if null then model used
-         commands - additional commands available
-
-         Dialog - presents a dialog for user interaction
-         contents is object with following properties:
-         dialogModel - points to model used for presentation
-         commands - additional commands available
-
-
-
-       */
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of User', true, function () {
+        return new Presentation() instanceof Presentation;
+      });
+      test.heading('Model tests are applied', function () {
+        test.runnerModel(Presentation, true);
+      });
     });
+
+    test.heading('PROPERTIES', function () {
+      test.heading('model', function () {
+        test.paragraph('points to model from which presentation is created and CRUD op');
+      });
+      test.heading('ID', function () {
+        test.paragraph('the ID of the model being presented - if null then new (n/a if no model)');
+      });
+      test.heading('attributes', function () {
+        test.paragraph('if null then model-attributes used for presentation (one or other needed)');
+      });
+      test.heading('commands', function () {
+        test.paragraph('commands available, if string then built in predefined command ex: \'store\'');
+      });
+    });
+
+
   });
-};;
+};
+;
 /**
  * tequila
  * user-test
@@ -5580,6 +5578,10 @@ test.runnerStoreIntegration = function () {
  * tequila-spec
  */
 test.start();
+test.heading('Library', function () {
+  test.runnerTequila();
+});
+
 test.heading('Classes', function () {
   test.paragraph('These objects are make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerAttribute();
@@ -5591,7 +5593,6 @@ test.heading('Classes', function () {
   test.runnerModel(Model,false);
   test.runnerProcedure();
   test.runnerStoreModel();
-  test.runnerTequila();
   test.runnerTransport();
   test.runnerWorkspace();
 });
