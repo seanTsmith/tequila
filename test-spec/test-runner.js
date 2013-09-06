@@ -264,7 +264,8 @@ test.renderDetail = function (isBrowser) {
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined') {
+          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+            test.nodes[i].expectedValue != null) {
             if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
               test.nodes[i].asyncTest = true;
           }
