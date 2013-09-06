@@ -290,7 +290,9 @@ test.renderDetail = function (isBrowser) {
             ranTest = true;
             exampleCode += test.formatCode(test.nodes[i].func, true);
             var test_Value = 'undefined';
-            if (typeof test_Results !== 'undefined') test_Value = test_Results.toString();
+            if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+              test.nodes[i].expectedValue != null) {
+            if (typeof test_Results !== 'undefined' && test_Results !== 'null') test_Value = test_Results.toString();
             var expected_Value = 'undefined';
             if (typeof test.nodes[i].expectedValue !== 'undefined') expected_Value = test.nodes[i].expectedValue.toString();
             // Check assertions
