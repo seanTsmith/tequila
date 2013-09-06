@@ -8,7 +8,7 @@ test.heading('Library', function () {
 });
 
 test.heading('Classes', function () {
-  test.paragraph('These objects are make up the core "classes" and are extended via javascript prototype inheritance.');
+  test.paragraph('These objects make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerAttribute();
   test.runnerCommand();
   test.runnerDelta();

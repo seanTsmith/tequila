@@ -331,7 +331,8 @@ test.renderDetail = function (isBrowser) {
         if (!test.nodes[i].inheritanceTest) test.countUnique++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined') {
+          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+            test.nodes[i].expectedValue != null) {
             if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
               test.nodes[i].asyncTest = true;
           }
@@ -445,7 +446,7 @@ test.renderCloser = function (isBrowser) {
     test.closerCalled = false;
     test.cliCloser();
   }
-}
+};
 test.asyncResponse = function (wut) {
   return 'test.asyncResponse: ' + wut;
 };
