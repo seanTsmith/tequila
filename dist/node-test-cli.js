@@ -1500,7 +1500,12 @@ function Attribute(args, arg2) {
   this.name = args.name || null;
   this.label = args.label || args.name;
   this.type = args.type || 'String';
-  splitTypes = splitParens(this.type);
+  splitTypes = function (str) { // for String(30) remove right of (
+    var tmpSplit = str.split('(');
+    tmpSplit[1] = parseInt(tmpSplit[1]);
+    return tmpSplit;
+  }(this.type);
+
   this.type = splitTypes[0];
   var unusedProperties = [];
   switch (this.type) {
@@ -1583,7 +1588,7 @@ Attribute.prototype.coerce = function (value) {
     case 'Boolean':
       if (typeof newValue == 'undefined') return false;
       if (typeof newValue == 'string') {
-        newValue =newValue.toUpperCase();
+        newValue = newValue.toUpperCase();
         if (newValue === 'Y' || newValue === 'YES' || newValue === 'T' || newValue === 'TRUE' || newValue === '1')
           return true;
         return false;
@@ -1653,14 +1658,6 @@ Attribute.prototype.getValidationErrors = function () {
   }
   return errors;
 };
-/*
- * Helpers
- */
-function splitParens(str, outside, inside) {
-  var tmpSplit = str.split('(');
-  tmpSplit[1] = parseInt(tmpSplit[1]);
-  return tmpSplit;
-}
 ;
 /**
  * tequila
@@ -1679,7 +1676,7 @@ function Command(/* does this matter */ args) {
   for (i in args) this[i] = args[i];
   this.name = this.name || "(unnamed)"; // name is optional
   if ('string' != typeof this.name) throw new Error('name must be string');
-  if ('undefined' == typeof this.description) this.description = this.name;
+  if ('undefined' == typeof this.description) this.description = this.name + ' Command';
   if ('undefined' == typeof this.type) this.type = 'Stub';
   if (!T.contains(T.getCommandTypes(), this.type)) throw new Error('Invalid command type: ' + this.type);
   switch (this.type) {
@@ -1739,6 +1736,48 @@ Command.prototype.abort = function () {
  * tequila
  * interface-class
  */
+// Interface Constructor
+function Interface(args) {
+  if (false === (this instanceof Interface)) throw new Error('new operator required');
+  args = args || {};
+  args.name = args.name || '(unnamed)';
+  args.description = args.description || 'a Interface';
+  var i;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'tasksCompleted']);
+  var badJooJoo = [];
+  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1)
+    throw new Error('error creating Procedure: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  // args ok, now copy to object and check for errors
+  for (i in args) this[i] = args[i];
+  badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
+  if (badJooJoo) {
+    if (badJooJoo.length > 1) throw new Error('error creating Procedure: multiple errors');
+    if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  }
+}
+/*
+ * Methods
+ */
+Interface.prototype.getValidationErrors = function () {
+  var badJooJoo = [];
+  return badJooJoo.length ? badJooJoo : null;
+};
+Interface.prototype.toString = function () {
+  return this.description;
+};
+Interface.prototype.requestResponse = function (obj, callback) {
+  if (obj == null || typeof obj !== 'object' || typeof callback !== 'function')
+    throw new Error('requestResponse arguments required: object, callback');
+  if (obj.request === undefined)
+    throw new Error('requestResponse object has no request property');
+  // Parameters are ok now handle the request
+  setTimeout(function () {
+    obj.response = new Error('invalid request: ' + obj.request);
+    callback(obj);
+  }, 0);
+};
 ;
 /**
  * tequila
@@ -2160,6 +2199,11 @@ Log.prototype = T.inheritPrototype(Model.prototype);;
 // Model Constructor
 var Presentation = function (args) {
   if (false === (this instanceof Presentation)) throw new Error('new operator required');
+  args = args || {};
+  if (!args.attributes) {
+    args.attributes = [];
+  }
+  args.attributes.push(new Attribute({name: 'name', type: 'String(20)'}));
   Model.call(this, args);
   this.modelType = "Presentation";
 };
@@ -2934,7 +2978,11 @@ test.runner = function (isBrowser) {
       }
       console.log(test.integrationStore.name + ' is a ' + test.integrationStore.storeType);
       test.renderHead(isBrowser);
-      test.renderDetail(isBrowser);
+      try {
+        test.renderDetail(isBrowser);
+      } catch (e) {
+        console.log('renderDetail error...\n' + e.stack)
+      }
       test.renderCloser(isBrowser);
       test.updateStats();
     }
@@ -3088,9 +3136,6 @@ test.renderHead = function (isBrowser) {
     test.outerDiv.appendChild(test.innerDiv);
 
     test.updateStats();
-
-  } else {
-    process.stdout.write('Testing 123');
   }
 };
 test.renderDetail = function (isBrowser) {
@@ -3159,7 +3204,8 @@ test.renderDetail = function (isBrowser) {
         test.countTests++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined') {
+          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+            test.nodes[i].expectedValue != null) {
             if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
               test.nodes[i].asyncTest = true;
           }
@@ -3184,9 +3230,11 @@ test.renderDetail = function (isBrowser) {
             ranTest = true;
             exampleCode += test.formatCode(test.nodes[i].func, true);
             var test_Value = 'undefined';
-            if (typeof test_Results !== 'undefined') test_Value = test_Results.toString();
+            if (typeof test_Results !== 'undefined' && test_Results != null)
+              test_Value = test_Results.toString();
             var expected_Value = 'undefined';
-            if (typeof test.nodes[i].expectedValue !== 'undefined') expected_Value = test.nodes[i].expectedValue.toString();
+            if (typeof test.nodes[i].expectedValue !== 'undefined' && test.nodes[i].expectedValue != null)
+              expected_Value = test.nodes[i].expectedValue.toString();
             // Check assertions
             var gotFailedAssertions = false;
             for (var j in test.assertions) {
@@ -3195,7 +3243,7 @@ test.renderDetail = function (isBrowser) {
             if (test_Value !== expected_Value || gotFailedAssertions) {
               test.countFail++; // TODO if console is white this is invisible ink...
               if (gotFailedAssertions) {
-                process.stdout.write( '\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
+                process.stdout.write('\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
                   'ASSERTION(s) failed'));
               } else {
                 process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
@@ -3226,7 +3274,8 @@ test.renderDetail = function (isBrowser) {
         if (!test.nodes[i].inheritanceTest) test.countUnique++;
         if (!test.nodes[i].deferedExample && test.nodes[i].func) {
           test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined') {
+          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+            test.nodes[i].expectedValue != null) {
             if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
               test.nodes[i].asyncTest = true;
           }
@@ -3340,7 +3389,7 @@ test.renderCloser = function (isBrowser) {
     test.closerCalled = false;
     test.cliCloser();
   }
-}
+};
 test.asyncResponse = function (wut) {
   return 'test.asyncResponse: ' + wut;
 };
@@ -3966,12 +4015,10 @@ test.runnerCommand = function () {
         });
       });
       test.heading('description', function () {
-        test.example('more descriptive than name (for menus)', 'Tequila is a beverage made from blue agave', function () {
-          // description set to name if not specified
-          var desc = new Command({name: 'Tequila'}).description;
-          desc += ' is a ';
-          desc += new Command({name: 'Tequila', description: 'beverage made from blue agave'}).description;
-          return desc;
+        test.example('more descriptive than name (for menus)', 'Tequila Command : Tequila is a beverage made from blue agave.', function () {
+          // description set to (name) Command if not specified
+          return new Command({name: 'Tequila'}).description + ' : ' +
+            new Command({name: 'tequila', description: 'Tequila is a beverage made from blue agave.'}).description;
         });
       });
       test.heading('type', function () {
@@ -4133,12 +4180,70 @@ test.runnerDelta = function () {
 test.runnerInterface = function () {
   test.heading('Interface Class', function () {
     test.paragraph('The Interface Class is an abstraction of a user interface.');
-    test.xexample('', false, function () {
-      /* TODO
-        see readme
-       */
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of Interface', true, function () {
+        return new Interface() instanceof Interface;
+      });
+      test.example('should make sure new operator used', Error('new operator required'), function () {
+        Interface();
+      });
+      test.example('should make sure argument properties are valid', Error('error creating Procedure: invalid property: yo'), function () {
+        new Interface({yo: 'whatup'});
+      });
     });
+    test.heading('PROPERTIES', function () {
+      test.heading('name', function () {
+        test.example('defaults to (unnamed)', '(unnamed)', function () {
+          return new Interface().name;
+        });
+      });
+      test.heading('description', function () {
+        test.example('defaults to a Interface', 'a Interface', function () {
+          return new Interface().description;
+        });
+      });
+    });
+    test.heading('METHODS', function () {
+      test.heading('toString()', function () {
+        test.example('should return a description of the message', 'Punched Card Interface', function () {
+          return new Interface({description: 'Punched Card Interface'}).toString();
+        });
+      });
+      test.heading('getValidationErrors()', function () {
+        test.example('returns null when no errors', null, function () {
+          return new Interface().getValidationErrors();
+        });
+      });
+      test.heading('requestResponse({request:object, response:object}, callback', function () {
+        test.paragraph('Subclasses of Interface will use this to submit user (or agent) initiated requests.  ' +
+          'It can also be used by the app to push objects to the interface by passing {request:this...');
 
+        test.example('arguments must be in correct format', test.asyncResponse(Error('invalid request: null')), function (testNode, returnResponse) {
+          test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
+            new Interface().requestResponse();
+          });
+          test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
+            new Interface().requestResponse({}); // missing callback
+          });
+          test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
+            new Interface().requestResponse("hello", function () {
+              // function part ok but not passing an object
+            });
+          });
+          test.shouldThrow(Error('requestResponse object has no request property'), function () {
+            new Interface().requestResponse({}, function () {
+              // function part ok but not passing an object
+            });
+          });
+          // Any value can be set to request will be accepted on function call.
+          // If the value is not handled then the callback receives an error as the response.
+          // null should always return an error.
+          new Interface().requestResponse({request:null}, function (obj) {
+            returnResponse(testNode, obj.response);
+          });
+        });
+      });
+    });
   });
 };;
 /**
@@ -4432,11 +4537,11 @@ test.runnerProcedure = function () {
       });
       test.heading('tasksNeeded', function () {
         test.paragraph('Total tasks that will execute (does not include skipped tasks).');
-        test.paragraph('_See Inegration Tests for usage_');
+        test.paragraph('_See Integration Tests for usage_');
       });
       test.heading('tasksCompleted', function () {
         test.paragraph('Number of tasks completed and started (does not include skipped tasks)');
-        test.paragraph('_See Inegration Tests for usage_');
+        test.paragraph('_See Integration Tests for usage_');
       });
     });
     test.heading('TASKS', function () {
@@ -4976,6 +5081,16 @@ test.runnerPresentation = function () {
       });
     });
 
+    test.heading('ATTRIBUTES', function () {
+      test.paragraph('Presentation extends model and inherits the attributes property.  All Presentation objects ' +
+        'have the following attributes:');
+    });
+    test.example('following attributes are defined:', undefined, function () {
+      var presentation = new Presentation(); // default attributes and values
+      test.assertion(presentation.get('id') === null);
+      test.assertion(presentation.get('name') === null);
+    });
+
 
   });
 };
@@ -4998,7 +5113,7 @@ test.runnerUserModel = function () {
       //          return new Attribute({name: 'comments', type: 'String(255)'}).size;
     });
     test.heading('ATTRIBUTES', function () {
-      test.example('name - user name also login name', undefined, function () {
+      test.example('following attributes are defined:', undefined, function () {
         var user = new User(); // default attributes and values
         test.assertion(user.get('id') === null);
         test.assertion(user.get('name') === null);
@@ -5583,7 +5698,7 @@ test.heading('Library', function () {
 });
 
 test.heading('Classes', function () {
-  test.paragraph('These objects are make up the core "classes" and are extended via javascript prototype inheritance.');
+  test.paragraph('These objects make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerAttribute();
   test.runnerCommand();
   test.runnerDelta();

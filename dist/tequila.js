@@ -99,7 +99,12 @@ function Attribute(args, arg2) {
   this.name = args.name || null;
   this.label = args.label || args.name;
   this.type = args.type || 'String';
-  splitTypes = splitParens(this.type);
+  splitTypes = function (str) { // for String(30) remove right of (
+    var tmpSplit = str.split('(');
+    tmpSplit[1] = parseInt(tmpSplit[1]);
+    return tmpSplit;
+  }(this.type);
+
   this.type = splitTypes[0];
   var unusedProperties = [];
   switch (this.type) {
@@ -182,7 +187,7 @@ Attribute.prototype.coerce = function (value) {
     case 'Boolean':
       if (typeof newValue == 'undefined') return false;
       if (typeof newValue == 'string') {
-        newValue =newValue.toUpperCase();
+        newValue = newValue.toUpperCase();
         if (newValue === 'Y' || newValue === 'YES' || newValue === 'T' || newValue === 'TRUE' || newValue === '1')
           return true;
         return false;
@@ -252,14 +257,6 @@ Attribute.prototype.getValidationErrors = function () {
   }
   return errors;
 };
-/*
- * Helpers
- */
-function splitParens(str, outside, inside) {
-  var tmpSplit = str.split('(');
-  tmpSplit[1] = parseInt(tmpSplit[1]);
-  return tmpSplit;
-}
 ;
 /**
  * tequila
@@ -278,7 +275,7 @@ function Command(/* does this matter */ args) {
   for (i in args) this[i] = args[i];
   this.name = this.name || "(unnamed)"; // name is optional
   if ('string' != typeof this.name) throw new Error('name must be string');
-  if ('undefined' == typeof this.description) this.description = this.name;
+  if ('undefined' == typeof this.description) this.description = this.name + ' Command';
   if ('undefined' == typeof this.type) this.type = 'Stub';
   if (!T.contains(T.getCommandTypes(), this.type)) throw new Error('Invalid command type: ' + this.type);
   switch (this.type) {
@@ -338,6 +335,48 @@ Command.prototype.abort = function () {
  * tequila
  * interface-class
  */
+// Interface Constructor
+function Interface(args) {
+  if (false === (this instanceof Interface)) throw new Error('new operator required');
+  args = args || {};
+  args.name = args.name || '(unnamed)';
+  args.description = args.description || 'a Interface';
+  var i;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'tasksCompleted']);
+  var badJooJoo = [];
+  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1)
+    throw new Error('error creating Procedure: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  // args ok, now copy to object and check for errors
+  for (i in args) this[i] = args[i];
+  badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
+  if (badJooJoo) {
+    if (badJooJoo.length > 1) throw new Error('error creating Procedure: multiple errors');
+    if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  }
+}
+/*
+ * Methods
+ */
+Interface.prototype.getValidationErrors = function () {
+  var badJooJoo = [];
+  return badJooJoo.length ? badJooJoo : null;
+};
+Interface.prototype.toString = function () {
+  return this.description;
+};
+Interface.prototype.requestResponse = function (obj, callback) {
+  if (obj == null || typeof obj !== 'object' || typeof callback !== 'function')
+    throw new Error('requestResponse arguments required: object, callback');
+  if (obj.request === undefined)
+    throw new Error('requestResponse object has no request property');
+  // Parameters are ok now handle the request
+  setTimeout(function () {
+    obj.response = new Error('invalid request: ' + obj.request);
+    callback(obj);
+  }, 0);
+};
 ;
 /**
  * tequila
@@ -759,6 +798,11 @@ Log.prototype = T.inheritPrototype(Model.prototype);;
 // Model Constructor
 var Presentation = function (args) {
   if (false === (this instanceof Presentation)) throw new Error('new operator required');
+  args = args || {};
+  if (!args.attributes) {
+    args.attributes = [];
+  }
+  args.attributes.push(new Attribute({name: 'name', type: 'String(20)'}));
   Model.call(this, args);
   this.modelType = "Presentation";
 };

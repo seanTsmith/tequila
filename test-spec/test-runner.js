@@ -39,7 +39,11 @@ test.runner = function (isBrowser) {
       }
       console.log(test.integrationStore.name + ' is a ' + test.integrationStore.storeType);
       test.renderHead(isBrowser);
-      test.renderDetail(isBrowser);
+      try {
+        test.renderDetail(isBrowser);
+      } catch (e) {
+        console.log('renderDetail error...\n' + e.stack)
+      }
       test.renderCloser(isBrowser);
       test.updateStats();
     }
@@ -193,9 +197,6 @@ test.renderHead = function (isBrowser) {
     test.outerDiv.appendChild(test.innerDiv);
 
     test.updateStats();
-
-  } else {
-    process.stdout.write('Testing 123');
   }
 };
 test.renderDetail = function (isBrowser) {
@@ -290,11 +291,11 @@ test.renderDetail = function (isBrowser) {
             ranTest = true;
             exampleCode += test.formatCode(test.nodes[i].func, true);
             var test_Value = 'undefined';
-            if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
-              test.nodes[i].expectedValue != null) {
-            if (typeof test_Results !== 'undefined' && test_Results !== 'null') test_Value = test_Results.toString();
+            if (typeof test_Results !== 'undefined' && test_Results != null)
+              test_Value = test_Results.toString();
             var expected_Value = 'undefined';
-            if (typeof test.nodes[i].expectedValue !== 'undefined') expected_Value = test.nodes[i].expectedValue.toString();
+            if (typeof test.nodes[i].expectedValue !== 'undefined' && test.nodes[i].expectedValue != null)
+              expected_Value = test.nodes[i].expectedValue.toString();
             // Check assertions
             var gotFailedAssertions = false;
             for (var j in test.assertions) {
@@ -303,7 +304,7 @@ test.renderDetail = function (isBrowser) {
             if (test_Value !== expected_Value || gotFailedAssertions) {
               test.countFail++; // TODO if console is white this is invisible ink...
               if (gotFailedAssertions) {
-                process.stdout.write( '\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
+                process.stdout.write('\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
                   'ASSERTION(s) failed'));
               } else {
                 process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
