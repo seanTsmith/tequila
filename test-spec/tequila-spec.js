@@ -19,7 +19,6 @@ test.heading('Classes', function () {
   test.runnerProcedure();
   test.runnerStoreModel();
   test.runnerTransport();
-  test.runnerWorkspace();
 });
 test.heading('Models', function () {
   test.paragraph('These core models are used by the library. suck it');
@@ -27,6 +26,7 @@ test.heading('Models', function () {
   test.runnerLogModel();
   test.runnerPresentation();
   test.runnerUserModel();
+  test.runnerWorkspace();
 });
 test.heading('Stores', function () {
   test.paragraph('The core stores implemented in the library.');

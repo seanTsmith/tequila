@@ -444,8 +444,8 @@ test.renderDetail = function (isBrowser) {
 test.renderCloser = function (isBrowser) {
   if (isBrowser) {
     test.updateStats();
-    if (test.scrollFirstError > 0)
-      window.scroll(0, test.scrollFirstError);
+//    if (test.scrollFirstError > 0)
+//      window.scroll(0, test.scrollFirstError);
   } else {
     test.closerCalled = false;
     test.cliCloser();
