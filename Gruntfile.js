@@ -97,8 +97,8 @@ module.exports = function (grunt) {
     grunt.log.writeln('cover\tgenerate coverage report');
   });
 
-  // help
-
+  // tasks are ...
+  grunt.log.muted = true; // to spammy
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.registerTask('cover', ['coverme']);
