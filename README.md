@@ -4,7 +4,10 @@ Tequila es bueno!
 
 TODO:
 
-* create image attribute
+Attribute
+- image type
+- visible property
+
 * make validation for types
 * have stores validate before saving
 * create redis-store
@@ -14,8 +17,6 @@ TODO:
 * create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 * tequilaStore needs to be set not hard coded
 * fix Test variations on getList method test for remote stores
-* add visible attribute to attribute and default by type on creation
-* Finish INTERFACE design
 
 ## Project Root
 + **/bin** tequila command line interface
