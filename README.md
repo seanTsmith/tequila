@@ -4,13 +4,24 @@ Tequila es bueno!
 
 TODO:
 
+App
+- Run (interface, callback)
+    callback invoked when app terminates
+
+Interface
+- Start (command, callback)
+
+
+
+
 Attribute
 - image type
 - visible property
 
+* create redis-store
+* Session Model
 * make validation for types
 * have stores validate before saving
-* create redis-store
 * create json-file-store
 * create cookie-store
 * create local-store

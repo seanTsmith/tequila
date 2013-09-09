@@ -39,5 +39,7 @@ test.heading('Integration Tests', function () {
     'If any assertion fails the test is failed.');
   test.runnerListIntegration();
   test.runnerStoreIntegration();
+  test.runnerProcedureIntegration();
+  test.runnerCommandIntegration();
 });
 test.stop();

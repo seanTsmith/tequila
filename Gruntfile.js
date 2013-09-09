@@ -55,6 +55,8 @@ module.exports = function (grunt) {
           'lib/stores/remote-test.js',
           'test-spec/integration/test-list-integration.js',
           'test-spec/integration/test-store-integration.js',
+          'test-spec/integration/test-command-integration.js',
+          'test-spec/integration/test-procedure-integration.js',
           'test-spec/tequila-spec.js',
           'test-spec/node-test-tail.js'
         ],

@@ -1,8 +1,8 @@
 /**
- * interface.js
+ * myInterface.js
  */
 
-var interface = {};
+myInterface = {};
 
 // -------------------------------------------------------------------------------------------------------------------
 // Entry point when document ready
@@ -10,7 +10,7 @@ var interface = {};
 $(document).ready(function () {
 
   // Create html elements for framework
-  interface.renderFramework();
+  myInterface.renderFramework();
 
   // Remover loading panel
   try {
@@ -24,84 +24,85 @@ $(document).ready(function () {
 // -------------------------------------------------------------------------------------------------------------------
 // Render Framework
 // -------------------------------------------------------------------------------------------------------------------
-interface.renderFramework = function () {
-  interface.renderNavBar();
+myInterface.renderFramework = function () {
+  console.log('suck')
+  myInterface.renderNavBar();
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar
 // -------------------------------------------------------------------------------------------------------------------
-interface.renderNavBar = function () {
+myInterface.renderNavBar = function () {
 
   // Main navbar
-  interface.navBar = document.createElement("header");
-  interface.navBar.id = "navBar";
-  interface.navBar.className = "navbar navbar-default navbar-fixed-top";
-//  interface.navBar.className = "navbar navbar-inverse navbar-fixed-top";
-  interface.navBar.setAttribute('role', 'banner');
-  document.body.appendChild(interface.navBar);
+  myInterface.navBar = document.createElement("header");
+  myInterface.navBar.id = "navBar";
+  myInterface.navBar.className = "navbar navbar-default navbar-fixed-top";
+//  myInterface.navBar.className = "navbar navbar-inverse navbar-fixed-top";
+  myInterface.navBar.setAttribute('role', 'banner');
+  document.body.appendChild(myInterface.navBar);
 
   // Container so bootstrap centers
-  interface.navContainer = document.createElement("div");
-  interface.navContainer.id = "navContainer";
-  interface.navContainer.className = "container";
-  interface.navBar.appendChild(interface.navContainer);
+  myInterface.navContainer = document.createElement("div");
+  myInterface.navContainer.id = "navContainer";
+  myInterface.navContainer.className = "container";
+  myInterface.navBar.appendChild(myInterface.navContainer);
 
   // Responsive header
-  interface.navResponsiveHeader = document.createElement("div");
-  interface.navResponsiveHeader.id = "navResponsiveHeader";
-  interface.navResponsiveHeader.className = "navbar-header";
-  interface.navContainer.appendChild(interface.navResponsiveHeader);
+  myInterface.navResponsiveHeader = document.createElement("div");
+  myInterface.navResponsiveHeader.id = "navResponsiveHeader";
+  myInterface.navResponsiveHeader.className = "navbar-header";
+  myInterface.navContainer.appendChild(myInterface.navResponsiveHeader);
 
   // Navbar toggle button when small presentation
   var iconBar = '<span class="icon-bar"></span>';
-  interface.navBarToggle = document.createElement("button");
-  interface.navBarToggle.id = "navBarToggle";
-  interface.navBarToggle.className = "navbar-toggle";
-  interface.navBarToggle.setAttribute('type', 'button');
-  interface.navBarToggle.setAttribute('data-toggle', 'collapse');
-  interface.navBarToggle.setAttribute('data-target', '.navbar-collapse');
-  interface.navBarToggle.innerHTML = iconBar + iconBar + iconBar;
-  interface.navResponsiveHeader.appendChild(interface.navBarToggle);
+  myInterface.navBarToggle = document.createElement("button");
+  myInterface.navBarToggle.id = "navBarToggle";
+  myInterface.navBarToggle.className = "navbar-toggle";
+  myInterface.navBarToggle.setAttribute('type', 'button');
+  myInterface.navBarToggle.setAttribute('data-toggle', 'collapse');
+  myInterface.navBarToggle.setAttribute('data-target', '.navbar-collapse');
+  myInterface.navBarToggle.innerHTML = iconBar + iconBar + iconBar;
+  myInterface.navResponsiveHeader.appendChild(myInterface.navBarToggle);
 
   // Brand
-  interface.navBarBrand = document.createElement("a");
-  interface.navBarBrand.id = "navBarBrand";
-  interface.navBarBrand.className = "navbar-brand";
-  interface.navBarBrand.innerHTML = '<a href="javascript:alert(\'wtf\')">' + 'tequila.js' + '</a>';
-  interface.navResponsiveHeader.appendChild(interface.navBarBrand);
+  myInterface.navBarBrand = document.createElement("a");
+  myInterface.navBarBrand.id = "navBarBrand";
+  myInterface.navBarBrand.className = "navbar-brand";
+  myInterface.navBarBrand.innerHTML = '<a href="javascript:alert(\'wtf\')">' + 'tequila.js' + '</a>';
+  myInterface.navResponsiveHeader.appendChild(myInterface.navBarBrand);
 
 //  <li class="active"><a style="display: block; text-align: center;" href="javascript:loadStore()">TRY AGAIN</a></li>
 
 
   // Collapsible navbar
-  interface.collapsibleNavBar = document.createElement("nav");
-  interface.collapsibleNavBar.id = "collapsibleNavBar";
-  interface.collapsibleNavBar.className = "navbar-collapse collapse";
-  interface.collapsibleNavBar.setAttribute('role', 'navigation');
-  interface.navContainer.appendChild(interface.collapsibleNavBar);
+  myInterface.collapsibleNavBar = document.createElement("nav");
+  myInterface.collapsibleNavBar.id = "collapsibleNavBar";
+  myInterface.collapsibleNavBar.className = "navbar-collapse collapse";
+  myInterface.collapsibleNavBar.setAttribute('role', 'navigation');
+  myInterface.navContainer.appendChild(myInterface.collapsibleNavBar);
 
   // navbar list
-  interface.navList = document.createElement("ul");
-  interface.navList.id = "navList";
-  interface.navList.className = "nav navbar-nav";
-  interface.collapsibleNavBar.appendChild(interface.navList);
+  myInterface.navList = document.createElement("ul");
+  myInterface.navList.id = "navList";
+  myInterface.navList.className = "nav navbar-nav";
+  myInterface.collapsibleNavBar.appendChild(myInterface.navList);
 
-  interface.stooges = interface.renderNavBarListMenu(interface.navList, 'Stooges');
-  interface.renderNavBarListItem(interface.stooges, 'Moe');
-  interface.renderNavBarListItem(interface.stooges, 'Larry');
-  interface.renderNavBarListItem(interface.stooges, 'Curly');
+  myInterface.stooges = myInterface.renderNavBarListMenu(myInterface.navList, 'Stooges');
+  myInterface.renderNavBarListItem(myInterface.stooges, 'Moe');
+  myInterface.renderNavBarListItem(myInterface.stooges, 'Larry');
+  myInterface.renderNavBarListItem(myInterface.stooges, 'Curly');
 
-  interface.fruit = interface.renderNavBarListMenu(interface.navList, 'Fruit');
-  interface.renderNavBarListItem(interface.fruit, 'Apple');
-  interface.renderNavBarListItem(interface.fruit, 'Banana');
-  interface.renderNavBarListItem(interface.fruit, 'Cherry');
-  interface.renderNavBarListItem(interface.fruit, 'Peach');
+  myInterface.fruit = myInterface.renderNavBarListMenu(myInterface.navList, 'Fruit');
+  myInterface.renderNavBarListItem(myInterface.fruit, 'Apple');
+  myInterface.renderNavBarListItem(myInterface.fruit, 'Banana');
+  myInterface.renderNavBarListItem(myInterface.fruit, 'Cherry');
+  myInterface.renderNavBarListItem(myInterface.fruit, 'Peach');
 
-  interface.superhero = interface.renderNavBarListMenu(interface.navList, 'Super Heroes');
-  interface.renderNavBarListItem(interface.superhero, 'Superman');
-  interface.renderNavBarListItem(interface.superhero, 'Batman');
-  interface.renderNavBarListItem(interface.superhero, 'Spiderman');
+  myInterface.superhero = myInterface.renderNavBarListMenu(myInterface.navList, 'Super Heroes');
+  myInterface.renderNavBarListItem(myInterface.superhero, 'Superman');
+  myInterface.renderNavBarListItem(myInterface.superhero, 'Batman');
+  myInterface.renderNavBarListItem(myInterface.superhero, 'Spiderman');
 
 
 };
@@ -109,7 +110,7 @@ interface.renderNavBar = function () {
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar List Item
 // -------------------------------------------------------------------------------------------------------------------
-interface.renderNavBarListItem = function (parent, name) {
+myInterface.renderNavBarListItem = function (parent, name) {
   var listItem = document.createElement('li');
   listItem.innerHTML = '<a href="#">' + name + '</a>';
   parent.appendChild(listItem);
@@ -118,7 +119,7 @@ interface.renderNavBarListItem = function (parent, name) {
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar List Menu
 // -------------------------------------------------------------------------------------------------------------------
-interface.renderNavBarListMenu = function (parent, name) {
+myInterface.renderNavBarListMenu = function (parent, name) {
 
   var dropDown = document.createElement('li');
   dropDown.className = "dropdown";
