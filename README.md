@@ -11,19 +11,17 @@ App
 Interface
 - Start (command, callback)
 
-
-
-
 Attribute
 - image type
 - visible property
 
-* create redis-store
 * Session Model
 * make validation for types
 * have stores validate before saving
+* create redis-store
 * create json-file-store
 * create cookie-store
+* create redis-store
 * create local-store
 * create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 * tequilaStore needs to be set not hard coded

@@ -72,7 +72,7 @@ test.runnerCommandIntegration = function () {
       });
       cmd.bucket = 'Hola!';
       // Monitor all events
-      cmd.onEvent(['BeforeExecute', 'AfterExecute', 'Error', 'Aborted', 'Completed'], function (event) {
+      cmd.onEvent('*', function (event) { // * for all events
         this.bucket += ' ' + event;
         if (event == 'Completed') returnResponse(testNode, this.bucket);
       });

@@ -11,7 +11,7 @@ test.runnerStoreIntegration = function () {
         test.show(storeBeingTested);
 
         // If store is not ready then get out...
-        if (!test.integrationStore.getStoreInterface().isReady) {
+        if (!test.integrationStore.getServices().isReady) {
           returnResponse(testNode, Error('Store is not ready.'));
           return;
         }
@@ -52,17 +52,17 @@ test.runnerStoreIntegration = function () {
               storeStooges();
             else
               self.oldStoogesFound = list._items.length;
-              for (var i = 0; i < list._items.length; i++) {
-                self.killhim.set('id', list._items[i][0]);
-                test.integrationStore.deleteModel(self.killhim, function (model, error) {
-                  if (typeof error != 'undefined') {
-                    console.log('error deleting: ' + JSON.stringify(error));
-                  }
-                  if (++self.oldStoogesKilled >= self.oldStoogesFound) {
-                    storeStooges();
-                  }
-                })
-              }
+            for (var i = 0; i < list._items.length; i++) {
+              self.killhim.set('id', list._items[i][0]);
+              test.integrationStore.deleteModel(self.killhim, function (model, error) {
+                if (typeof error != 'undefined') {
+                  console.log('error deleting: ' + JSON.stringify(error));
+                }
+                if (++self.oldStoogesKilled >= self.oldStoogesFound) {
+                  storeStooges();
+                }
+              })
+            }
           });
         }
         catch (err) {
@@ -193,13 +193,18 @@ test.runnerStoreIntegration = function () {
             returnResponse(testNode, Error('no error deleting stooge when expected'));
             return;
           }
-          // Now create a list from the stooge store
-          var list = new List(new self.Stooge());
-          try {
-            test.integrationStore.getList(list, [], listReady);
-          }
-          catch (err) {
-            returnResponse(testNode, err);
+          // Skip List test if subclass can't do
+          if (!test.integrationStore.getServices().canGetList) {
+            returnResponse(testNode, true);
+          } else {
+            // Now create a list from the stooge store
+            var list = new List(new self.Stooge());
+            try {
+              test.integrationStore.getList(list, [], listReady);
+            }
+            catch (err) {
+              returnResponse(testNode, err);
+            }
           }
         }
 

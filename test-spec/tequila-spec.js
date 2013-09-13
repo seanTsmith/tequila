@@ -6,7 +6,6 @@ test.start();
 test.heading('Library', function () {
   test.runnerTequila();
 });
-
 test.heading('Classes', function () {
   test.paragraph('These objects make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerAttribute();
@@ -17,11 +16,17 @@ test.heading('Classes', function () {
   test.runnerMessage();
   test.runnerModel(Model,false);
   test.runnerProcedure();
-  test.runnerStoreModel();
+  test.runnerStore();
   test.runnerTransport();
 });
+test.heading('Interfaces', function () {
+  test.paragraph('These core interfaces are included in the library.');
+  test.runnerMockInterface();
+  test.runnerBootstrap3Interface();
+  test.runnerCommandLineInterface();
+});
 test.heading('Models', function () {
-  test.paragraph('These core models are used by the library. suck it');
+  test.paragraph('These core models are included in the library.');
   test.runnerApplicationModel();
   test.runnerLogModel();
   test.runnerPresentation();
@@ -29,10 +34,10 @@ test.heading('Models', function () {
   test.runnerWorkspace();
 });
 test.heading('Stores', function () {
-  test.paragraph('The core stores implemented in the library.');
-  test.runnerMemoryStoreModel();
-  test.runnerMongoStoreModel();
-  test.runnerRemoteStoreModel();
+  test.paragraph('These core stores are included in the library.');
+  test.runnerMemoryStore();
+  test.runnerMongoStore();
+  test.runnerRemoteStore();
 });
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
