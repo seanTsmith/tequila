@@ -1406,13 +1406,15 @@ else
 
 var Tequila = (function () {
   var singletonInstance;
+
   function init() {
     // Private methods and variables
     var version = '0.1.2';
-    var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table'];
+    var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table', 'Object'];
     var messageTypes = ['Null', 'Connected', 'Error', 'Sent', 'Ping', 'PutModel', 'PutModelAck', 'GetModel', 'GetModelAck', 'DeleteModel', 'DeleteModelAck', 'GetList', 'GetListAck'];
     var commandTypes = ['Stub', 'Menu', 'Presentation', 'Function', 'Procedure'];
     var commandEvents = ['BeforeExecute', 'AfterExecute', 'Error', 'Aborted', 'Completed'];
+    var logTypes = ['Text', 'Delta'];
     var messageHandlers = {};
     return    {
       // Public methods and variables
@@ -1448,16 +1450,19 @@ var Tequila = (function () {
         return new f();
       },
       getAttributeTypes: function () {
-        return attributeTypes;
+        return attributeTypes.slice(0); // copy array
       },
       getMessageTypes: function () {
-        return messageTypes;
+        return messageTypes.slice(0); // copy array
       },
       getCommandTypes: function () {
-        return commandTypes;
+        return commandTypes.slice(0); // copy array
       },
       getCommandEvents: function () {
-        return commandEvents;
+        return commandEvents.slice(0); // copy array
+      },
+      getLogTypes: function () {
+        return logTypes.slice(0); // copy array
       },
       setMessageHandler: function (message, handler) {
         messageHandlers[message] = handler;
@@ -1466,12 +1471,13 @@ var Tequila = (function () {
         if (messageHandlers[obj.type]) {
           messageHandlers[obj.type](obj.contents, fn);
         } else {
-          console.log('socket.io ackmessage: ' + JSON.stringify(obj));
+//          console.log('socket.io ackmessage: ' + JSON.stringify(obj));
           fn(true); // todo should this be an error?
         }
       }
     };
   }
+
   return function () {
     if (!singletonInstance) singletonInstance = init();
     return singletonInstance;
@@ -1484,8 +1490,13 @@ var T = Tequila();
  * tequila
  * attribute-class
  */
-// Attribute Constructor
+/*
+ * Constructor
+ */
 function Attribute(args, arg2) {
+
+  // this.ID = function() {};
+
   var splitTypes; // For String(30) type
   if (false === (this instanceof Attribute)) throw new Error('new operator required');
   if (typeof args == 'string') {
@@ -1531,9 +1542,10 @@ function Attribute(args, arg2) {
       this.value = args.value || null;
       break;
     case 'Model':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value', 'modelType']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
-      this.modelType = args.modelType || null;
+      if (this.value instanceof Attribute.ModelID)
+      this.modelType = this.value.modelType;
       break;
     case 'Group':
       unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
@@ -1544,6 +1556,10 @@ function Attribute(args, arg2) {
       this.value = args.value || null;
       this.group = args.group || null;
       break;
+    case 'Object':
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      this.value = args.value || null;
+      break;
 
     default:
       break;
@@ -1553,6 +1569,22 @@ function Attribute(args, arg2) {
   if (badJooJoo.length > 1) throw new Error('error creating Attribute: multiple errors');
   if (badJooJoo.length) throw new Error('error creating Attribute: ' + badJooJoo[0]);
 }
+/*
+ * Additional Constructors
+ */
+Attribute.ModelID = function (model) {
+  if (false === (this instanceof Attribute.ModelID)) throw new Error('new operator required');
+  if (false === (model instanceof Model)) throw new Error('must be constructed with Model');
+  this.value = model.get('id');
+  this.constructorFunction = model.constructor;
+  this.modelType = model.modelType;
+};
+Attribute.ModelID.prototype.toString = function () {
+  if (typeof this.value == 'string')
+    return 'ModelID(' + this.modelType + ':\'' + this.value + '\')';
+  else
+    return 'ModelID(' + this.modelType + ':' + this.value + ')';
+};
 /*
  * Methods
  */
@@ -1604,8 +1636,7 @@ Attribute.prototype.getValidationErrors = function () {
   if (!T.contains(T.getAttributeTypes(), this.type))
     errors.push('Invalid type: ' + this.type);
   switch (this.type) {
-    case 'ID': // Todo how to handle IDs ?
-      if (!(this.value == null /*  || this.value instanceof ID */ )) errors.push('value must be null or a ID');
+    case 'ID':
       break;
     case 'String':
       if (typeof this.size != 'number') errors.push('size must be a number from 1 to 255');
@@ -1622,8 +1653,7 @@ Attribute.prototype.getValidationErrors = function () {
       if (!(this.value == null || typeof this.value == 'number')) errors.push('value must be null or a Number');
       break;
     case 'Model':
-      if (!(this.value == null || this.value instanceof Model)) errors.push('value must be null or a Model');
-      if (!(this.modelType instanceof Model)) errors.push('modelType must be instance of Model');
+      if (!(this.value instanceof Attribute.ModelID)) errors.push('value must be Attribute.ModelID');
       break;
     case 'Group':
       if (this.value == null || this.value instanceof Array) {
@@ -1668,7 +1698,7 @@ function Command(/* does this matter */ args) {
   if (false === (this instanceof Command)) throw new Error('new operator required');
   args = args || {};
   var i;
-  var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'type', 'contents', 'scope', 'executionErrors', 'beforeExecute', 'validate', 'afterExecute', 'observe', 'timeout']);
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'type', 'contents', 'scope', 'timeout', 'bucket']);
   var badJooJoo = [];
   for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1) throw new Error('error creating Command: multiple errors');
@@ -1705,6 +1735,8 @@ function Command(/* does this matter */ args) {
       throw new Error('optional scope property must be Model or List');
   if ('undefined' != typeof this.timeout)
     if (typeof this.timeout != 'Number') throw new Error('timeout must be a Number');
+  // Validations done
+  this._eventListeners = [];
 }
 /*
  * Methods
@@ -1713,30 +1745,94 @@ Command.prototype.toString = function () {
   return this.type + ' Command: ' + this.name;
 };
 Command.prototype.onEvent = function (events, callback) {
-  if (!(events instanceof Array)) throw new Error('subscription array required');
+  if (!(events instanceof Array)) {
+    if (typeof events != 'string') throw new Error('subscription string or array required');
+    events = [events]; // coerce to array
+  }
   if (typeof callback != 'function') throw new Error('callback is required');
   // Check known Events
   for (var i in events) {
-    if (!T.contains(T.getCommandEvents(), events[i])) throw new Error('Unknown command event: ' + events[i]);
+    if (events[i] != '*')
+      if (!T.contains(T.getCommandEvents(), events[i]))
+        throw new Error('Unknown command event: ' + events[i]);
   }
+  // All good add to chain
+  this._eventListeners.push({events: events, callback: callback});
+};
+Command.prototype.emitEvent = function (event) {
+  var i;
+  for (i in this._eventListeners) {
+    var subscriber = this._eventListeners[i];
+    if ((subscriber.events.length && subscriber.events[0] === '*') || T.contains(subscriber.events, event)) {
+      subscriber.callback.call(this, event);
+    }
+  }
+  if (event == 'Completed') // if command complete release listeners
+    this._eventListeners = [];
 };
 Command.prototype.execute = function () {
-  throw Error('command not implemented');
+  if (!T.contains(['Function'], this.type)) throw new Error('command not implemented');
+  var self = this;
+  this.emitEvent('BeforeExecute');
+  try {
+    switch (this.type) {
+      case 'Function':
+        setTimeout(callFunc, 0); // async execution delay till function returns
+        break;
+      default:
+        throw new Error('command not implemented');
+    }
+  } catch (e) {
+    this.error = e;
+    this.emitEvent('Error');
+    this.emitEvent('Completed');
+    this.status = -1;
+  }
+  this.emitEvent('AfterExecute');
+  function callFunc() {
+    try {
+      self.contents(); // give function this context to command object (self)
+    } catch (e) {
+      self.error = e;
+      self.emitEvent('Error');
+      self.emitEvent('Completed');
+      self.status = -1;
+    }
+  }
 };
 Command.prototype.abort = function () {
+  this.emitEvent('Aborted');
+  this.emitEvent('Completed');
   this.status = -1;
 };
+Command.prototype.complete = function () {
+  this.emitEvent('Completed');
+  this.status = 1;
+};
+
 ;
 /**
  * tequila
  * delta-class
  */
+/*
+ * Constructor
+ */
+function Delta(modelID) {
+  if (false === (this instanceof Delta)) throw new Error('new operator required');
+  if (false === (modelID instanceof Attribute.ModelID)) throw new Error('Attribute.ModelID required in constructor');
+  this.dateCreated = new Date();
+  this.modelID = modelID;
+  this.attributeValues = {};
+}
 ;
 /**
  * tequila
  * interface-class
  */
-// Interface Constructor
+/*
+ * Constructor
+ */
 function Interface(args) {
   if (false === (this instanceof Interface)) throw new Error('new operator required');
   args = args || {};
@@ -1768,15 +1864,17 @@ Interface.prototype.toString = function () {
   return this.description;
 };
 Interface.prototype.requestResponse = function (obj, callback) {
-  if (obj == null || typeof obj !== 'object' || typeof callback !== 'function')
-    throw new Error('requestResponse arguments required: object, callback');
-  if (obj.request === undefined)
-    throw new Error('requestResponse object has no request property');
+  if (obj == null || typeof obj !== 'object' || typeof callback !== 'function') throw new Error('requestResponse arguments required: object, callback');
+  if (obj.request === undefined) throw new Error('requestResponse object has no request property');
+  if (obj.mockResponse !== undefined) throw new Error('mockResponse not available for Interface');
   // Parameters are ok now handle the request
   setTimeout(function () {
     obj.response = new Error('invalid request: ' + obj.request);
     callback(obj);
   }, 0);
+};
+Interface.prototype.canMockResponses = function () {
+  return false;
 };
 ;
 /**
@@ -1887,7 +1985,9 @@ List.prototype.sort = function (key) {
  * tequila
  * message-class
  */
-// Message Constructor
+/*
+ * Constructor
+ */
 function Message(type,contents) {
   if (false === (this instanceof Message)) throw new Error('new operator required');
   if ('undefined' == typeof type) throw new Error('message type required');
@@ -2064,7 +2164,7 @@ Store.prototype.toString = function () {
     return this.storeType + ': ' +this.name;
   }
 };
-Store.prototype.getStoreInterface = function () {
+Store.prototype.getServices = function () {
   return this.storeInterface;
 };
 Store.prototype.onConnect = function (location, callBack) {
@@ -2162,22 +2262,28 @@ Transport.prototype.close = function () {
 ;
 /**
  * tequila
- * workspace-class
+ * application-model
  */
-function Workspace(user) {
-  if (false === (this instanceof Workspace)) throw new Error('new operator required');
-  if (false === (user instanceof User)) throw new Error('user model required');
-//  if ('undefined' == typeof type) throw new Error('message type required');
-//  if (!T.contains(T.getWorkspaceTypes(), type)) throw new Error('Invalid message type: ' + type);
-  this.user = user;
-  this.deltas = [];
-//  this.contents = contents;
-}
+
+// Model Constructor
+var Application = function (args) {
+  if (false === (this instanceof Application)) throw new Error('new operator required');
+  Model.call(this, args);
+  this.modelType = "Application";
+  this.interface = new Interface();
+};
+Application.prototype = T.inheritPrototype(Model.prototype);
 /*
  * Methods
  */
-Workspace.prototype.toString = function () {
-  return "unknown user's workspace";
+Application.prototype.run = function () {
+  return new Command().execute();
+};
+Application.prototype.setInterface = function (interface) {
+  if (false === (interface instanceof Interface)) throw new Error('instance of Interface a required parameter');
+};
+Application.prototype.getInterface = function () {
+  return this.interface;
 };
 ;
 /**
@@ -2188,10 +2294,44 @@ Workspace.prototype.toString = function () {
 // Model Constructor
 var Log = function (args) {
   if (false === (this instanceof Log)) throw new Error('new operator required');
+  if (typeof args == 'string') {
+    var simpleText = args;
+    args = {};
+    args.contents = simpleText;
+  }
+  args = args || {};
+  if (!args.attributes) {
+    args.attributes = [];
+  }
+  var my_logType = args.logType || 'Text';
+  var my_importance = args.importance || 'Info';
+  var my_contents = args.contents || '(no text)';
+  if (!T.contains(T.getLogTypes(), my_logType)) throw new Error('Unknown log type: ' + my_logType);
+
+  if (typeof args.logType != 'undefined') delete args.logType;
+  if (typeof args.importance != 'undefined') delete args.importance;
+  if (typeof args.contents != 'undefined') delete args.contents;
+  args.attributes.push(new Attribute({name: 'dateLogged', type: 'Date', value: new Date()}));
+  args.attributes.push(new Attribute({name: 'logType', type: 'String', value: my_logType}));
+  args.attributes.push(new Attribute({name: 'importance', type: 'String', value: my_importance}));
+  if (my_logType=='Delta')
+    args.attributes.push(new Attribute({name: 'contents', type: 'Object', value: my_contents}));
+  else
+    args.attributes.push(new Attribute({name: 'contents', type: 'String', value: my_contents}));
   Model.call(this, args);
   this.modelType = "Log";
 };
-Log.prototype = T.inheritPrototype(Model.prototype);;
+Log.prototype = T.inheritPrototype(Model.prototype);
+/*
+ * Methods
+ */
+Log.prototype.toString = function () {
+  if (this.get('logType')=='Delta')
+    return this.get('importance') + ': ' + '(delta)';
+  else
+    return this.get('importance') + ': ' + this.get('contents');
+};
+;
 /**
  * tequila
  * presentation-model
@@ -2212,7 +2352,6 @@ Presentation.prototype = T.inheritPrototype(Model.prototype);;
  * tequila
  * user-core-model
  */
-
 // Model Constructor
 var User = function (args) {
   if (false === (this instanceof User)) throw new Error('new operator required');
@@ -2231,6 +2370,33 @@ var User = function (args) {
   this.set('active',false)
 };
 User.prototype = T.inheritPrototype(Model.prototype);;
+/**
+ * tequila
+ * workspace-class
+ */
+function Workspace(args) {
+  if (false === (this instanceof Workspace)) throw new Error('new operator required');
+  args = args || {};
+  if (!args.attributes) {
+    args.attributes = [];
+  }
+  var userModelID = new Attribute.ModelID(new User());
+  args.attributes.push(new Attribute({name: 'user', type: 'Model', value: userModelID}));
+  args.attributes.push(new Attribute({name: 'deltas', type: 'Object', value: {}}));
+
+  var delta
+//  this.deltas = [];
+
++
+  Model.call(this, args);
+  this.modelType = "Workspace";
+}
+Workspace.prototype = T.inheritPrototype(Model.prototype);
+/*
+ * Methods
+ */
+
+;
 /**
  * tequila
  * memory-store
@@ -2705,6 +2871,77 @@ T.setMessageHandler('GetList', function getListMessageHandler(messageContents, f
 ;
 /**
  * tequila
+ * local-store
+ */
+// Constructor
+var LocalStore = function (args) {
+  if (false === (this instanceof LocalStore)) throw new Error('new operator required');
+  args = args || {};
+  this.storeType = args.storeType || "LocalStore";
+  this.name = args.name || 'a ' + this.storeType;
+  this.storeInterface = {
+    isReady: false,
+    canGetModel: false,
+    canPutModel: false,
+    canDeleteModel: false,
+    canGetList: false
+  };
+  this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
+  this.idCounter = 0;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
+  var badJooJoo = [];
+  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+};
+LocalStore.prototype = T.inheritPrototype(Store.prototype);
+// Methods
+;
+/**
+ * tequila
+ * redis-store
+ */
+// Constructor
+var RedisStore = function (args) {
+  if (false === (this instanceof RedisStore)) throw new Error('new operator required');
+  args = args || {};
+  this.storeType = args.storeType || "RedisStore";
+  this.name = args.name || 'a ' + this.storeType;
+  this.storeInterface = {
+    isReady: false,
+    canGetModel: false,
+    canPutModel: false,
+    canDeleteModel: false,
+    canGetList: false
+  };
+  this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
+  this.idCounter = 0;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
+  var badJooJoo = [];
+  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+};
+RedisStore.prototype = T.inheritPrototype(Store.prototype);
+// Methods
+;
+/**
+ * tequila
+ * bootstrap3-interface
+ */
+;
+/**
+ * tequila
+ * command-line-interface
+ */
+;
+/**
+ * tequila
+ * mock-interface.js
+ */
+;
+/**
+ * tequila
  * mongo-store-server
  *
  * MongoDB goodies
@@ -2957,6 +3194,7 @@ var test = {};
 test.converter = new Markdown.Converter();
 test.showWork = [];
 test.examplesDisabled = false;
+test.criticalFail = false;
 test.runner = function (isBrowser) {
   test.isBrowser = isBrowser;
 
@@ -3383,8 +3621,8 @@ test.renderDetail = function (isBrowser) {
 test.renderCloser = function (isBrowser) {
   if (isBrowser) {
     test.updateStats();
-    if (test.scrollFirstError > 0)
-      window.scroll(0, test.scrollFirstError);
+//    if (test.scrollFirstError > 0)
+//      window.scroll(0, test.scrollFirstError);
   } else {
     test.closerCalled = false;
     test.cliCloser();
@@ -3410,6 +3648,8 @@ test.heading = function (text, func) {
     try {
       func();
     } catch (e) {
+      console.error('Critical test spec error: ' + e)
+      test.criticalFail = true;
     }
     this.headingLevel--;
     this.levels.pop();
@@ -3729,6 +3969,38 @@ test.runnerAttribute = function () {
       test.example('should validate and throw errors before returning from constructor', Error('error creating Attribute: multiple errors'), function () {
         new Attribute({eman: 'the'}); // 2 errors: name missing and eman an unknown property
       });
+      test.heading('Attribute.ModelID', function () {
+        test.paragraph('Attribute.ModelID defines reference to ID in external mode.');
+        test.example('objects created should be an instance of Attribute.ModelID', true, function () {
+          return new Attribute.ModelID(new Model()) instanceof Attribute.ModelID;
+        });
+        test.example('should make sure new operator used', Error('new operator required'), function () {
+          Attribute.ModelID();
+        });
+        test.example('constructor must pass instance of model', Error('must be constructed with Model'), function () {
+          new Attribute.ModelID();
+        });
+        test.example('value is set to value of ID in constructor', 123, function () {
+          var model = new Model();
+          model.set('id', 123);
+          return new Attribute.ModelID(model).value;
+        });
+        test.example('constructorFunction is set to constructor of model', true, function () {
+          var model = new Model();
+          model.set('id', 123);
+          var attrib = new Attribute.ModelID(model);
+          var newModel = new attrib.constructorFunction();
+          return newModel instanceof Model;
+        });
+        test.example('modelType is set from model in constructor', 'Model', function () {
+          return new Attribute.ModelID(new Model()).modelType;
+        });
+        test.example('toString is more descriptive', "ModelID(Model:123)", function () {
+          var model = new Model();
+          model.set('id', 123);
+          return new Attribute.ModelID(model).toString();
+        });
+      });
     });
     test.heading('PROPERTIES', function () {
       test.heading('name', function () {
@@ -3769,50 +4041,52 @@ test.runnerAttribute = function () {
           test.show(record);
           // It's the default and it passes constructor validation
         });
-        test.example('should accept assignment of correct type and validate incorrect attributeTypes', undefined, function () {
-          // Test all known attribute types (TODO ID type needs work)
-          var myTypes = T.getAttributeTypes();
-          test.show(myTypes);
+        test.example('should accept assignment of correct type and validate incorrect attributeTypes',
+          '7 correct assignments 91 errors thrown', function () {
+            // Test all known attribute types
+            var myTypes = T.getAttributeTypes();
+            myTypes.shift(); // not testing ID
+            myTypes.pop(); // not testing Object since it matches other types
+            test.show(myTypes);
+            test.show(T.getAttributeTypes());
 
-          // Now create an array of matching values for each type into myValues
-          var myModel = new Model();
-          var myGroup = new Attribute({name: 'columns', type: 'Group', value: [new Attribute("Name")]});
-          var myTable = new Attribute({name: 'bills', type: 'Table', group: myGroup });
-          var myValues = [null, 'Jane Doe', new Date, true, 18, new Model(), [], myTable];
+            // Now create an array of matching values for each type into myValues
+            var myModel = new Model();
+            var myGroup = new Attribute({name: 'columns', type: 'Group', value: [new Attribute("Name")]});
+            var myTable = new Attribute({name: 'bills', type: 'Table', group: myGroup });
+            var myValues = ['Jane Doe', new Date, true, 18, new Attribute.ModelID(new Model()), [], myTable];
 
-          // Loop thru each type
-          for (var i in myTypes)
-            for (var j in myValues) {
-              // for the value that works it won't throw error just create and to test
-              if (i == j) {
-                switch (myTypes[i]) {
-                  case 'Model':
-                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j], modelType: myModel});
-                    break;
-                  case 'Group':
-                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
-                    break;
-                  case 'Table':
-                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j], group: myGroup});
-                    break;
-                  default:
-                    new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j] });
-                    break;
-                }
-              } else {
-                // mismatches bad so should throw error (is caught unless no error or different error)
-                if (j > 0) { // null in id will be valid for others so skip
+            // Loop thru each type
+            var theGood = 0;
+            var theBad = 0;
+            for (var i in myTypes)
+              for (var j in myValues) {
+                // for the value that works it won't throw error just create and to test
+                if (i == j) {
+                  theGood++;
+                  switch (myTypes[i]) {
+                    case 'Table':
+                      new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j], group: myGroup});
+                      break;
+                    default:
+                      new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j] });
+                      break;
+                  }
+                } else {
+                  // mismatches bad so should throw error (is caught unless no error or different error)
+                  theBad++;
                   test.shouldThrow('*', function () {
                     new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: myValues[j]});
                   });
                 }
+                // other objects should throw always
+                theBad++;
+                test.shouldThrow('*', function () {
+                  new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: {} });
+                });
               }
-              // other objects should throw always
-              test.shouldThrow('*', function () {
-                new Attribute({name: 'my' + myTypes[i], type: myTypes[i], value: {} });
-              });
-            }
-        });
+            return theGood + ' correct assignments ' + theBad + ' errors thrown';
+          });
       });
     });
     test.heading('TYPES', function () {
@@ -3863,12 +4137,18 @@ test.runnerAttribute = function () {
         });
       });
       test.heading('Model', function () {
-        test.paragraph('Parameter type Model is used to store a reference to another model of any type.  The value attribute is the ID of the referenced Model.');
-        test.example("should be type of 'Model' or null", 'Model', function () {
-          return new Attribute({name: 'Twiggy', type: 'Model', modelType: new Model()}).type;
+        test.paragraph('Parameter type Model is used to store a reference to another model instance.  ' +
+          'The value attribute is a Attribute.ModelID reference to the Model.');
+
+        test.example('must construct with Attribute.ModelID in value', Error('error creating Attribute: value must be Attribute.ModelID'), function () {
+          new Attribute({name: 'Twiggy',type: 'Model'});
         });
-        test.example('modelType is required', Error('error creating Attribute: modelType must be instance of Model'), function () {
-          return new Attribute({name: 'Twiggy', type: 'Model'});
+        test.example("modelType property set from constructor", 'Model', function () {
+          return new Attribute(
+            {name: 'Twiggy',
+            type: 'Model',
+            value: new Attribute.ModelID(new Model())
+          }).modelType;
         });
       });
       test.heading('Group', function () {
@@ -3915,6 +4195,14 @@ test.runnerAttribute = function () {
             new Attribute({name: 'details', type: 'Table', group: cols });
           });
       });
+      test.heading('Object', function () {
+        test.paragraph('Javascript objects ... structure user defined');
+        test.example("should have type of 'Object'", 'Object', function () {
+          return new Attribute({name: 'stuff', type: 'Object'}).type;
+        });
+
+      });
+
     });
     test.heading('METHODS', function () {
       test.heading('toString()', function () {
@@ -3956,7 +4244,7 @@ test.runnerAttribute = function () {
             new Attribute('TODO', 'Date').coerce();
           });
           test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
-            new Attribute({name: 'Twiggy', type: 'Model', modelType: new Model()}).coerce();
+            new Attribute({name: 'Twiggy',type: 'Model',value: new Attribute.ModelID(new Model())}).coerce();
           });
           test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
             new Attribute(myGroup.coerce());
@@ -4050,30 +4338,10 @@ test.runnerCommand = function () {
         });
       });
       test.heading('bucket', function () {
-        test.paragraph('app defined contents initial state null on execution');
-      });
-      test.heading('onEvent', function () {
-        test.paragraph('Use onEvent(events,callback)');
-        test.example('first parameter is array of event subscriptions', Error('subscription array required'), function () {
-          new Command().onEvent();
+        test.example('valid property is for app use', 'bucket of KFC', function () {
+          return 'bucket of ' + new Command({bucket: 'KFC'}).bucket;
         });
-        test.example('callback is required', Error('callback is required'), function () {
-          new Command().onEvent([]);
-        });
-        test.example('events are checked against known types', Error('Unknown command event: onDrunk'), function () {
-          new Command().onEvent(['onDrunk'], function () {
-          });
-        });
-        test.example('here is a working version', undefined, function () {
-          test.show(T.getCommandEvents());
-          //  BeforeExecute - callback called before first task executed but after tasks initialized
-          //  AfterExecute - callback called after initial task(s) launched (see onCompletion)
-          //  Error - error occurred (return {errorClear:true})
-          //  Aborted - procedure aborted - should clean up resources
-          //  Completed - execution is complete check status property
-          new Command().onEvent(['Completed'], function () {
-          });
-        });
+
       });
     });
     test.heading('TYPES', function () {
@@ -4129,13 +4397,6 @@ test.runnerCommand = function () {
           return 'I am a ' + new Command({name: 'Customer'});
         });
       });
-      test.heading('execute', function () {
-        test.paragraph('executes task');
-        test.example('see integration tests', Error('command not implemented'), function () {
-          new Command().execute();
-        });
-
-      });
       test.heading('abort', function () {
         test.paragraph('aborts task');
         test.example('aborted command ends with error status', -1, function () {
@@ -4143,7 +4404,43 @@ test.runnerCommand = function () {
           cmd.abort();
           return cmd.status;
         });
-
+      });
+      test.heading('complete', function () {
+        test.paragraph('completes task');
+        test.example('call when task complete status', 1, function () {
+          var cmd = new Command();
+          cmd.complete();
+          return cmd.status;
+        });
+      });
+      test.heading('execute', function () {
+        test.paragraph('executes task');
+        test.example('see integration tests', Error('command not implemented'), function () {
+          new Command().execute();
+        });
+      });
+      test.heading('onEvent', function () {
+        test.paragraph('Use onEvent(events,callback)');
+        test.example('first parameter is a string or array of event subscriptions', Error('subscription string or array required'), function () {
+          new Command().onEvent();
+        });
+        test.example('callback is required', Error('callback is required'), function () {
+          new Command().onEvent([]);
+        });
+        test.example('events are checked against known types', Error('Unknown command event: onDrunk'), function () {
+          new Command().onEvent(['onDrunk'], function () {
+          });
+        });
+        test.example('here is a working version', undefined, function () {
+          test.show(T.getCommandEvents());
+          //  BeforeExecute - callback called before first task executed but after tasks initialized
+          //  AfterExecute - callback called after initial task(s) launched (see onCompletion)
+          //  Error - error occurred (return {errorClear:true})
+          //  Aborted - procedure aborted - should clean up resources
+          //  Completed - execution is complete check status property
+          new Command().onEvent(['Completed'], function () {
+          });
+        });
       });
     });
   });
@@ -4155,24 +4452,46 @@ test.runnerCommand = function () {
  */
 test.runnerDelta = function () {
   test.heading('Delta Class', function () {
-    test.paragraph('Deltas represent changes to models.  They used for CRUD operations and logging changes.');
-    test.example('', undefined, function () {
-      /* TODO
-
-       PROPERTIES
-       created - date when delta created and put in user workspace
-        model - delta applies to this model
-        crud - can be ['create', 'replace', 'update', 'delete']
-        attributeValues - {attribute:[before,after]}  before and after attribute values represent the model
-          attribute value changes. If the model attribute is type Table then attributeValues is array of
-          attributeValues corresponding to model -> attribute -> group....
-
-
-       */
+    test.paragraph('Deltas represent changes to models.  They can be applied to a store then update the model.  ' +
+      'They can be stored in logs as a change audit for the model.');
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of Delta', true, function () {
+        return new Delta(new Attribute.ModelID(new Model())) instanceof Delta;
+      });
+      test.example('should make sure new operator used', Error('new operator required'), function () {
+        Delta();
+      });
+      test.example('Attribute.ModelID required in constructor', Error('Attribute.ModelID required in constructor'), function () {
+        new Delta();
+      });
     });
-
+    test.heading('PROPERTIES', function () {
+      test.heading('dateCreated', function () {
+        test.example('set to current date/time on creation', true, function () {
+          var delta = new Delta(new Attribute.ModelID(new Model()));
+          test.show(delta.dateCreated);
+          return delta.dateCreated instanceof Date;
+        });
+      });
+      test.heading('modelID', function () {
+        test.example('set from constructor', "ModelID(Model:null)", function () {
+          var delta = new Delta(new Attribute.ModelID(new Model()));
+          test.show(delta.dateCreated);
+          return delta.modelID.toString();
+        });
+      });
+      test.heading('attributeValues', function () {
+        test.example('created as empty object', {}, function () {
+          // attributeValues - {attribute:[before,after]}  before and after attribute values represent the model
+          // attribute value changes. If the model attribute is type Table then attributeValues is array of
+          // attributeValues corresponding to model -> attribute -> group....
+          return new Delta(new Attribute.ModelID(new Model())).attributeValues;
+        });
+      });
+    });
   });
-};;
+};
+;
 /**
  * tequila
  * interface-test
@@ -4180,68 +4499,85 @@ test.runnerDelta = function () {
 test.runnerInterface = function () {
   test.heading('Interface Class', function () {
     test.paragraph('The Interface Class is an abstraction of a user interface.');
-    test.heading('CONSTRUCTOR', function () {
-      test.example('objects created should be an instance of Interface', true, function () {
-        return new Interface() instanceof Interface;
-      });
-      test.example('should make sure new operator used', Error('new operator required'), function () {
-        Interface();
-      });
-      test.example('should make sure argument properties are valid', Error('error creating Procedure: invalid property: yo'), function () {
-        new Interface({yo: 'whatup'});
+    test.runnerInterfaceMethodsTest(Interface);
+  });
+};
+test.runnerInterfaceMethodsTest = function (SurrogateInterface) {
+  test.heading('CONSTRUCTOR', function () {
+    test.example('objects created should be an instance of SurrogateInterface', true, function () {
+      return new SurrogateInterface() instanceof SurrogateInterface;
+    });
+    test.example('should make sure new operator used', Error('new operator required'), function () {
+      SurrogateInterface();
+    });
+    test.example('should make sure argument properties are valid', Error('error creating Procedure: invalid property: yo'), function () {
+      new SurrogateInterface({yo: 'whatup'});
+    });
+  });
+  test.heading('PROPERTIES', function () {
+    test.heading('name', function () {
+      test.example('defaults to (unnamed)', '(unnamed)', function () {
+        return new SurrogateInterface().name;
       });
     });
-    test.heading('PROPERTIES', function () {
-      test.heading('name', function () {
-        test.example('defaults to (unnamed)', '(unnamed)', function () {
-          return new Interface().name;
-        });
+    test.heading('description', function () {
+      test.example('defaults to a SurrogateInterface', 'a Interface', function () {
+        return new SurrogateInterface().description;
       });
-      test.heading('description', function () {
-        test.example('defaults to a Interface', 'a Interface', function () {
-          return new Interface().description;
+    });
+  });
+  test.heading('METHODS', function () {
+    test.heading('toString()', function () {
+      test.example('should return a description of the message', 'Punched Card SurrogateInterface', function () {
+        return new SurrogateInterface({description: 'Punched Card SurrogateInterface'}).toString();
+      });
+    });
+    test.heading('getValidationErrors()', function () {
+      test.example('returns null when no errors', null, function () {
+        return new SurrogateInterface().getValidationErrors();
+      });
+    });
+    test.heading('requestResponse({request:object}, callback', function () {
+      test.paragraph('Subclasses of SurrogateInterface will use this to submit user (or agent) initiated requests.  ' +
+        'It can also be used by the app to push objects to the SurrogateInterface by passing {request:this...');
+      test.example('arguments must be in correct format', test.asyncResponse(Error('invalid request: null')), function (testNode, returnResponse) {
+        test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
+          new SurrogateInterface().requestResponse();
+        });
+        test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
+          new SurrogateInterface().requestResponse({}); // missing callback
+        });
+        test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
+          new SurrogateInterface().requestResponse("hello", function () {
+            // function part ok but not passing an object
+          });
+        });
+        test.shouldThrow(Error('requestResponse object has no request property'), function () {
+          new SurrogateInterface().requestResponse({}, function () {
+            // function part ok but not passing an object
+          });
+        });
+        // Any value can be set to request will be accepted on function call.
+        // If the value is not handled then the callback receives an error as the response.
+        // null should always return an error.
+        new SurrogateInterface().requestResponse({request: null}, function (obj) {
+          returnResponse(testNode, obj.response);
         });
       });
     });
-    test.heading('METHODS', function () {
-      test.heading('toString()', function () {
-        test.example('should return a description of the message', 'Punched Card Interface', function () {
-          return new Interface({description: 'Punched Card Interface'}).toString();
-        });
-      });
-      test.heading('getValidationErrors()', function () {
-        test.example('returns null when no errors', null, function () {
-          return new Interface().getValidationErrors();
-        });
-      });
-      test.heading('requestResponse({request:object, response:object}, callback', function () {
-        test.paragraph('Subclasses of Interface will use this to submit user (or agent) initiated requests.  ' +
-          'It can also be used by the app to push objects to the interface by passing {request:this...');
-
-        test.example('arguments must be in correct format', test.asyncResponse(Error('invalid request: null')), function (testNode, returnResponse) {
-          test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
-            new Interface().requestResponse();
-          });
-          test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
-            new Interface().requestResponse({}); // missing callback
-          });
-          test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
-            new Interface().requestResponse("hello", function () {
-              // function part ok but not passing an object
+    test.heading('canMockResponses()', function () {
+      test.example('see if mock responses allowed before testing', test.asyncResponse('mock check done'), function (testNode, returnResponse) {
+        var ui = new SurrogateInterface();
+        if (ui.canMockResponses()) {
+          throw new Error('no test for mock');
+        } else {
+          test.shouldThrow(Error('mockResponse not available for Interface'), function () {
+            new SurrogateInterface().requestResponse({request: null, mockResponse: null}, function (obj) {
+              returnResponse(testNode, 'mock check failed');
             });
           });
-          test.shouldThrow(Error('requestResponse object has no request property'), function () {
-            new Interface().requestResponse({}, function () {
-              // function part ok but not passing an object
-            });
-          });
-          // Any value can be set to request will be accepted on function call.
-          // If the value is not handled then the callback receives an error as the response.
-          // null should always return an error.
-          new Interface().requestResponse({request:null}, function (obj) {
-            returnResponse(testNode, obj.response);
-          });
-        });
+          returnResponse(testNode, 'mock check done');
+        }
       });
     });
   });
@@ -4434,8 +4770,8 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
     });
     test.heading('METHODS', function () {
       test.heading('toString()', function () {
-        test.example('should return a description of the model', 'a ' + new SurrogateModelClass().modelType, function () {
-          return new SurrogateModelClass().toString();
+        test.example('should return a description of the model', true, function () {
+          return new SurrogateModelClass().toString().length>0;
         });
       });
       test.heading('copy(sourceModel)', function () {
@@ -4608,7 +4944,7 @@ test.runnerProcedure = function () {
  * tequila
  * store-test
  */
-test.runnerStoreModel = function () {
+test.runnerStore = function () {
   test.heading('Store Class', function () {
     test.paragraph('The store class is used for object persistence.');
     test.heading('CONSTRUCTOR', function () {
@@ -4617,32 +4953,32 @@ test.runnerStoreModel = function () {
     test.runnerStoreMethods(Store);
   });
 };
-test.runnerStoreConstructor = function (SurrogateStoreModel) {
+test.runnerStoreConstructor = function (SurrogateStore) {
   test.example('objects created should be an instance of Store', true, function () {
-    return new SurrogateStoreModel() instanceof Store;
+    return new SurrogateStore() instanceof Store;
   });
   test.example('should make sure new operator used', Error('new operator required'), function () {
-    SurrogateStoreModel();
+    SurrogateStore();
   });
   test.example('should make sure properties are valid', Error('error creating Store: invalid property: food'), function () {
-    new SurrogateStoreModel({food: 'twinkies'});
+    new SurrogateStore({food: 'twinkies'});
   });
 };
-test.runnerStoreMethods = function (SurrogateStoreModel) {
+test.runnerStoreMethods = function (SurrogateStore) {
   test.heading('METHODS', function () {
-    var interface = new SurrogateStoreModel().getStoreInterface();
+    var services = new SurrogateStore().getServices();
     test.example('getStoreInterface() returns an object with interface for the Store.', undefined, function () {
-      test.show(interface);
-      test.assertion(interface instanceof Object);
-      test.assertion(typeof interface['isReady'] == 'boolean'); // don't use until
-      test.assertion(typeof interface['canGetModel'] == 'boolean'); // define all allowed methods...
-      test.assertion(typeof interface['canPutModel'] == 'boolean');
-      test.assertion(typeof interface['canDeleteModel'] == 'boolean');
-      test.assertion(typeof interface['canGetList'] == 'boolean');
+      test.show(services);
+      test.assertion(services instanceof Object);
+      test.assertion(typeof services['isReady'] == 'boolean'); // don't use until
+      test.assertion(typeof services['canGetModel'] == 'boolean'); // define all allowed methods...
+      test.assertion(typeof services['canPutModel'] == 'boolean');
+      test.assertion(typeof services['canDeleteModel'] == 'boolean');
+      test.assertion(typeof services['canGetList'] == 'boolean');
     });
     test.heading('toString()', function () {
       test.example('should return a description of the Store', "ConvenienceStore: 7-Eleven", function () {
-        var cStore = new SurrogateStoreModel();
+        var cStore = new SurrogateStore();
         test.show(cStore.toString());
         cStore.name = '7-Eleven';
         cStore.storeType = 'ConvenienceStore';
@@ -4652,14 +4988,14 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
     });
     test.heading('onConnect()', function () {
       test.example('must pass url string', Error('argument must a url string'), function () {
-        new SurrogateStoreModel().onConnect();
+        new SurrogateStore().onConnect();
       });
       test.example('must pass callback function', Error('argument must a callback'), function () {
-        new SurrogateStoreModel().onConnect("");
+        new SurrogateStore().onConnect("");
       });
-      if (interface['isReady']) {
+      if (services['isReady']) {
         test.example('return store and undefined error upon successful connection to remote store.', test.asyncResponse(true), function (testNode, returnResponse) {
-          new SurrogateStoreModel().onConnect('', function (store, err) {
+          new SurrogateStore().onConnect('', function (store, err) {
             if (err) {
               returnResponse(testNode, err);
             } else {
@@ -4668,32 +5004,32 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
           });
         });
       } else {
-        test.paragraph('see integration test for ' + new SurrogateStoreModel().storeType);
+        test.paragraph('see integration test for ' + new SurrogateStore().storeType);
       }
     });
     test.heading('getModel()', function () {
-      if (interface['canGetModel']) {
+      if (services['canGetModel']) {
         test.example('must pass valid model', Error('argument must be a Model'), function () {
-          new SurrogateStoreModel().getModel();
+          new SurrogateStore().getModel();
         });
         test.example('model must have no validation errors', Error('model has validation errors'), function () {
           var m = new Model();
           m.attributes = null;
-          new SurrogateStoreModel().getModel(m);
+          new SurrogateStore().getModel(m);
         });
         test.example('ID attribute must have truthy value', Error('ID not set'), function () {
-          new SurrogateStoreModel().getModel(new Model());
+          new SurrogateStore().getModel(new Model());
         });
         test.example('callback function required', Error('callback required'), function () {
           var m = new Model();
           m.attributes[0].value = 1;
-          new SurrogateStoreModel().getModel(m);
+          new SurrogateStore().getModel(m);
         });
-        if (interface['isReady']) {
+        if (services['isReady']) {
           test.example('returns error when model not found', test.asyncResponse(Error('model not found in store')), function (testNode, returnResponse) {
             var m = new Model();
             m.attributes[0].value = 1;
-            new SurrogateStoreModel().getModel(m, function (mod, err) {
+            new SurrogateStore().getModel(m, function (mod, err) {
               if (err) {
                 returnResponse(testNode, err);
               } else {
@@ -4705,31 +5041,31 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
           test.paragraph('skipping tests since store is not ready');
         }
       } else {
-        test.example('getModel() is not implemented', Error(new SurrogateStoreModel().storeType + ' does not provide getModel'), function () {
-          new SurrogateStoreModel().getModel();
+        test.example('getModel() is not implemented', Error(new SurrogateStore().storeType + ' does not provide getModel'), function () {
+          new SurrogateStore().getModel();
         });
       }
     });
     test.heading('putModel(model)', function () {
-      if (interface['canPutModel']) {
+      if (services['canPutModel']) {
         test.example('must pass valid model', Error('argument must be a Model'), function () {
-          new SurrogateStoreModel().putModel();
+          new SurrogateStore().putModel();
         });
         test.example('model must have no validation errors', Error('model has validation errors'), function () {
           var m = new Model();
           m.attributes = null;
-          new SurrogateStoreModel().putModel(m);
+          new SurrogateStore().putModel(m);
         });
         test.example('callback function required', Error('callback required'), function () {
           var m = new Model();
           m.attributes[0].value = 1;
-          new SurrogateStoreModel().putModel(m);
+          new SurrogateStore().putModel(m);
         });
-        if (interface['isReady']) {
+        if (services['isReady']) {
           test.example('returns error when model not found', test.asyncResponse(Error('model not found in store')), function (testNode, returnResponse) {
             var m = new Model();
             m.attributes[0].value = 1;
-            new SurrogateStoreModel().putModel(m, function (mod, err) {
+            new SurrogateStore().putModel(m, function (mod, err) {
               if (err) {
                 returnResponse(testNode, err);
               } else {
@@ -4739,7 +5075,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
           });
           test.example('creates new model when ID is not set', test.asyncResponse(true), function (testNode, returnResponse) {
             var m = new Model();
-            new SurrogateStoreModel().putModel(m, function (mod, err) {
+            new SurrogateStore().putModel(m, function (mod, err) {
               if (err) {
                 returnResponse(testNode, err);
               } else {
@@ -4752,30 +5088,30 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         }
       } else {
         test.example('putModel() is not implemented', Error('Store does not provide putModel'), function () {
-          new SurrogateStoreModel().putModel();
+          new SurrogateStore().putModel();
         });
       }
     });
     test.heading('deleteModel(model)', function () {
-      if (interface['canDeleteModel']) {
+      if (services['canDeleteModel']) {
         test.example('must pass valid model', Error('argument must be a Model'), function () {
-          new SurrogateStoreModel().deleteModel();
+          new SurrogateStore().deleteModel();
         });
         test.example('model must have no validation errors', Error('model has validation errors'), function () {
           var m = new Model();
           m.attributes = null;
-          new SurrogateStoreModel().deleteModel(m);
+          new SurrogateStore().deleteModel(m);
         });
         test.example('callback function required', Error('callback required'), function () {
           var m = new Model();
           m.attributes[0].value = 1;
-          new SurrogateStoreModel().deleteModel(m);
+          new SurrogateStore().deleteModel(m);
         });
-        if (interface['isReady']) {
+        if (services['isReady']) {
           test.example('returns error when model not found', test.asyncResponse(Error('model not found in store')), function (testNode, returnResponse) {
             var m = new Model();
             m.attributes[0].value = 1;
-            new SurrogateStoreModel().deleteModel(m, function (mod, err) {
+            new SurrogateStore().deleteModel(m, function (mod, err) {
               if (err) {
                 returnResponse(testNode, err);
               } else {
@@ -4788,7 +5124,7 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         }
       } else {
         test.example('deleteModel() is not implemented', Error('Store does not provide deleteModel'), function () {
-          new SurrogateStoreModel().deleteModel();
+          new SurrogateStore().deleteModel();
         });
       }
     });
@@ -4797,36 +5133,42 @@ test.runnerStoreMethods = function (SurrogateStoreModel) {
         'The **filter** property can be used to query the store.  ' +
         'The **order** property can specify the sort order of the list.  ' +
         '_See integration test for more info._');
-      if (interface['isReady'] && interface['canGetList']) {
+      if (services['isReady'] && services['canGetList']) {
         test.example('returns a List populated from store', undefined, function () {
           test.shouldThrow(Error('argument must be a List'),function(){
-            new SurrogateStoreModel().getList();
+            new SurrogateStore().getList();
           })
           test.shouldThrow(Error('filter argument must be Object'),function(){
-            new SurrogateStoreModel().getList(new List(new Model()));
+            new SurrogateStore().getList(new List(new Model()));
           })
           test.shouldThrow(Error('callback required'),function(){
-            new SurrogateStoreModel().getList(new List(new Model()),[]);
+            new SurrogateStore().getList(new List(new Model()),[]);
           })
           // See integration tests for examples of usage
         });
       } else {
-        test.xexample('returns a List populated from store', Error('Store does not provide getList'), function () {
-          return new SurrogateStoreModel().getList();
-        });
+        if (services['isReady'] && services['canGetList']) {
+          test.example('returns a List populated from store', Error('Store does not provide getList'), function () {
+            return new SurrogateStore().getList();
+          });
+        } else {
+          test.xexample('returns a List populated from store', Error('Store does not provide getList'), function () {
+            return new SurrogateStore().getList();
+          });
+        }
       }
     });
   });
   test.heading('PROPERTIES', function () {
     test.heading('name', function () {
       test.example('name of store can be set in constructor', 'punchedCards', function () {
-        return new SurrogateStoreModel({name: 'punchedCards'}).name;
+        return new SurrogateStore({name: 'punchedCards'}).name;
       });
     });
     test.heading('storeType', function () {
       test.paragraph('storeType defaults to Store Class Name but can be set to suite the app architecture.');
       test.example('storeType can be set in constructor', 'legacyStorage', function () {
-        return new SurrogateStoreModel({storeType: 'legacyStorage'}).storeType;
+        return new SurrogateStore({storeType: 'legacyStorage'}).storeType;
       });
     });
   });
@@ -4990,58 +5332,80 @@ test.runnerTransport = function () {
 ;
 /**
  * tequila
- * workspace-test
+ * application-test
  */
-test.runnerWorkspace = function () {
-  test.heading('Workspace Class', function () {
-    test.paragraph('A workspace is a collection of active deltas for a user.  The GUI could represent that as open' +
-      'tabs for instance.  Each tab a model view.  The deltas represent the change in model state');
+test.runnerApplicationModel = function () {
+  test.heading('Application Model', function () {
+    test.paragraph('Information about the application is modeled here.');
     test.heading('CONSTRUCTOR', function () {
-      test.example('objects created should be an instance of Workspace', true, function () {
-        return new Workspace(new User()) instanceof Workspace;
+      test.example('objects created should be an instance of Application', true, function () {
+        return new Application() instanceof Application;
       });
-      test.example('should make sure new operator used', Error('new operator required'), function () {
-        Workspace();
-      });
-      test.example('must pass user model in constructor', Error('user model required'), function () {
-        new Workspace();
-      });
-    });
-    test.heading('PROPERTIES', function () {
-      test.heading('user - User Model who owns workspace', function () {
-        test.example('value is a user model', undefined, function () {
-          test.assertion(new Workspace(new User()).user instanceof User);
-        });
-      });
-      test.heading('deltas - array of deltas active deltas for user', function () {
-        test.example('value is array', undefined, function () {
-          test.assertion(new Workspace(new User()).deltas instanceof Array);
-        });
+      test.heading('Model tests are applied', function () {
+        test.runnerModel(Application, true);
       });
     });
     test.heading('METHODS', function () {
-      test.heading('toString()', function () {
-        test.example('should return a description of the workspace', "unknown user's workspace", function () {
-          return new Workspace(new User()).toString();
+      test.heading('run()', function () {
+        test.paragraph('The run method executes the application.');
+        test.example('with no parameters default command will be executed', Error('command not implemented'), function () {
+          new Application().run();
+        });
+      });
+      test.heading('setInterface(interface)', function () {
+        test.paragraph('Setting the interface for the application determines the primary method of user interaction.');
+        test.example('must supply Interface object', Error('instance of Interface a required parameter'), function () {
+          new Application().setInterface();
+        });
+      });
+      test.heading('getInterface()', function () {
+        test.paragraph('returns primary user interface for application');
+        test.example('get default interface for applications', 'a Interface', function () {
+          return new Application().getInterface().toString();
         });
       });
     });
   });
-};;
+};
+;
 /**
  * tequila
  * log-test
  */
 test.runnerLogModel = function () {
   test.heading('Log Model', function () {
-    test.paragraph('The Log!.');
+    test.paragraph('Multi purpose log model.');
     test.heading('CONSTRUCTOR', function () {
-      test.xexample('yadda', true, function () {
-        // blah
+      test.example('objects created should be an instance of Workspace', true, function () {
+        return new Log() instanceof Log;
       });
-//      test.heading('Model tests are applied', function () {
-//        test.runnerModel(User,true);
-//      });
+      test.heading('Model tests are applied', function () {
+        test.runnerModel(Log, true);
+      });
+      test.heading('ATTRIBUTES', function () {
+        test.example('following attributes are defined:', undefined, function () {
+          var log = new Log('what up'); // default attributes and values
+          test.assertion(log.get('id') !== undefined);
+          test.assertion(log.get('dateLogged') instanceof Date);
+          test.show(log.get('dateLogged'));
+          test.assertion(log.get('logType') == 'Text');
+          test.assertion(log.get('importance') == 'Info');
+          test.assertion(log.get('contents') == 'what up');
+        });
+      });
+      test.heading('LOG TYPES', function () {
+        test.example('must be valid', Error('Unknown log type: wood'), function () {
+          test.show(T.getLogTypes());
+          new Log({logType: 'wood'}); // default attributes and values
+        });
+        test.example('Delta is simple text message', 'Info: sup', function () {
+          return new Log('sup');
+        });
+        test.example('Text is simple text message', 'Info: (delta)', function () {
+          var delta = new Delta(new Attribute.ModelID(new Model()));
+          return new Log({logType: 'Delta', contents: delta}).toString();
+        });
+      });
     });
   });
 };
@@ -5110,7 +5474,6 @@ test.runnerUserModel = function () {
       test.heading('Model tests are applied', function () {
         test.runnerModel(User, true);
       });
-      //          return new Attribute({name: 'comments', type: 'String(255)'}).size;
     });
     test.heading('ATTRIBUTES', function () {
       test.example('following attributes are defined:', undefined, function () {
@@ -5129,9 +5492,36 @@ test.runnerUserModel = function () {
 ;
 /**
  * tequila
+ * workspace-test
+ */
+test.runnerWorkspace = function () {
+  test.heading('Workspace Model', function () {
+    test.paragraph('A workspace is a collection of active deltas for a user.  The GUI could represent that as open' +
+      'tabs for instance.  Each tab a model view.  The deltas represent the change in model state');
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of Workspace', true, function () {
+        return new Workspace() instanceof Workspace;
+      });
+      test.heading('Model tests are applied', function () {
+        test.runnerModel(Workspace, true);
+      });
+    });
+    test.heading('ATTRIBUTES', function () {
+      test.example('following attributes are defined:', undefined, function () {
+        var user = new Workspace(); // default attributes and values
+        test.assertion(user.get('id') !== undefined);
+        test.assertion(user.get('user') instanceof Attribute.ModelID);
+        test.assertion(user.get('user').modelType == 'User');
+        test.assertion(typeof user.get('deltas') == 'object');
+      });
+    });
+  });
+};;
+/**
+ * tequila
  * memory-test
  */
-test.runnerMemoryStoreModel = function () {
+test.runnerMemoryStore = function () {
   test.heading('MemoryStore', function () {
     test.paragraph('The MemoryStore is a simple volatile store.');
     test.heading('CONSTRUCTOR', function () {
@@ -5149,7 +5539,7 @@ test.runnerMemoryStoreModel = function () {
  * mongo-test
  */
 
-test.runnerMongoStoreModel = function () {
+test.runnerMongoStore = function () {
   test.heading('MongoStore', function () {
     test.paragraph('The MongoStore is a simple volatile store.');
     test.heading('CONSTRUCTOR', function () {
@@ -5166,7 +5556,7 @@ test.runnerMongoStoreModel = function () {
  * tequila
  * remote-test
  */
-test.runnerRemoteStoreModel = function () {
+test.runnerRemoteStore = function () {
   test.heading('RemoteStore', function () {
     test.paragraph('The RemoteStore is a store that is maintained by a remote host.');
     test.heading('CONSTRUCTOR', function () {
@@ -5177,6 +5567,71 @@ test.runnerRemoteStoreModel = function () {
     });
     test.runnerStoreMethods(RemoteStore);
   });
+};
+;
+/**
+ * tequila
+ * local-test
+ */
+test.runnerLocalStore = function () {
+  test.heading('Local Store', function () {
+    test.paragraph('The LocalStore is a simple volatile store.');
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of LocalStore', true, function () {
+        return new LocalStore() instanceof LocalStore;
+      });
+      test.runnerStoreConstructor(LocalStore);
+    });
+    test.runnerStoreMethods(LocalStore);
+  });
+};
+;
+/**
+ * tequila
+ * redis-test
+ */
+test.runnerRedisStore = function () {
+  test.heading('Redis Store', function () {
+    test.paragraph('The RedisStore is a simple volatile store.');
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of RedisStore', true, function () {
+        return new RedisStore() instanceof RedisStore;
+      });
+      test.runnerStoreConstructor(RedisStore);
+    });
+    test.runnerStoreMethods(RedisStore);
+  });
+};
+;
+/**
+ * tequila
+ * bootstrap3-test.js
+ */
+test.runnerBootstrap3Interface = function () {
+  test.heading('Bootstrap3Interface', function () {
+  });
+};
+;
+/**
+ * tequila
+ * command-line-test
+ */
+test.runnerCommandLineInterface = function () {
+  test.heading('CommandLineInterface', function () {
+
+  });
+
+};
+;
+/**
+ * tequila
+ * mock-test.js
+ */
+test.runnerMockInterface = function () {
+  test.heading('MockInterface', function () {
+
+  });
+
 };
 ;
 /**
@@ -5477,7 +5932,7 @@ test.runnerStoreIntegration = function () {
         test.show(storeBeingTested);
 
         // If store is not ready then get out...
-        if (!test.integrationStore.getStoreInterface().isReady) {
+        if (!test.integrationStore.getServices().isReady) {
           returnResponse(testNode, Error('Store is not ready.'));
           return;
         }
@@ -5506,18 +5961,20 @@ test.runnerStoreIntegration = function () {
 
         // Make sure store starts in known state.  Stores such as mongoStore will retain test values.
         // So... use getList to get all stooges then delete them from the Store
-        var list = new List(new self.Stooge());
-        try {
-          self.killhim = new self.Stooge();
-          test.integrationStore.getList(list, [], function (list, error) {
-            if (typeof error != 'undefined') {
-              returnResponse(testNode, error);
-              return;
-            }
-            if (list._items.length < 1)
-              storeStooges();
-            else
-              self.oldStoogesFound = list._items.length;
+        var useListToCleanStart = test.integrationStore.getServices().canGetList;
+        if (useListToCleanStart) {
+          var list = new List(new self.Stooge());
+          try {
+            self.killhim = new self.Stooge();
+            test.integrationStore.getList(list, [], function (list, error) {
+              if (typeof error != 'undefined') {
+                returnResponse(testNode, error);
+                return;
+              }
+              if (list._items.length < 1)
+                storeStooges();
+              else
+                self.oldStoogesFound = list._items.length;
               for (var i = 0; i < list._items.length; i++) {
                 self.killhim.set('id', list._items[i][0]);
                 test.integrationStore.deleteModel(self.killhim, function (model, error) {
@@ -5529,10 +5986,14 @@ test.runnerStoreIntegration = function () {
                   }
                 })
               }
-          });
-        }
-        catch (err) {
-          returnResponse(testNode, err);
+            });
+          }
+          catch (err) {
+            returnResponse(testNode, err);
+          }
+        } else {
+          // TODO May have to delete manually or expire for redis ?
+          storeStooges();
         }
 
         // Callback to store new stooges
@@ -5659,13 +6120,18 @@ test.runnerStoreIntegration = function () {
             returnResponse(testNode, Error('no error deleting stooge when expected'));
             return;
           }
-          // Now create a list from the stooge store
-          var list = new List(new self.Stooge());
-          try {
-            test.integrationStore.getList(list, [], listReady);
-          }
-          catch (err) {
-            returnResponse(testNode, err);
+          // Skip List test if subclass can't do
+          if (!test.integrationStore.getServices().canGetList) {
+            returnResponse(testNode, true);
+          } else {
+            // Now create a list from the stooge store
+            var list = new List(new self.Stooge());
+            try {
+              test.integrationStore.getList(list, [], listReady);
+            }
+            catch (err) {
+              returnResponse(testNode, err);
+            }
           }
         }
 
@@ -5690,13 +6156,136 @@ test.runnerStoreIntegration = function () {
 ;
 /**
  * tequila
+ * test-command-integration
+ */
+test.runnerCommandIntegration = function () {
+  test.heading('Command Integration', function () {
+    test.paragraph('test each command type');
+
+    // Stub
+    test.example('Stub', Error('command not implemented'), function () {
+      var cmd = new Command({
+        name: 'stubCommand',
+        description: 'stub command test',
+        type: 'Stub'
+      });
+      test.show(cmd);
+      cmd.execute();
+    });
+
+    // Menu
+    test.example('Menu', Error('command not implemented'), function () {
+      var cmd = new Command({
+        name: 'menuCommand',
+        description: 'menu command test',
+        type: 'Menu',
+        contents: ['Hello World']
+      });
+      test.show(cmd);
+      cmd.execute();
+    });
+
+    // Presentation
+    test.example('Presentation', Error('command not implemented'), function () {
+      var cmd = new Command({
+        name: 'presentationCommand',
+        description: 'presentation command test',
+        type: 'Presentation',
+        contents: new Presentation()
+      });
+      test.show(cmd);
+      cmd.execute();
+    });
+
+    // Function
+    test.example('Function test straight up', test.asyncResponse('Hola! BeforeExecute AfterExecute Adious! funk Completed'), function (testNode, returnResponse) {
+      var cmd = new Command({
+        type: 'Function',
+        contents: function () {
+          this.bucket += ' funk';
+          this.complete();
+        }
+      });
+      cmd.bucket = 'Hola!';
+      // Monitor all events
+      cmd.onEvent(['BeforeExecute', 'AfterExecute', 'Error', 'Aborted', 'Completed'], function (event) {
+        this.bucket += ' ' + event;
+        if (event == 'Completed')
+          returnResponse(testNode, this.bucket);
+      });
+      cmd.execute();
+      cmd.bucket += ' Adious!';
+    });
+
+    // Function error
+    test.example('Function test with error', test.asyncResponse('Hola! BeforeExecute AfterExecute Adious! funk Error Completed'), function (testNode, returnResponse) {
+      var cmd = new Command({
+        type: 'Function',
+        contents: function () {
+          this.bucket += ' funk';
+          throw new Error('function go boom!');
+        }
+      });
+      cmd.bucket = 'Hola!';
+      // Monitor all events
+      cmd.onEvent('*', function (event) { // * for all events
+        this.bucket += ' ' + event;
+        if (event == 'Completed') returnResponse(testNode, this.bucket);
+      });
+      cmd.execute();
+      cmd.bucket += ' Adious!';
+    });
+
+    // Function abort
+    test.example('Function test with abort', test.asyncResponse('Hola! BeforeExecute AfterExecute Adious! funk Aborted Completed'), function (testNode, returnResponse) {
+      var cmd = new Command({
+        type: 'Function',
+        contents: function () {
+          this.bucket += ' funk';
+          this.abort();
+        }
+      });
+      cmd.bucket = 'Hola!';
+      // Monitor all events
+      cmd.onEvent(['BeforeExecute', 'AfterExecute', 'Error', 'Aborted', 'Completed'], function (event) {
+        this.bucket += ' ' + event;
+        if (event == 'Completed') returnResponse(testNode, this.bucket);
+      });
+      cmd.execute();
+      cmd.bucket += ' Adious!';
+    });
+
+    // Procedure
+    test.example('Procedure', Error('command not implemented'), function () {
+      var cmd = new Command({
+        name: 'procedureCommand',
+        description: 'procedure command test',
+        type: 'Procedure',
+        contents: new Procedure()
+      });
+      test.show(cmd);
+      cmd.execute();
+    });
+  });
+};
+;
+/**
+ * tequila
+ * test-procedure-integration
+ */
+test.runnerProcedureIntegration = function () {
+  test.heading('Procedure Integration', function () {
+  });
+};
+;
+/**
+ * tequila
  * tequila-spec
  */
 test.start();
 test.heading('Library', function () {
   test.runnerTequila();
 });
-
 test.heading('Classes', function () {
   test.paragraph('These objects make up the core "classes" and are extended via javascript prototype inheritance.');
   test.runnerAttribute();
@@ -5707,28 +6296,38 @@ test.heading('Classes', function () {
   test.runnerMessage();
   test.runnerModel(Model,false);
   test.runnerProcedure();
-  test.runnerStoreModel();
+  test.runnerStore();
   test.runnerTransport();
-  test.runnerWorkspace();
+});
+test.heading('Interfaces', function () {
+  test.paragraph('These core interfaces are included in the library.');
+  test.runnerMockInterface();
+  test.runnerBootstrap3Interface();
+  test.runnerCommandLineInterface();
 });
 test.heading('Models', function () {
-  test.paragraph('These core models are used by the library. suck it');
+  test.paragraph('These core models are included in the library.');
   test.runnerApplicationModel();
   test.runnerLogModel();
   test.runnerPresentation();
   test.runnerUserModel();
+  test.runnerWorkspace();
 });
 test.heading('Stores', function () {
-  test.paragraph('The core stores implemented in the library.');
-  test.runnerMemoryStoreModel();
-  test.runnerMongoStoreModel();
-  test.runnerRemoteStoreModel();
+  test.paragraph('These core stores are included in the library.');
+  test.runnerMemoryStore();
+  test.runnerMongoStore();
+  test.runnerRemoteStore();
+  test.runnerLocalStore();
+  test.runnerRedisStore();
 });
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
     'If any assertion fails the test is failed.');
   test.runnerListIntegration();
   test.runnerStoreIntegration();
+  test.runnerProcedureIntegration();
+  test.runnerCommandIntegration();
 });
 test.stop();
 ;
@@ -5738,5 +6337,5 @@ test.stop();
  */
 test.runner(false);
 process.on('exit', function () {
-  process.exit(test.countFail ? 1 : 0);
+  process.exit(test.countFail || test.criticalFail ? 1 : 0);
 });

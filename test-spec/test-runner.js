@@ -18,6 +18,7 @@ var test = {};
 test.converter = new Markdown.Converter();
 test.showWork = [];
 test.examplesDisabled = false;
+test.criticalFail = false;
 test.runner = function (isBrowser) {
   test.isBrowser = isBrowser;
 
@@ -471,6 +472,8 @@ test.heading = function (text, func) {
     try {
       func();
     } catch (e) {
+      console.error('Critical test spec error: ' + e)
+      test.criticalFail = true;
     }
     this.headingLevel--;
     this.levels.pop();

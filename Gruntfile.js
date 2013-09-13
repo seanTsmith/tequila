@@ -8,6 +8,7 @@ module.exports = function (grunt) {
       tequila: {
         src: [
           'lib/classes/tequila-singleton.js',
+
           'lib/classes/attribute-class.js',
           'lib/classes/command-class.js',
           'lib/classes/delta-class.js',
@@ -18,13 +19,22 @@ module.exports = function (grunt) {
           'lib/classes/procedure-class.js',
           'lib/classes/store-class.js',
           'lib/classes/transport-class.js',
-          'lib/models/workspace-model.js',
+
+          'lib/models/application-model.js',
           'lib/models/log-model.js',
           'lib/models/presentation-model.js',
           'lib/models/user-model.js',
+          'lib/models/workspace-model.js',
+
           'lib/stores/memory-store.js',
           'lib/stores/mongo-store.js',
-          'lib/stores/remote-store.js'
+          'lib/stores/remote-store.js',
+          'lib/stores/local-store.js',
+          'lib/stores/redis-store.js',
+
+          'lib/interfaces/bootstrap3-interface.js',
+          'lib/interfaces/command-line-interface.js',
+          'lib/interfaces/mock-interface.js'
         ],
         dest: 'dist/tequila.js'
       },
@@ -35,6 +45,7 @@ module.exports = function (grunt) {
           'lib/stores/mongo-store-server.js',
           'test-spec/node-test-header.js',
           'test-spec/test-runner.js',
+
           'lib/classes/attribute-test.js',
           'lib/classes/command-test.js',
           'lib/classes/delta-test.js',
@@ -46,13 +57,22 @@ module.exports = function (grunt) {
           'lib/classes/store-test.js',
           'lib/classes/tequila-test.js',
           'lib/classes/transport-test.js',
-          'lib/models/workspace-test.js',
+
+          'lib/models/application-test.js',
           'lib/models/log-test.js',
           'lib/models/presentation-test.js',
           'lib/models/user-test.js',
+          'lib/models/workspace-test.js',
+
           'lib/stores/memory-test.js',
           'lib/stores/mongo-test.js',
           'lib/stores/remote-test.js',
+          'lib/stores/local-test.js',
+          'lib/stores/redis-test.js',
+
+          'lib/interfaces/bootstrap3-test.js',
+          'lib/interfaces/command-line-test.js',
+          'lib/interfaces/mock-test.js',
           'test-spec/integration/test-list-integration.js',
           'test-spec/integration/test-store-integration.js',
           'test-spec/integration/test-command-integration.js',
@@ -100,6 +120,7 @@ module.exports = function (grunt) {
   });
 
   // tasks are ...
+  grunt.log.write('Grunt ...\n');
   grunt.log.muted = true; // to spammy
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');

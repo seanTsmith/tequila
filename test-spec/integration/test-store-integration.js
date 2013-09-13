@@ -40,33 +40,39 @@ test.runnerStoreIntegration = function () {
 
         // Make sure store starts in known state.  Stores such as mongoStore will retain test values.
         // So... use getList to get all stooges then delete them from the Store
-        var list = new List(new self.Stooge());
-        try {
-          self.killhim = new self.Stooge();
-          test.integrationStore.getList(list, [], function (list, error) {
-            if (typeof error != 'undefined') {
-              returnResponse(testNode, error);
-              return;
-            }
-            if (list._items.length < 1)
-              storeStooges();
-            else
-              self.oldStoogesFound = list._items.length;
-            for (var i = 0; i < list._items.length; i++) {
-              self.killhim.set('id', list._items[i][0]);
-              test.integrationStore.deleteModel(self.killhim, function (model, error) {
-                if (typeof error != 'undefined') {
-                  console.log('error deleting: ' + JSON.stringify(error));
-                }
-                if (++self.oldStoogesKilled >= self.oldStoogesFound) {
-                  storeStooges();
-                }
-              })
-            }
-          });
-        }
-        catch (err) {
-          returnResponse(testNode, err);
+        var useListToCleanStart = test.integrationStore.getServices().canGetList;
+        if (useListToCleanStart) {
+          var list = new List(new self.Stooge());
+          try {
+            self.killhim = new self.Stooge();
+            test.integrationStore.getList(list, [], function (list, error) {
+              if (typeof error != 'undefined') {
+                returnResponse(testNode, error);
+                return;
+              }
+              if (list._items.length < 1)
+                storeStooges();
+              else
+                self.oldStoogesFound = list._items.length;
+              for (var i = 0; i < list._items.length; i++) {
+                self.killhim.set('id', list._items[i][0]);
+                test.integrationStore.deleteModel(self.killhim, function (model, error) {
+                  if (typeof error != 'undefined') {
+                    console.log('error deleting: ' + JSON.stringify(error));
+                  }
+                  if (++self.oldStoogesKilled >= self.oldStoogesFound) {
+                    storeStooges();
+                  }
+                })
+              }
+            });
+          }
+          catch (err) {
+            returnResponse(testNode, err);
+          }
+        } else {
+          // TODO May have to delete manually or expire for redis ?
+          storeStooges();
         }
 
         // Callback to store new stooges

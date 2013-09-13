@@ -2,7 +2,15 @@
 
 Tequila es bueno!
 
-TODO:
+==========================
+TODO DOUG:
+==========================
+- implement /lib/stores/local-test.js & /lib/stores/local-store.js
+- install http://redis.io/ on tgiCloud Server
+- implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
+- test with /test-spec/integration/test-store-integration.js
+- thought you had phonegap app for tests - test localstore with it
+==========================
 
 App
 - Run (interface, callback)
@@ -19,13 +27,13 @@ Attribute
 * make validation for types
 * have stores validate before saving
 * create redis-store
+* create local-store
 * create json-file-store
 * create cookie-store
-* create redis-store
-* create local-store
 * create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 * tequilaStore needs to be set not hard coded
 * fix Test variations on getList method test for remote stores
+* Use confess / phantomJS to make cache manifest
 
 ## Project Root
 + **/bin** tequila command line interface

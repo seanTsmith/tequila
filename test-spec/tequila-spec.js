@@ -38,6 +38,8 @@ test.heading('Stores', function () {
   test.runnerMemoryStore();
   test.runnerMongoStore();
   test.runnerRemoteStore();
+  test.runnerLocalStore();
+  test.runnerRedisStore();
 });
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +

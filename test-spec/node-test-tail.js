@@ -4,5 +4,5 @@
  */
 test.runner(false);
 process.on('exit', function () {
-  process.exit(test.countFail ? 1 : 0);
+  process.exit(test.countFail || test.criticalFail ? 1 : 0);
 });
