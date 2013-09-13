@@ -10,6 +10,7 @@ TODO DOUG:
 - implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
 - test with /test-spec/integration/test-store-integration.js
 - thought you had phonegap app for tests - test localstore with it
+
 ==========================
 
 App
