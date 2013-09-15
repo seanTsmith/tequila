@@ -1433,8 +1433,10 @@ var Tequila = (function () {
       getInvalidProperties: function (args, allowedProperties) {
         var props = [];
         for (var property in args) {
-          if (!this.contains(allowedProperties, property)) {
-            props.push(property);
+          if (args.hasOwnProperty(property)) {
+            if (!this.contains(allowedProperties, property)) {
+              props.push(property);
+            }
           }
         }
         return props;
@@ -1658,8 +1660,10 @@ Attribute.prototype.getValidationErrors = function () {
     case 'Group':
       if (this.value == null || this.value instanceof Array) {
         for (var i in this.value) {
-          if (!(this.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
-          if (this.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+          if (this.value.hasOwnProperty(i)) {
+            if (!(this.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
+            if (this.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+          }
         }
       } else {
         errors.push('value must be null or an array');
@@ -1674,8 +1678,10 @@ Attribute.prototype.getValidationErrors = function () {
             errors.push('group property value must contain at least one Attribute');
           } else {
             for (var i in this.group.value) {
-              if (!(this.group.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
-              if (this.group.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+              if (this.group.value.hasOwnProperty(i)) {
+                if (!(this.group.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
+                if (this.group.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+              }
             }
           }
         } else {
@@ -1716,8 +1722,9 @@ function Command(/* does this matter */ args) {
       if (!(this.contents instanceof Array)) throw new Error('contents must be array of menu items');
       if (!this.contents.length) throw new Error('contents must be array of menu items');
       for (i in this.contents) {
-        if (typeof this.contents[i] != 'string' && !(this.contents[i] instanceof Command))
-          throw new Error('contents must be array of menu items');
+        if (this.contents.hasOwnProperty(i))
+          if (typeof this.contents[i] != 'string' && !(this.contents[i] instanceof Command))
+            throw new Error('contents must be array of menu items');
       }
       break;
     case 'Presentation':
@@ -1752,9 +1759,10 @@ Command.prototype.onEvent = function (events, callback) {
   if (typeof callback != 'function') throw new Error('callback is required');
   // Check known Events
   for (var i in events) {
-    if (events[i] != '*')
-      if (!T.contains(T.getCommandEvents(), events[i]))
-        throw new Error('Unknown command event: ' + events[i]);
+    if (events.hasOwnProperty(i))
+      if (events[i] != '*')
+        if (!T.contains(T.getCommandEvents(), events[i]))
+          throw new Error('Unknown command event: ' + events[i]);
   }
   // All good add to chain
   this._eventListeners.push({events: events, callback: callback});
@@ -1762,9 +1770,11 @@ Command.prototype.onEvent = function (events, callback) {
 Command.prototype.emitEvent = function (event) {
   var i;
   for (i in this._eventListeners) {
-    var subscriber = this._eventListeners[i];
-    if ((subscriber.events.length && subscriber.events[0] === '*') || T.contains(subscriber.events, event)) {
-      subscriber.callback.call(this, event);
+    if (this._eventListeners.hasOwnProperty(i)) {
+      var subscriber = this._eventListeners[i];
+      if ((subscriber.events.length && subscriber.events[0] === '*') || T.contains(subscriber.events, event)) {
+        subscriber.callback.call(this, event);
+      }
     }
   }
   if (event == 'Completed') // if command complete release listeners
@@ -2021,7 +2031,8 @@ var Model = function (args) {
   args = args || {};
   if (args.attributes) {
     for (var i in args.attributes) {
-      this.attributes.push(args.attributes[i]);
+      if (args.attributes.hasOwnProperty(i))
+        this.attributes.push(args.attributes[i]);
     }
   }
   var unusedProperties = T.getInvalidProperties(args, ['attributes']);
@@ -2035,8 +2046,9 @@ Model.prototype.toString = function () {
   return "a " + this.modelType;
 };
 Model.prototype.copy = function (sourceModel) {
-  for (var i in this.attributes) {
-    this.attributes[i].value = sourceModel.attributes[i].value;
+  for (var i=0; i<this.attributes.length; i++) {
+    //if (args.attributes.hasOwnProperty(i))
+      this.attributes[i].value = sourceModel.attributes[i].value;
   }
 };
 Model.prototype.getValidationErrors = function () {
@@ -2091,7 +2103,9 @@ var Procedure = function (args) {
     throw new Error('error creating Procedure: multiple errors');
   if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
   // args ok, now copy to object and check for errors
-  for (i in args) this[i] = args[i];
+  for (i in args)
+    if (args.hasOwnProperty(i))
+      this[i] = args[i];
   badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
   if (badJooJoo) {
     if (badJooJoo.length > 1) throw new Error('error creating Procedure: multiple errors');
@@ -2104,32 +2118,35 @@ Procedure.prototype.getValidationErrors = function () {
   if (this.tasks && !(this.tasks instanceof Array)) return ['tasks is not an array'];
   var badJooJoo = [];
   for (i in this.tasks) {
-    var task = this.tasks[i];
-    unusedProperties = T.getInvalidProperties(task, ['label', 'command', 'requires', 'timeout']);
-    for (j = 0; j < unusedProperties.length; j++) badJooJoo.push('invalid task[' + i + '] property: ' + unusedProperties[j]);
-    if (typeof task.label != 'undefined' && typeof task.label != 'string')
-      badJooJoo.push('task[' + i + '].label must be string');
-    if (typeof task.command != 'undefined' && !(task.command instanceof Command))
-      badJooJoo.push('task[' + i + '].command must be a Command object');
-    // make sure requires valid if specified
-    if (!task.requires)
-      task.requires = -1; // default to
-    if (!(task.requires instanceof Array)) task.requires = [task.requires]; // coerce to array
-    for (j in task.requires) {
-      switch (typeof task.requires[j]) {
-        case 'string':
-          throw new Error('wtf string requires in task[' + i + ']');
-          break;
-        case 'number':
-          if (task.requires[j] >= this.tasks.length) throw new Error('missing task #' + task.requires[j] + ' for requires in task[' + i + ']');
-          if (task.requires[j] < -1) throw new Error('task #' + task.requires[j] + ' invalid requires in task[' + i + ']');
-          break;
-        default:
-          throw new Error('invalid type for requires in task[' + i + ']');
+    if (this.tasks.hasOwnProperty(i)) {
+      var task = this.tasks[i];
+      unusedProperties = T.getInvalidProperties(task, ['label', 'command', 'requires', 'timeout']);
+      for (j = 0; j < unusedProperties.length; j++) badJooJoo.push('invalid task[' + i + '] property: ' + unusedProperties[j]);
+      if (typeof task.label != 'undefined' && typeof task.label != 'string')
+        badJooJoo.push('task[' + i + '].label must be string');
+      if (typeof task.command != 'undefined' && !(task.command instanceof Command))
+        badJooJoo.push('task[' + i + '].command must be a Command object');
+      // make sure requires valid if specified
+      if (!task.requires)
+        task.requires = -1; // default to
+      if (!(task.requires instanceof Array)) task.requires = [task.requires]; // coerce to array
+      for (j in task.requires) {
+        if (task.requires.hasOwnProperty(j))
+          switch (typeof task.requires[j]) {
+            case 'string':
+              throw new Error('wtf string requires in task[' + i + ']');
+              break;
+            case 'number':
+              if (task.requires[j] >= this.tasks.length) throw new Error('missing task #' + task.requires[j] + ' for requires in task[' + i + ']');
+              if (task.requires[j] < -1) throw new Error('task #' + task.requires[j] + ' invalid requires in task[' + i + ']');
+              break;
+            default:
+              throw new Error('invalid type for requires in task[' + i + ']');
+          }
       }
     }
   }
-return badJooJoo.length ? badJooJoo : null;
+  return badJooJoo.length ? badJooJoo : null;
 };
 ;
 /**
@@ -2678,9 +2695,11 @@ RemoteStore.prototype.putModel = function (model, callBack) {
       var c = msg.contents;
       model.attributes = [];
       for (var a in c.attributes) {
-        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
-        attrib.value = c.attributes[a].value;
-        model.attributes.push(attrib);
+        if (c.attributes.hasOwnProperty(a)) {
+          var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
+          attrib.value = c.attributes[a].value;
+          model.attributes.push(attrib);
+        }
       }
       if (typeof c == 'string')
         callBack(model, c);
@@ -3171,6 +3190,11 @@ MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
  * node-test-header
  */
 
+// Lay down some shitty code to defend against
+Object.prototype.badActor = function() {
+  return "I'm just a cook.";
+};
+
 var colors = require('colors');
 var mongo = require('mongodb');
 ;
@@ -3378,242 +3402,246 @@ test.renderHead = function (isBrowser) {
 };
 test.renderDetail = function (isBrowser) {
   for (i in test.nodes) {
-    // Check filters
-    var filterSection = (test.filterSection + '.');
-    if (filterSection.indexOf('..') >= 0) filterSection = (test.filterSection);
-    var curSection = test.nodes[i].levelText;
-    var testNodeType = test.nodes[i].nodeType;
-    var dotCount = curSection.match(/\./g) ? curSection.match(/\./g).length : 0;
-    var isInScope = curSection.indexOf(filterSection) == 0;
-    var isFiltered = false; // If true will not be rendered
-    switch (test.filterLevel) {
-      case 'TOC':
-        test.filterLevel = 'TOC';
-        if (!isInScope && dotCount > 2) isFiltered = true;
-        break;
-      case 'Inf':
-        test.filterLevel = 'Inf'; // TOC with paragraph text
-        if (!isInScope && dotCount > 2) isFiltered = true;
-        break;
-    }
-    if (test.filterSection && curSection.indexOf(filterSection) != 0) {
-      isFiltered = true;
-      if (testNodeType != 'e' && filterSection.indexOf(curSection) == 0) {
-        isFiltered = false;
+    if (test.nodes.hasOwnProperty(i)) {
+      // Check filters
+      var filterSection = (test.filterSection + '.');
+      if (filterSection.indexOf('..') >= 0) filterSection = (test.filterSection);
+      var curSection = test.nodes[i].levelText;
+      var testNodeType = test.nodes[i].nodeType;
+      var dotCount = curSection.match(/\./g) ? curSection.match(/\./g).length : 0;
+      var isInScope = curSection.indexOf(filterSection) == 0;
+      var isFiltered = false; // If true will not be rendered
+      switch (test.filterLevel) {
+        case 'TOC':
+          test.filterLevel = 'TOC';
+          if (!isInScope && dotCount > 2) isFiltered = true;
+          break;
+        case 'Inf':
+          test.filterLevel = 'Inf'; // TOC with paragraph text
+          if (!isInScope && dotCount > 2) isFiltered = true;
+          break;
       }
-    }
-    if (test.nodes[i].inheritanceTest) isFiltered = true;
+      if (test.filterSection && curSection.indexOf(filterSection) != 0) {
+        isFiltered = true;
+        if (testNodeType != 'e' && filterSection.indexOf(curSection) == 0) {
+          isFiltered = false;
+        }
+      }
+      if (test.nodes[i].inheritanceTest) isFiltered = true;
 //    console.log((isInScope?'SCOPE ':'scope ')+testNodeType+(isFiltered?' FILTER ':' filter ')+filterSection+' '+curSection);
-    if (!isBrowser) {
-      if (testNodeType == 'e') {
-        testNodeType = '.';
-      } else {
-        testNodeType = '';
+      if (!isBrowser) {
+        if (testNodeType == 'e') {
+          testNodeType = '.';
+        } else {
+          testNodeType = '';
+        }
       }
-    }
-    switch (testNodeType) {
-      case 'h':
-        if (!isFiltered) {
-          var p = document.createElement("h" + test.nodes[i].level);
-          var lt = test.nodes[i].levelText;
-          if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
+      switch (testNodeType) {
+        case 'h':
+          if (!isFiltered) {
+            var p = document.createElement("h" + test.nodes[i].level);
+            var lt = test.nodes[i].levelText;
+            if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
 //          if (dots < 2)
 //            p.innerHTML = test.nodes[i].text;
 //          else
-          p.innerHTML = lt + ' ' + test.nodes[i].text;
-          p.onclick = function () {
-            var words = this.innerText.split(' ');
-            test.filterSection = '';
-            if (words.length > 0 && parseInt(words[0]) > 0)
-              test.filterSection = words[0];
-            test.refresh();
-          };
-          test.innerDiv.appendChild(p);
-        }
-        break;
-      case 'p':
-        if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
-          var p = document.createElement("p");
-          p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
-          test.innerDiv.appendChild(p);
-        }
-        break;
-      case '.':
-        test.countTests++;
-        if (!test.nodes[i].deferedExample && test.nodes[i].func) {
-          test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
-            test.nodes[i].expectedValue != null) {
-            if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
-              test.nodes[i].asyncTest = true;
+            p.innerHTML = lt + ' ' + test.nodes[i].text;
+            p.onclick = function () {
+              var words = this.innerText.split(' ');
+              test.filterSection = '';
+              if (words.length > 0 && parseInt(words[0]) > 0)
+                test.filterSection = words[0];
+              test.refresh();
+            };
+            test.innerDiv.appendChild(p);
           }
-          test.showWork = [];
-          test.assertions = [];
-          var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
-          var indent = '';
-          for (j = 0; j < ref.length; j++)
-            indent += ' ';
+          break;
+        case 'p':
+          if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
+            var p = document.createElement("p");
+            p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
+            test.innerDiv.appendChild(p);
+          }
+          break;
+        case '.':
+          test.countTests++;
+          if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+            test.nodes[i].asyncTest = false;
+            if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+              test.nodes[i].expectedValue != null) {
+              if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
+                test.nodes[i].asyncTest = true;
+            }
+            test.showWork = [];
+            test.assertions = [];
+            var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+            var indent = '';
+            for (j = 0; j < ref.length; j++)
+              indent += ' ';
+            if (test.nodes[i].asyncTest) {
+              test.countPending++;
+              test.nodes[i].errorThrown = false;
+              var err = test.callTestCode(test.nodes[i], test.asyncCallback);
+              if (test.wasThrown) {
+                process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: ' + err));
+                test.countPending--;
+                test.countFail++;
+                test.nodes[i].errorThrown = true;
+              }
+            } else {
+              var test_Results = test.callTestCode(test.nodes[i]);
+              ranTest = true;
+              exampleCode += test.formatCode(test.nodes[i].func, true);
+              var test_Value = 'undefined';
+              if (typeof test_Results !== 'undefined' && test_Results != null)
+                test_Value = test_Results.toString();
+              var expected_Value = 'undefined';
+              if (typeof test.nodes[i].expectedValue !== 'undefined' && test.nodes[i].expectedValue != null)
+                expected_Value = test.nodes[i].expectedValue.toString();
+              // Check assertions
+              var gotFailedAssertions = false;
+              for (var j in test.assertions) {
+                if (test.assertions.hasOwnProperty(i))
+                  if (!test.assertions[j]) gotFailedAssertions = true;
+              }
+              if (test_Value !== expected_Value || gotFailedAssertions) {
+                test.countFail++; // TODO if console is white this is invisible ink...
+                if (gotFailedAssertions) {
+                  process.stdout.write('\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
+                    'ASSERTION(s) failed'));
+                } else {
+                  process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+                    'RETURNED: ' + test.expressionInfo(test_Results) +
+                      '\n' + indent +
+                      'EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '\n'));
+                }
+              } else {
+                test.countPass++;
+                process.stdout.write(colors.green('✓'));
+              }
+            }
+          } else {
+            test.countDefer++;
+            process.stdout.write(colors.yellow('⚑'));
+          }
+          break;
+        case 'e':
+          var testPassed = false;
+          var ranTest = false;
+          var caption = document.createElement("caption");
+          caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>';
+          var pre = document.createElement("pre");
+          test.nodes[i].exampleCaption = caption;
+          test.nodes[i].examplePre = pre;
+          pre.className = "prettyprint";
+          test.countTests++;
+          if (!test.nodes[i].inheritanceTest) test.countUnique++;
+          if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+            test.nodes[i].asyncTest = false;
+            if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+              test.nodes[i].expectedValue != null) {
+              if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
+                test.nodes[i].asyncTest = true;
+            }
+            test.showWork = [];
+            test.assertions = [];
+            var exampleCode = '';
+            if (test.nodes[i].asyncTest) {
+              exampleCode += test.formatCode(test.nodes[i].func, true);
+              exampleCode += '⚑<b>pending async results</b>';
+              test.countPending++;
+              pre.style.background = "#ffa500"; // oranges
+            } else {
+              var test_Results = test.callTestCode(test.nodes[i], test.asyncCallback);
+              ranTest = true;
+              exampleCode += test.formatCode(test.nodes[i].func, true);
+              if (typeof test_Results == 'undefined') {
+                if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
+              } else if (test_Results === null) {
+                if (typeof test.nodes[i].expectedValue != 'undefined' && test.nodes[i].expectedValue === null) testPassed = true;
+              } else {
+                if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
+              }
+              // Check assertions
+              var gotFailedAssertions = false;
+              for (var j in test.assertions) {
+                if (test.assertions.hasOwnProperty(i))
+                  if (!test.assertions[j]) gotFailedAssertions = true;
+              }
+              if (testPassed && !gotFailedAssertions) {
+                test.countPass++;
+                pre.style.background = "#cfc"; // green
+                if (test.wasThrown) {
+                  exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
+                } else {
+                  if (typeof test_Results == 'undefined') {
+                    exampleCode += '✓<b>returns without harming any kittens</b>'; // TODO This is wrong for async since tests are not really done yet!!!
+                  } else {
+                    exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
+                  }
+                }
+              } else {
+                test.countFail++;
+                pre.style.background = "#fcc"; // red
+                if (test.wasThrown) {
+                  if (test.nodes[i].expectedValue === undefined) {
+                    exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+                  } else {
+                    exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>';
+                  }
+                } else if (testPassed && gotFailedAssertions) {
+                  exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
+                } else {
+                  exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+                }
+              }
+            }
+            pre.innerHTML = '<code>' + exampleCode + '</code>';
+          } else {
+            test.countDefer++;
+            pre.style.background = "#ffc"; // yellow
+            if (test.nodes[i].func) {
+              exampleCode = test.formatCode(test.nodes[i].func, false);
+              exampleCode += '⚑ <b>(test disabled)</b>';
+              pre.innerHTML = exampleCode;
+            } else {
+              pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
+            }
+          }
+          var showExample = test.showExamples;
+          if (isFiltered) showExample = false;
+          if (ranTest && (!testPassed || gotFailedAssertions)) showExample = true;
           if (test.nodes[i].asyncTest) {
-            test.countPending++;
+            if (!showExample) pre.style.display = "none";
+            if (!showExample) caption.style.display = "none";
+            test.innerDiv.appendChild(caption);
+            test.innerDiv.appendChild(pre);
+          } else {
+            if (showExample) test.innerDiv.appendChild(caption);
+            if (showExample) test.innerDiv.appendChild(pre);
+          }
+          test.updateStats();
+          if (ranTest && !testPassed && test.scrollFirstError < 1) {
+            test.scrollFirstError = document.height - document.documentElement.clientHeight;
+          }
+          if (test.nodes[i].asyncTest) {
             test.nodes[i].errorThrown = false;
             var err = test.callTestCode(test.nodes[i], test.asyncCallback);
             if (test.wasThrown) {
-              process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: ' + err));
               test.countPending--;
               test.countFail++;
               test.nodes[i].errorThrown = true;
-            }
-          } else {
-            var test_Results = test.callTestCode(test.nodes[i]);
-            ranTest = true;
-            exampleCode += test.formatCode(test.nodes[i].func, true);
-            var test_Value = 'undefined';
-            if (typeof test_Results !== 'undefined' && test_Results != null)
-              test_Value = test_Results.toString();
-            var expected_Value = 'undefined';
-            if (typeof test.nodes[i].expectedValue !== 'undefined' && test.nodes[i].expectedValue != null)
-              expected_Value = test.nodes[i].expectedValue.toString();
-            // Check assertions
-            var gotFailedAssertions = false;
-            for (var j in test.assertions) {
-              if (!test.assertions[j]) gotFailedAssertions = true;
-            }
-            if (test_Value !== expected_Value || gotFailedAssertions) {
-              test.countFail++; // TODO if console is white this is invisible ink...
-              if (gotFailedAssertions) {
-                process.stdout.write('\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
-                  'ASSERTION(s) failed'));
-              } else {
-                process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
-                  'RETURNED: ' + test.expressionInfo(test_Results) +
-                    '\n' + indent +
-                    'EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '\n'));
-              }
-            } else {
-              test.countPass++;
-              process.stdout.write(colors.green('✓'));
+              exampleCode = test.formatCode(test.nodes[i].func, true);
+              exampleCode += '<b>✘ERROR THROWN: ' + err.stack + '\n';
+              pre.innerHTML = '<code>' + exampleCode + '</code>';
+              test.nodes[i].examplePre.style.display = "";
+              test.nodes[i].exampleCaption.style.display = "";
+              test.nodes[i].examplePre.style.background = "#fcc"; // red
+              test.updateStats();
             }
           }
-        } else {
-          test.countDefer++;
-          process.stdout.write(colors.yellow('⚑'));
-        }
-        break;
-      case 'e':
-        var testPassed = false;
-        var ranTest = false;
-        var caption = document.createElement("caption");
-        caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>';
-        var pre = document.createElement("pre");
-        test.nodes[i].exampleCaption = caption;
-        test.nodes[i].examplePre = pre;
-        pre.className = "prettyprint";
-        test.countTests++;
-        if (!test.nodes[i].inheritanceTest) test.countUnique++;
-        if (!test.nodes[i].deferedExample && test.nodes[i].func) {
-          test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
-            test.nodes[i].expectedValue != null) {
-            if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
-              test.nodes[i].asyncTest = true;
-          }
-          test.showWork = [];
-          test.assertions = [];
-          var exampleCode = '';
-          if (test.nodes[i].asyncTest) {
-            exampleCode += test.formatCode(test.nodes[i].func, true);
-            exampleCode += '⚑<b>pending async results</b>';
-            test.countPending++;
-            pre.style.background = "#ffa500"; // oranges
-          } else {
-            var test_Results = test.callTestCode(test.nodes[i], test.asyncCallback);
-            ranTest = true;
-            exampleCode += test.formatCode(test.nodes[i].func, true);
-            if (typeof test_Results == 'undefined') {
-              if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
-            } else if (test_Results === null) {
-              if (typeof test.nodes[i].expectedValue != 'undefined' && test.nodes[i].expectedValue === null) testPassed = true;
-            } else {
-              if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
-            }
-            // Check assertions
-            var gotFailedAssertions = false;
-            for (var j in test.assertions) {
-              if (!test.assertions[j]) gotFailedAssertions = true;
-            }
-            if (testPassed && !gotFailedAssertions) {
-              test.countPass++;
-              pre.style.background = "#cfc"; // green
-              if (test.wasThrown) {
-                exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
-              } else {
-                if (typeof test_Results == 'undefined') {
-                  exampleCode += '✓<b>returns without harming any kittens</b>'; // TODO This is wrong for async since tests are not really done yet!!!
-                } else {
-                  exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
-                }
-              }
-            } else {
-              test.countFail++;
-              pre.style.background = "#fcc"; // red
-              if (test.wasThrown) {
-                if (test.nodes[i].expectedValue === undefined) {
-                  exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
-                } else {
-                  exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>';
-                }
-              } else if (testPassed && gotFailedAssertions) {
-                exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
-              } else {
-                exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
-              }
-            }
-          }
-          pre.innerHTML = '<code>' + exampleCode + '</code>';
-        } else {
-          test.countDefer++;
-          pre.style.background = "#ffc"; // yellow
-          if (test.nodes[i].func) {
-            exampleCode = test.formatCode(test.nodes[i].func, false);
-            exampleCode += '⚑ <b>(test disabled)</b>';
-            pre.innerHTML = exampleCode;
-          } else {
-            pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
-          }
-        }
-        var showExample = test.showExamples;
-        if (isFiltered) showExample = false;
-        if (ranTest && (!testPassed || gotFailedAssertions)) showExample = true;
-        if (test.nodes[i].asyncTest) {
-          if (!showExample) pre.style.display = "none";
-          if (!showExample) caption.style.display = "none";
-          test.innerDiv.appendChild(caption);
-          test.innerDiv.appendChild(pre);
-        } else {
-          if (showExample) test.innerDiv.appendChild(caption);
-          if (showExample) test.innerDiv.appendChild(pre);
-        }
-        test.updateStats();
-        if (ranTest && !testPassed && test.scrollFirstError < 1) {
-          test.scrollFirstError = document.height - document.documentElement.clientHeight;
-        }
-        if (test.nodes[i].asyncTest) {
-          test.nodes[i].errorThrown = false;
-          var err = test.callTestCode(test.nodes[i], test.asyncCallback);
-          if (test.wasThrown) {
-            test.countPending--;
-            test.countFail++;
-            test.nodes[i].errorThrown = true;
-            exampleCode = test.formatCode(test.nodes[i].func, true);
-            exampleCode += '<b>✘ERROR THROWN: ' + err.stack + '\n';
-            pre.innerHTML = '<code>' + exampleCode + '</code>';
-            test.nodes[i].examplePre.style.display = "";
-            test.nodes[i].exampleCaption.style.display = "";
-            test.nodes[i].examplePre.style.background = "#fcc"; // red
-            test.updateStats();
-          }
-        }
-        break;
+          break;
+      }
     }
   }
   test.testsLaunched = true;
@@ -3640,7 +3668,9 @@ test.start = function (options) {
 test.heading = function (text, func) {
   this.levels[this.headingLevel]++;
   this.outlineLabel = '';
-  for (var i in this.levels) this.outlineLabel += this.levels[i].toString() + '.';
+  for (var i in this.levels)
+    if (this.levels.hasOwnProperty(i))
+      this.outlineLabel += this.levels[i].toString() + '.';
   this.nodes.push(new TestNode(T.inheritanceTest, 'h', this.headingLevel + 1, this.outlineLabel, text, func));
   if (func) {
     this.headingLevel++;
@@ -3724,8 +3754,9 @@ test.asyncCallback = function (node, test_Results) {
   // Check assertions
   var gotFailedAssertions = false;
   for (var j in test.assertions) {
-    if (!test.assertions[j])
-      gotFailedAssertions = true;
+    if (test.assertions.hasOwnProperty(j))
+      if (!test.assertions[j])
+        gotFailedAssertions = true;
   }
   //gotFailedAssertions = true; /////////////////////////////////// FORCE
   test.countPending--;
@@ -4059,8 +4090,8 @@ test.runnerAttribute = function () {
             // Loop thru each type
             var theGood = 0;
             var theBad = 0;
-            for (var i in myTypes)
-              for (var j in myValues) {
+            for (var i = 0; i < myTypes.length; i++)
+              for (var j = 0; j < myValues.length; j++) {
                 // for the value that works it won't throw error just create and to test
                 if (i == j) {
                   theGood++;
@@ -4141,14 +4172,14 @@ test.runnerAttribute = function () {
           'The value attribute is a Attribute.ModelID reference to the Model.');
 
         test.example('must construct with Attribute.ModelID in value', Error('error creating Attribute: value must be Attribute.ModelID'), function () {
-          new Attribute({name: 'Twiggy',type: 'Model'});
+          new Attribute({name: 'Twiggy', type: 'Model'});
         });
         test.example("modelType property set from constructor", 'Model', function () {
           return new Attribute(
             {name: 'Twiggy',
-            type: 'Model',
-            value: new Attribute.ModelID(new Model())
-          }).modelType;
+              type: 'Model',
+              value: new Attribute.ModelID(new Model())
+            }).modelType;
         });
       });
       test.heading('Group', function () {
@@ -4244,7 +4275,7 @@ test.runnerAttribute = function () {
             new Attribute('TODO', 'Date').coerce();
           });
           test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
-            new Attribute({name: 'Twiggy',type: 'Model',value: new Attribute.ModelID(new Model())}).coerce();
+            new Attribute({name: 'Twiggy', type: 'Model', value: new Attribute.ModelID(new Model())}).coerce();
           });
           test.shouldThrow(Error('coerce cannot determine appropriate value'), function () {
             new Attribute(myGroup.coerce());

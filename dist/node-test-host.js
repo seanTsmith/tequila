@@ -32,8 +32,10 @@ var Tequila = (function () {
       getInvalidProperties: function (args, allowedProperties) {
         var props = [];
         for (var property in args) {
-          if (!this.contains(allowedProperties, property)) {
-            props.push(property);
+          if (args.hasOwnProperty(property)) {
+            if (!this.contains(allowedProperties, property)) {
+              props.push(property);
+            }
           }
         }
         return props;
@@ -257,8 +259,10 @@ Attribute.prototype.getValidationErrors = function () {
     case 'Group':
       if (this.value == null || this.value instanceof Array) {
         for (var i in this.value) {
-          if (!(this.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
-          if (this.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+          if (this.value.hasOwnProperty(i)) {
+            if (!(this.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
+            if (this.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+          }
         }
       } else {
         errors.push('value must be null or an array');
@@ -273,8 +277,10 @@ Attribute.prototype.getValidationErrors = function () {
             errors.push('group property value must contain at least one Attribute');
           } else {
             for (var i in this.group.value) {
-              if (!(this.group.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
-              if (this.group.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+              if (this.group.value.hasOwnProperty(i)) {
+                if (!(this.group.value[i] instanceof Attribute)) errors.push('each element in group must be instance of Attribute');
+                if (this.group.value[i].getValidationErrors().length) errors.push('group contains invalid members');
+              }
             }
           }
         } else {
@@ -315,8 +321,9 @@ function Command(/* does this matter */ args) {
       if (!(this.contents instanceof Array)) throw new Error('contents must be array of menu items');
       if (!this.contents.length) throw new Error('contents must be array of menu items');
       for (i in this.contents) {
-        if (typeof this.contents[i] != 'string' && !(this.contents[i] instanceof Command))
-          throw new Error('contents must be array of menu items');
+        if (this.contents.hasOwnProperty(i))
+          if (typeof this.contents[i] != 'string' && !(this.contents[i] instanceof Command))
+            throw new Error('contents must be array of menu items');
       }
       break;
     case 'Presentation':
@@ -351,9 +358,10 @@ Command.prototype.onEvent = function (events, callback) {
   if (typeof callback != 'function') throw new Error('callback is required');
   // Check known Events
   for (var i in events) {
-    if (events[i] != '*')
-      if (!T.contains(T.getCommandEvents(), events[i]))
-        throw new Error('Unknown command event: ' + events[i]);
+    if (events.hasOwnProperty(i))
+      if (events[i] != '*')
+        if (!T.contains(T.getCommandEvents(), events[i]))
+          throw new Error('Unknown command event: ' + events[i]);
   }
   // All good add to chain
   this._eventListeners.push({events: events, callback: callback});
@@ -361,9 +369,11 @@ Command.prototype.onEvent = function (events, callback) {
 Command.prototype.emitEvent = function (event) {
   var i;
   for (i in this._eventListeners) {
-    var subscriber = this._eventListeners[i];
-    if ((subscriber.events.length && subscriber.events[0] === '*') || T.contains(subscriber.events, event)) {
-      subscriber.callback.call(this, event);
+    if (this._eventListeners.hasOwnProperty(i)) {
+      var subscriber = this._eventListeners[i];
+      if ((subscriber.events.length && subscriber.events[0] === '*') || T.contains(subscriber.events, event)) {
+        subscriber.callback.call(this, event);
+      }
     }
   }
   if (event == 'Completed') // if command complete release listeners
@@ -620,7 +630,8 @@ var Model = function (args) {
   args = args || {};
   if (args.attributes) {
     for (var i in args.attributes) {
-      this.attributes.push(args.attributes[i]);
+      if (args.attributes.hasOwnProperty(i))
+        this.attributes.push(args.attributes[i]);
     }
   }
   var unusedProperties = T.getInvalidProperties(args, ['attributes']);
@@ -634,8 +645,9 @@ Model.prototype.toString = function () {
   return "a " + this.modelType;
 };
 Model.prototype.copy = function (sourceModel) {
-  for (var i in this.attributes) {
-    this.attributes[i].value = sourceModel.attributes[i].value;
+  for (var i=0; i<this.attributes.length; i++) {
+    //if (args.attributes.hasOwnProperty(i))
+      this.attributes[i].value = sourceModel.attributes[i].value;
   }
 };
 Model.prototype.getValidationErrors = function () {
@@ -690,7 +702,9 @@ var Procedure = function (args) {
     throw new Error('error creating Procedure: multiple errors');
   if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
   // args ok, now copy to object and check for errors
-  for (i in args) this[i] = args[i];
+  for (i in args)
+    if (args.hasOwnProperty(i))
+      this[i] = args[i];
   badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
   if (badJooJoo) {
     if (badJooJoo.length > 1) throw new Error('error creating Procedure: multiple errors');
@@ -703,32 +717,35 @@ Procedure.prototype.getValidationErrors = function () {
   if (this.tasks && !(this.tasks instanceof Array)) return ['tasks is not an array'];
   var badJooJoo = [];
   for (i in this.tasks) {
-    var task = this.tasks[i];
-    unusedProperties = T.getInvalidProperties(task, ['label', 'command', 'requires', 'timeout']);
-    for (j = 0; j < unusedProperties.length; j++) badJooJoo.push('invalid task[' + i + '] property: ' + unusedProperties[j]);
-    if (typeof task.label != 'undefined' && typeof task.label != 'string')
-      badJooJoo.push('task[' + i + '].label must be string');
-    if (typeof task.command != 'undefined' && !(task.command instanceof Command))
-      badJooJoo.push('task[' + i + '].command must be a Command object');
-    // make sure requires valid if specified
-    if (!task.requires)
-      task.requires = -1; // default to
-    if (!(task.requires instanceof Array)) task.requires = [task.requires]; // coerce to array
-    for (j in task.requires) {
-      switch (typeof task.requires[j]) {
-        case 'string':
-          throw new Error('wtf string requires in task[' + i + ']');
-          break;
-        case 'number':
-          if (task.requires[j] >= this.tasks.length) throw new Error('missing task #' + task.requires[j] + ' for requires in task[' + i + ']');
-          if (task.requires[j] < -1) throw new Error('task #' + task.requires[j] + ' invalid requires in task[' + i + ']');
-          break;
-        default:
-          throw new Error('invalid type for requires in task[' + i + ']');
+    if (this.tasks.hasOwnProperty(i)) {
+      var task = this.tasks[i];
+      unusedProperties = T.getInvalidProperties(task, ['label', 'command', 'requires', 'timeout']);
+      for (j = 0; j < unusedProperties.length; j++) badJooJoo.push('invalid task[' + i + '] property: ' + unusedProperties[j]);
+      if (typeof task.label != 'undefined' && typeof task.label != 'string')
+        badJooJoo.push('task[' + i + '].label must be string');
+      if (typeof task.command != 'undefined' && !(task.command instanceof Command))
+        badJooJoo.push('task[' + i + '].command must be a Command object');
+      // make sure requires valid if specified
+      if (!task.requires)
+        task.requires = -1; // default to
+      if (!(task.requires instanceof Array)) task.requires = [task.requires]; // coerce to array
+      for (j in task.requires) {
+        if (task.requires.hasOwnProperty(j))
+          switch (typeof task.requires[j]) {
+            case 'string':
+              throw new Error('wtf string requires in task[' + i + ']');
+              break;
+            case 'number':
+              if (task.requires[j] >= this.tasks.length) throw new Error('missing task #' + task.requires[j] + ' for requires in task[' + i + ']');
+              if (task.requires[j] < -1) throw new Error('task #' + task.requires[j] + ' invalid requires in task[' + i + ']');
+              break;
+            default:
+              throw new Error('invalid type for requires in task[' + i + ']');
+          }
       }
     }
   }
-return badJooJoo.length ? badJooJoo : null;
+  return badJooJoo.length ? badJooJoo : null;
 };
 ;
 /**
@@ -1277,9 +1294,11 @@ RemoteStore.prototype.putModel = function (model, callBack) {
       var c = msg.contents;
       model.attributes = [];
       for (var a in c.attributes) {
-        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
-        attrib.value = c.attributes[a].value;
-        model.attributes.push(attrib);
+        if (c.attributes.hasOwnProperty(a)) {
+          var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
+          attrib.value = c.attributes[a].value;
+          model.attributes.push(attrib);
+        }
       }
       if (typeof c == 'string')
         callBack(model, c);

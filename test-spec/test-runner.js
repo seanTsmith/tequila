@@ -202,242 +202,246 @@ test.renderHead = function (isBrowser) {
 };
 test.renderDetail = function (isBrowser) {
   for (i in test.nodes) {
-    // Check filters
-    var filterSection = (test.filterSection + '.');
-    if (filterSection.indexOf('..') >= 0) filterSection = (test.filterSection);
-    var curSection = test.nodes[i].levelText;
-    var testNodeType = test.nodes[i].nodeType;
-    var dotCount = curSection.match(/\./g) ? curSection.match(/\./g).length : 0;
-    var isInScope = curSection.indexOf(filterSection) == 0;
-    var isFiltered = false; // If true will not be rendered
-    switch (test.filterLevel) {
-      case 'TOC':
-        test.filterLevel = 'TOC';
-        if (!isInScope && dotCount > 2) isFiltered = true;
-        break;
-      case 'Inf':
-        test.filterLevel = 'Inf'; // TOC with paragraph text
-        if (!isInScope && dotCount > 2) isFiltered = true;
-        break;
-    }
-    if (test.filterSection && curSection.indexOf(filterSection) != 0) {
-      isFiltered = true;
-      if (testNodeType != 'e' && filterSection.indexOf(curSection) == 0) {
-        isFiltered = false;
+    if (test.nodes.hasOwnProperty(i)) {
+      // Check filters
+      var filterSection = (test.filterSection + '.');
+      if (filterSection.indexOf('..') >= 0) filterSection = (test.filterSection);
+      var curSection = test.nodes[i].levelText;
+      var testNodeType = test.nodes[i].nodeType;
+      var dotCount = curSection.match(/\./g) ? curSection.match(/\./g).length : 0;
+      var isInScope = curSection.indexOf(filterSection) == 0;
+      var isFiltered = false; // If true will not be rendered
+      switch (test.filterLevel) {
+        case 'TOC':
+          test.filterLevel = 'TOC';
+          if (!isInScope && dotCount > 2) isFiltered = true;
+          break;
+        case 'Inf':
+          test.filterLevel = 'Inf'; // TOC with paragraph text
+          if (!isInScope && dotCount > 2) isFiltered = true;
+          break;
       }
-    }
-    if (test.nodes[i].inheritanceTest) isFiltered = true;
+      if (test.filterSection && curSection.indexOf(filterSection) != 0) {
+        isFiltered = true;
+        if (testNodeType != 'e' && filterSection.indexOf(curSection) == 0) {
+          isFiltered = false;
+        }
+      }
+      if (test.nodes[i].inheritanceTest) isFiltered = true;
 //    console.log((isInScope?'SCOPE ':'scope ')+testNodeType+(isFiltered?' FILTER ':' filter ')+filterSection+' '+curSection);
-    if (!isBrowser) {
-      if (testNodeType == 'e') {
-        testNodeType = '.';
-      } else {
-        testNodeType = '';
+      if (!isBrowser) {
+        if (testNodeType == 'e') {
+          testNodeType = '.';
+        } else {
+          testNodeType = '';
+        }
       }
-    }
-    switch (testNodeType) {
-      case 'h':
-        if (!isFiltered) {
-          var p = document.createElement("h" + test.nodes[i].level);
-          var lt = test.nodes[i].levelText;
-          if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
+      switch (testNodeType) {
+        case 'h':
+          if (!isFiltered) {
+            var p = document.createElement("h" + test.nodes[i].level);
+            var lt = test.nodes[i].levelText;
+            if (lt.length > 2) lt = lt.substring(0, lt.length - 1);
 //          if (dots < 2)
 //            p.innerHTML = test.nodes[i].text;
 //          else
-          p.innerHTML = lt + ' ' + test.nodes[i].text;
-          p.onclick = function () {
-            var words = this.innerText.split(' ');
-            test.filterSection = '';
-            if (words.length > 0 && parseInt(words[0]) > 0)
-              test.filterSection = words[0];
-            test.refresh();
-          };
-          test.innerDiv.appendChild(p);
-        }
-        break;
-      case 'p':
-        if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
-          var p = document.createElement("p");
-          p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
-          test.innerDiv.appendChild(p);
-        }
-        break;
-      case '.':
-        test.countTests++;
-        if (!test.nodes[i].deferedExample && test.nodes[i].func) {
-          test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
-            test.nodes[i].expectedValue != null) {
-            if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
-              test.nodes[i].asyncTest = true;
+            p.innerHTML = lt + ' ' + test.nodes[i].text;
+            p.onclick = function () {
+              var words = this.innerText.split(' ');
+              test.filterSection = '';
+              if (words.length > 0 && parseInt(words[0]) > 0)
+                test.filterSection = words[0];
+              test.refresh();
+            };
+            test.innerDiv.appendChild(p);
           }
-          test.showWork = [];
-          test.assertions = [];
-          var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
-          var indent = '';
-          for (j = 0; j < ref.length; j++)
-            indent += ' ';
+          break;
+        case 'p':
+          if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
+            var p = document.createElement("p");
+            p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
+            test.innerDiv.appendChild(p);
+          }
+          break;
+        case '.':
+          test.countTests++;
+          if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+            test.nodes[i].asyncTest = false;
+            if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+              test.nodes[i].expectedValue != null) {
+              if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
+                test.nodes[i].asyncTest = true;
+            }
+            test.showWork = [];
+            test.assertions = [];
+            var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+            var indent = '';
+            for (j = 0; j < ref.length; j++)
+              indent += ' ';
+            if (test.nodes[i].asyncTest) {
+              test.countPending++;
+              test.nodes[i].errorThrown = false;
+              var err = test.callTestCode(test.nodes[i], test.asyncCallback);
+              if (test.wasThrown) {
+                process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: ' + err));
+                test.countPending--;
+                test.countFail++;
+                test.nodes[i].errorThrown = true;
+              }
+            } else {
+              var test_Results = test.callTestCode(test.nodes[i]);
+              ranTest = true;
+              exampleCode += test.formatCode(test.nodes[i].func, true);
+              var test_Value = 'undefined';
+              if (typeof test_Results !== 'undefined' && test_Results != null)
+                test_Value = test_Results.toString();
+              var expected_Value = 'undefined';
+              if (typeof test.nodes[i].expectedValue !== 'undefined' && test.nodes[i].expectedValue != null)
+                expected_Value = test.nodes[i].expectedValue.toString();
+              // Check assertions
+              var gotFailedAssertions = false;
+              for (var j in test.assertions) {
+                if (test.assertions.hasOwnProperty(i))
+                  if (!test.assertions[j]) gotFailedAssertions = true;
+              }
+              if (test_Value !== expected_Value || gotFailedAssertions) {
+                test.countFail++; // TODO if console is white this is invisible ink...
+                if (gotFailedAssertions) {
+                  process.stdout.write('\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
+                    'ASSERTION(s) failed'));
+                } else {
+                  process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
+                    'RETURNED: ' + test.expressionInfo(test_Results) +
+                      '\n' + indent +
+                      'EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '\n'));
+                }
+              } else {
+                test.countPass++;
+                process.stdout.write(colors.green('✓'));
+              }
+            }
+          } else {
+            test.countDefer++;
+            process.stdout.write(colors.yellow('⚑'));
+          }
+          break;
+        case 'e':
+          var testPassed = false;
+          var ranTest = false;
+          var caption = document.createElement("caption");
+          caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>';
+          var pre = document.createElement("pre");
+          test.nodes[i].exampleCaption = caption;
+          test.nodes[i].examplePre = pre;
+          pre.className = "prettyprint";
+          test.countTests++;
+          if (!test.nodes[i].inheritanceTest) test.countUnique++;
+          if (!test.nodes[i].deferedExample && test.nodes[i].func) {
+            test.nodes[i].asyncTest = false;
+            if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
+              test.nodes[i].expectedValue != null) {
+              if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
+                test.nodes[i].asyncTest = true;
+            }
+            test.showWork = [];
+            test.assertions = [];
+            var exampleCode = '';
+            if (test.nodes[i].asyncTest) {
+              exampleCode += test.formatCode(test.nodes[i].func, true);
+              exampleCode += '⚑<b>pending async results</b>';
+              test.countPending++;
+              pre.style.background = "#ffa500"; // oranges
+            } else {
+              var test_Results = test.callTestCode(test.nodes[i], test.asyncCallback);
+              ranTest = true;
+              exampleCode += test.formatCode(test.nodes[i].func, true);
+              if (typeof test_Results == 'undefined') {
+                if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
+              } else if (test_Results === null) {
+                if (typeof test.nodes[i].expectedValue != 'undefined' && test.nodes[i].expectedValue === null) testPassed = true;
+              } else {
+                if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
+              }
+              // Check assertions
+              var gotFailedAssertions = false;
+              for (var j in test.assertions) {
+                if (test.assertions.hasOwnProperty(i))
+                  if (!test.assertions[j]) gotFailedAssertions = true;
+              }
+              if (testPassed && !gotFailedAssertions) {
+                test.countPass++;
+                pre.style.background = "#cfc"; // green
+                if (test.wasThrown) {
+                  exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
+                } else {
+                  if (typeof test_Results == 'undefined') {
+                    exampleCode += '✓<b>returns without harming any kittens</b>'; // TODO This is wrong for async since tests are not really done yet!!!
+                  } else {
+                    exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
+                  }
+                }
+              } else {
+                test.countFail++;
+                pre.style.background = "#fcc"; // red
+                if (test.wasThrown) {
+                  if (test.nodes[i].expectedValue === undefined) {
+                    exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
+                  } else {
+                    exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>';
+                  }
+                } else if (testPassed && gotFailedAssertions) {
+                  exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
+                } else {
+                  exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
+                }
+              }
+            }
+            pre.innerHTML = '<code>' + exampleCode + '</code>';
+          } else {
+            test.countDefer++;
+            pre.style.background = "#ffc"; // yellow
+            if (test.nodes[i].func) {
+              exampleCode = test.formatCode(test.nodes[i].func, false);
+              exampleCode += '⚑ <b>(test disabled)</b>';
+              pre.innerHTML = exampleCode;
+            } else {
+              pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
+            }
+          }
+          var showExample = test.showExamples;
+          if (isFiltered) showExample = false;
+          if (ranTest && (!testPassed || gotFailedAssertions)) showExample = true;
           if (test.nodes[i].asyncTest) {
-            test.countPending++;
+            if (!showExample) pre.style.display = "none";
+            if (!showExample) caption.style.display = "none";
+            test.innerDiv.appendChild(caption);
+            test.innerDiv.appendChild(pre);
+          } else {
+            if (showExample) test.innerDiv.appendChild(caption);
+            if (showExample) test.innerDiv.appendChild(pre);
+          }
+          test.updateStats();
+          if (ranTest && !testPassed && test.scrollFirstError < 1) {
+            test.scrollFirstError = document.height - document.documentElement.clientHeight;
+          }
+          if (test.nodes[i].asyncTest) {
             test.nodes[i].errorThrown = false;
             var err = test.callTestCode(test.nodes[i], test.asyncCallback);
             if (test.wasThrown) {
-              process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: ' + err));
               test.countPending--;
               test.countFail++;
               test.nodes[i].errorThrown = true;
-            }
-          } else {
-            var test_Results = test.callTestCode(test.nodes[i]);
-            ranTest = true;
-            exampleCode += test.formatCode(test.nodes[i].func, true);
-            var test_Value = 'undefined';
-            if (typeof test_Results !== 'undefined' && test_Results != null)
-              test_Value = test_Results.toString();
-            var expected_Value = 'undefined';
-            if (typeof test.nodes[i].expectedValue !== 'undefined' && test.nodes[i].expectedValue != null)
-              expected_Value = test.nodes[i].expectedValue.toString();
-            // Check assertions
-            var gotFailedAssertions = false;
-            for (var j in test.assertions) {
-              if (!test.assertions[j]) gotFailedAssertions = true;
-            }
-            if (test_Value !== expected_Value || gotFailedAssertions) {
-              test.countFail++; // TODO if console is white this is invisible ink...
-              if (gotFailedAssertions) {
-                process.stdout.write('\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
-                  'ASSERTION(s) failed'));
-              } else {
-                process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
-                  'RETURNED: ' + test.expressionInfo(test_Results) +
-                    '\n' + indent +
-                    'EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '\n'));
-              }
-            } else {
-              test.countPass++;
-              process.stdout.write(colors.green('✓'));
+              exampleCode = test.formatCode(test.nodes[i].func, true);
+              exampleCode += '<b>✘ERROR THROWN: ' + err.stack + '\n';
+              pre.innerHTML = '<code>' + exampleCode + '</code>';
+              test.nodes[i].examplePre.style.display = "";
+              test.nodes[i].exampleCaption.style.display = "";
+              test.nodes[i].examplePre.style.background = "#fcc"; // red
+              test.updateStats();
             }
           }
-        } else {
-          test.countDefer++;
-          process.stdout.write(colors.yellow('⚑'));
-        }
-        break;
-      case 'e':
-        var testPassed = false;
-        var ranTest = false;
-        var caption = document.createElement("caption");
-        caption.innerHTML = '<caption>' + 'EXAMPLE #' + test.nodes[i].exampleNumber + ' ' + test.nodes[i].text + '</caption>';
-        var pre = document.createElement("pre");
-        test.nodes[i].exampleCaption = caption;
-        test.nodes[i].examplePre = pre;
-        pre.className = "prettyprint";
-        test.countTests++;
-        if (!test.nodes[i].inheritanceTest) test.countUnique++;
-        if (!test.nodes[i].deferedExample && test.nodes[i].func) {
-          test.nodes[i].asyncTest = false;
-          if (typeof (test.nodes[i].expectedValue) != 'undefined' &&
-            test.nodes[i].expectedValue != null) {
-            if (test.nodes[i].expectedValue.toString().indexOf('test.asyncResponse') == 0)
-              test.nodes[i].asyncTest = true;
-          }
-          test.showWork = [];
-          test.assertions = [];
-          var exampleCode = '';
-          if (test.nodes[i].asyncTest) {
-            exampleCode += test.formatCode(test.nodes[i].func, true);
-            exampleCode += '⚑<b>pending async results</b>';
-            test.countPending++;
-            pre.style.background = "#ffa500"; // oranges
-          } else {
-            var test_Results = test.callTestCode(test.nodes[i], test.asyncCallback);
-            ranTest = true;
-            exampleCode += test.formatCode(test.nodes[i].func, true);
-            if (typeof test_Results == 'undefined') {
-              if (typeof test.nodes[i].expectedValue == 'undefined') testPassed = true;
-            } else if (test_Results === null) {
-              if (typeof test.nodes[i].expectedValue != 'undefined' && test.nodes[i].expectedValue === null) testPassed = true;
-            } else {
-              if (typeof test.nodes[i].expectedValue != 'undefined' && test_Results.toString() === test.nodes[i].expectedValue.toString()) testPassed = true;
-            }
-            // Check assertions
-            var gotFailedAssertions = false;
-            for (var j in test.assertions) {
-              if (!test.assertions[j]) gotFailedAssertions = true;
-            }
-            if (testPassed && !gotFailedAssertions) {
-              test.countPass++;
-              pre.style.background = "#cfc"; // green
-              if (test.wasThrown) {
-                exampleCode += '✓<b>error thrown as expected (' + test_Results + ')</b>'; // ✘
-              } else {
-                if (typeof test_Results == 'undefined') {
-                  exampleCode += '✓<b>returns without harming any kittens</b>'; // TODO This is wrong for async since tests are not really done yet!!!
-                } else {
-                  exampleCode += '✓<b>returns expected results (' + test.expressionInfo(test_Results) + ')</b>'; // ✘
-                }
-              }
-            } else {
-              test.countFail++;
-              pre.style.background = "#fcc"; // red
-              if (test.wasThrown) {
-                if (test.nodes[i].expectedValue === undefined) {
-                  exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n';
-                } else {
-                  exampleCode += '<b>✘ERROR THROWN: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>';
-                }
-              } else if (testPassed && gotFailedAssertions) {
-                exampleCode += '✘<b>ASSERTION(S) FAILED</b>'; // ✘
-              } else {
-                exampleCode += '✘<b>RETURNED: ' + test.expressionInfo(test_Results) + '\n  EXPECTED: ' + test.expressionInfo(test.nodes[i].expectedValue) + '</b>'; // ✘
-              }
-            }
-          }
-          pre.innerHTML = '<code>' + exampleCode + '</code>';
-        } else {
-          test.countDefer++;
-          pre.style.background = "#ffc"; // yellow
-          if (test.nodes[i].func) {
-            exampleCode = test.formatCode(test.nodes[i].func, false);
-            exampleCode += '⚑ <b>(test disabled)</b>';
-            pre.innerHTML = exampleCode;
-          } else {
-            pre.innerHTML = '<code> TODO: write some code that rocks.</code>';
-          }
-        }
-        var showExample = test.showExamples;
-        if (isFiltered) showExample = false;
-        if (ranTest && (!testPassed || gotFailedAssertions)) showExample = true;
-        if (test.nodes[i].asyncTest) {
-          if (!showExample) pre.style.display = "none";
-          if (!showExample) caption.style.display = "none";
-          test.innerDiv.appendChild(caption);
-          test.innerDiv.appendChild(pre);
-        } else {
-          if (showExample) test.innerDiv.appendChild(caption);
-          if (showExample) test.innerDiv.appendChild(pre);
-        }
-        test.updateStats();
-        if (ranTest && !testPassed && test.scrollFirstError < 1) {
-          test.scrollFirstError = document.height - document.documentElement.clientHeight;
-        }
-        if (test.nodes[i].asyncTest) {
-          test.nodes[i].errorThrown = false;
-          var err = test.callTestCode(test.nodes[i], test.asyncCallback);
-          if (test.wasThrown) {
-            test.countPending--;
-            test.countFail++;
-            test.nodes[i].errorThrown = true;
-            exampleCode = test.formatCode(test.nodes[i].func, true);
-            exampleCode += '<b>✘ERROR THROWN: ' + err.stack + '\n';
-            pre.innerHTML = '<code>' + exampleCode + '</code>';
-            test.nodes[i].examplePre.style.display = "";
-            test.nodes[i].exampleCaption.style.display = "";
-            test.nodes[i].examplePre.style.background = "#fcc"; // red
-            test.updateStats();
-          }
-        }
-        break;
+          break;
+      }
     }
   }
   test.testsLaunched = true;
@@ -464,7 +468,9 @@ test.start = function (options) {
 test.heading = function (text, func) {
   this.levels[this.headingLevel]++;
   this.outlineLabel = '';
-  for (var i in this.levels) this.outlineLabel += this.levels[i].toString() + '.';
+  for (var i in this.levels)
+    if (this.levels.hasOwnProperty(i))
+      this.outlineLabel += this.levels[i].toString() + '.';
   this.nodes.push(new TestNode(T.inheritanceTest, 'h', this.headingLevel + 1, this.outlineLabel, text, func));
   if (func) {
     this.headingLevel++;
@@ -548,8 +554,9 @@ test.asyncCallback = function (node, test_Results) {
   // Check assertions
   var gotFailedAssertions = false;
   for (var j in test.assertions) {
-    if (!test.assertions[j])
-      gotFailedAssertions = true;
+    if (test.assertions.hasOwnProperty(j))
+      if (!test.assertions[j])
+        gotFailedAssertions = true;
   }
   //gotFailedAssertions = true; /////////////////////////////////// FORCE
   test.countPending--;
