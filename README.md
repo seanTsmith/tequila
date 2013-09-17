@@ -15,7 +15,7 @@ TODO DOUG:
 
 From PCM experience:
 - Make ID fields stored as ObjectIDs in mongo
-
+- make a prettyprint function for model
 App
 - Run (interface, callback)
     callback invoked when app terminates

@@ -2727,9 +2727,11 @@ RemoteStore.prototype.getModel = function (model, callBack) {
       var c = msg.contents;
       model.attributes = [];
       for (var a in c.attributes) {
-        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
-        attrib.value = c.attributes[a].value;
-        model.attributes.push(attrib);
+        if (c.attributes.hasOwnProperty(a)) {
+          var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
+          attrib.value = c.attributes[a].value;
+          model.attributes.push(attrib);
+        }
       }
       if (typeof c == 'string')
         callBack(model, c);
@@ -3086,7 +3088,12 @@ MongoStore.prototype.getModel = function (model, callBack) {
   var store = this;
   var a;
   var id = model.attributes[0].value;
-  id = mongo.ObjectID.createFromHexString(id);
+  try {
+    id = mongo.ObjectID.createFromHexString(id);
+  } catch (e) {
+    console.log('getModel createFromHexString error: ' + e);
+    callBack(model, e);
+  }
   store.mongoDatabase.collection(model.modelType, function (err, collection) {
     if (err) {
       console.log('getModel collection error: ' + err);
