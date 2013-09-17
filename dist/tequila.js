@@ -495,7 +495,7 @@ Interface.prototype.canMockResponses = function () {
 var List = function (model) {
   if (false === (this instanceof List)) throw new Error('new operator required');
   if (false === (model instanceof Model)) throw new Error('argument required: model');
-  this.model = model;
+  this.model = model; // todo make unit test for this
   this._items = [];
   this._itemIndex = -1;
 };
@@ -675,6 +675,12 @@ Model.prototype.get = function(attribute) {
   for (var i = 0; i < this.attributes.length; i++) {
     if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase())
       return this.attributes[i].value;
+  }
+};
+Model.prototype.getAttributeType = function(attribute) {
+  for (var i = 0; i < this.attributes.length; i++) {
+    if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase())
+      return this.attributes[i].type;
   }
 };
 Model.prototype.set = function(attribute,value) {
@@ -1000,10 +1006,9 @@ function Workspace(args) {
   args.attributes.push(new Attribute({name: 'user', type: 'Model', value: userModelID}));
   args.attributes.push(new Attribute({name: 'deltas', type: 'Object', value: {}}));
 
-  var delta
+//  var delta
 //  this.deltas = [];
 
-+
   Model.call(this, args);
   this.modelType = "Workspace";
 }

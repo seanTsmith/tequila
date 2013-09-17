@@ -495,7 +495,7 @@ Interface.prototype.canMockResponses = function () {
 var List = function (model) {
   if (false === (this instanceof List)) throw new Error('new operator required');
   if (false === (model instanceof Model)) throw new Error('argument required: model');
-  this.model = model;
+  this.model = model; // todo make unit test for this
   this._items = [];
   this._itemIndex = -1;
 };
@@ -675,6 +675,12 @@ Model.prototype.get = function(attribute) {
   for (var i = 0; i < this.attributes.length; i++) {
     if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase())
       return this.attributes[i].value;
+  }
+};
+Model.prototype.getAttributeType = function(attribute) {
+  for (var i = 0; i < this.attributes.length; i++) {
+    if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase())
+      return this.attributes[i].type;
   }
 };
 Model.prototype.set = function(attribute,value) {
@@ -1000,10 +1006,9 @@ function Workspace(args) {
   args.attributes.push(new Attribute({name: 'user', type: 'Model', value: userModelID}));
   args.attributes.push(new Attribute({name: 'deltas', type: 'Object', value: {}}));
 
-  var delta
+//  var delta
 //  this.deltas = [];
 
-+
   Model.call(this, args);
   this.modelType = "Workspace";
 }
@@ -1628,10 +1633,15 @@ MongoStore.prototype.putModel = function (model, callBack) {
         if (!model.attributes[a].value)
           newModel = true;
       } else {
-        modelData[model.attributes[a].name] = model.attributes[a].value;
+        if (model.attributes[a].type == 'ID') {
+          modelData[model.attributes[a].name] = mongo.ObjectID.createFromHexString(model.attributes[a].value);
+        } else {
+          modelData[model.attributes[a].name] = model.attributes[a].value;
+        }
       }
     }
     if (newModel) {
+//      console.log('collection.insert (modelData): ' + JSON.stringify(modelData));
       collection.insert(modelData, {safe: true}, function (err, result) {
         if (err) {
           console.log('putModel insert error: ' + err);
@@ -1639,11 +1649,12 @@ MongoStore.prototype.putModel = function (model, callBack) {
         } else {
           // Get resulting data
           for (a in model.attributes) {
-            if (model.attributes[a].name == 'id') {
+            if (model.attributes[a].name == 'id')
               model.attributes[a].value = modelData['_id'].toString();
-            } else {
+            else if (model.attributes[a].type == 'ID')
+              model.attributes[a].value = (modelData[model.attributes[a].name]).toString();
+            else
               model.attributes[a].value = modelData[model.attributes[a].name];
-            }
           }
           callBack(model);
         }
@@ -1693,6 +1704,8 @@ MongoStore.prototype.getModel = function (model, callBack) {
         for (a in model.attributes) {
           if (model.attributes[a].name == 'id')
             model.attributes[a].value = item['_id'].toString();
+          else if (model.attributes[a].type == 'ID')
+            model.attributes[a].value = (item[model.attributes[a].name]).toString();
           else
             model.attributes[a].value = item[model.attributes[a].name];
         }
@@ -1743,6 +1756,22 @@ MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
   if (typeof callBack != "function") throw new Error('callback required');
   var store = this;
   list.clear();
+
+  console.log('getList (list): ' + JSON.stringify(list));
+  console.log('getList (filter): ' + JSON.stringify(filter));
+
+  // Convert list filter to mongo flavor
+  var mongoFilter = {};
+  for (var prop in filter) {
+    if (filter.hasOwnProperty(prop)) {
+//      console.log('prop = ' + prop);
+      if (list.model.getAttributeType(prop) == 'ID')
+        mongoFilter[prop] = mongo.ObjectID.createFromHexString(filter[prop]);
+      else
+        mongoFilter[prop] = filter[prop];
+    }
+  }
+
   store.mongoDatabase.collection(list.model.modelType, function (err, collection) {
     if (err) {
       console.log('getList collection error: ' + err);
@@ -1750,9 +1779,9 @@ MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
       return;
     }
     if (order) {
-      collection.find({ query: filter, $orderby: order}, findCallback);
+      collection.find({ query: mongoFilter, $orderby: order}, findCallback);
     } else {
-      collection.find(filter, findCallback);
+      collection.find(mongoFilter, findCallback);
     }
     function findCallback(err, cursor) {
       if (err) {

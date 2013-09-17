@@ -13,6 +13,9 @@ TODO DOUG:
 
 ==========================
 
+From PCM experience:
+- Make ID fields stored as ObjectIDs in mongo
+
 App
 - Run (interface, callback)
     callback invoked when app terminates
