@@ -16,6 +16,9 @@ TODO DOUG:
 From PCM experience:
 - Make ID fields stored as ObjectIDs in mongo
 - make a prettyprint function for model
+- getList should do a list.firstItem();
+- model.set({name:value}) should be like model.set('name',value})
+
 App
 - Run (interface, callback)
     callback invoked when app terminates
