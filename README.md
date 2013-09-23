@@ -10,11 +10,10 @@ TODO DOUG:
 - implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
 - test with /test-spec/integration/test-store-integration.js
 - thought you had phonegap app for tests - test localstore with it
-
 ==========================
 
 From PCM experience:
-- Make ID fields stored as ObjectIDs in mongo
+(done?) - Make ID fields stored as ObjectIDs in mongo
 - make a prettyprint function for model
 - getList should do a list.firstItem();
 - model.set({name:value}) should be like model.set('name',value})

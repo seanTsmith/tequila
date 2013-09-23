@@ -7,7 +7,7 @@ test.runnerCommandIntegration = function () {
     test.paragraph('test each command type');
 
     // Stub
-    test.example('Stub', Error('command not implemented'), function () {
+    test.example('Stub', Error('command type Stub not implemented'), function () {
       var cmd = new Command({
         name: 'stubCommand',
         description: 'stub command test',
@@ -18,7 +18,7 @@ test.runnerCommandIntegration = function () {
     });
 
     // Menu
-    test.example('Menu', Error('command not implemented'), function () {
+    test.example('Menu', Error('command type Menu not implemented'), function () {
       var cmd = new Command({
         name: 'menuCommand',
         description: 'menu command test',
@@ -30,7 +30,7 @@ test.runnerCommandIntegration = function () {
     });
 
     // Presentation
-    test.example('Presentation', Error('command not implemented'), function () {
+    test.example('Presentation', Error('command type Presentation not implemented'), function () {
       var cmd = new Command({
         name: 'presentationCommand',
         description: 'presentation command test',
@@ -100,7 +100,7 @@ test.runnerCommandIntegration = function () {
     });
 
     // Procedure
-    test.example('Procedure', Error('command not implemented'), function () {
+    test.xexample('Procedure', Error('command type Procedure not implemented'), function () {
       var cmd = new Command({
         name: 'procedureCommand',
         description: 'procedure command test',
