@@ -1702,6 +1702,10 @@ Attribute.prototype.getValidationErrors = function () {
 // Command Constructor
 function Command(/* does this matter */ args) {
   if (false === (this instanceof Command)) throw new Error('new operator required');
+  if (typeof args == 'function') { // shorthand for function command
+    var theFunc = args;
+    args = {type: 'Function', contents: theFunc};
+  }
   args = args || {};
   var i;
   var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'type', 'contents', 'scope', 'timeout', 'bucket']);
@@ -1781,13 +1785,18 @@ Command.prototype.emitEvent = function (event) {
     this._eventListeners = [];
 };
 Command.prototype.execute = function () {
-  if (!T.contains(['Function'], this.type)) throw new Error('command not implemented');
+  if (!this.type) throw new Error('command not implemented');
+  if (!T.contains(['Function', 'Procedure'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
   var self = this;
   this.emitEvent('BeforeExecute');
   try {
     switch (this.type) {
       case 'Function':
-        setTimeout(callFunc, 0); // async execution delay till function returns
+        this.status = 0;
+        setTimeout(callFunc, 0);
+        break;
+      case 'Procedure':
+        setTimeout(ProcedureExecute, 0);
         break;
       default:
         throw new Error('command not implemented');
@@ -1801,7 +1810,7 @@ Command.prototype.execute = function () {
   this.emitEvent('AfterExecute');
   function callFunc() {
     try {
-      self.contents(); // give function this context to command object (self)
+      self.contents.call(self, {}); // give function this context to command object (self)
     } catch (e) {
       self.error = e;
       self.emitEvent('Error');
@@ -1809,17 +1818,85 @@ Command.prototype.execute = function () {
       self.status = -1;
     }
   }
+
+  function ProcedureExecute() {
+    self.status = 0;
+    var tasks = self.contents.tasks;
+    for (var t = 0; t < tasks.length; t++) {
+      // shorthand for function command gets coerced into longhand
+      if (typeof tasks[t] == 'function') {
+        var theFunc = tasks[t];
+        tasks[t] = {requires:[-1], command: new Command({type: 'Function', contents: theFunc})};
+      }
+      // Initialize if not done
+      if (!tasks[t].command._parentProcedure) {
+        tasks[t].command._taskIndex = t;
+        tasks[t].command._parentProcedure = self;
+        tasks[t].command.onEvent('*', ProcedureEvents);
+      }
+      // Execute if it is time
+      var canExecute = true;
+      if (typeof (tasks[t].command.status) == 'undefined') {
+        for (var r in tasks[t].requires) {
+          if (typeof tasks[t].requires[r] == 'string') { // label of task needed to complete
+            for (var l = 0; l < tasks.length; l++) {
+              if (tasks[l].label == tasks[t].requires[r])
+                if (!tasks[l].command.status || tasks[l].command.status <= 0) {
+                  canExecute = false;
+                }
+            }
+          }
+          if (typeof tasks[t].requires[r] == 'number') {
+            if (tasks[t].requires[r] == -1) { // previous task needed to complete?
+              if (t != '0') { // first one always runs
+                if (!tasks[t-1].command.status || tasks[t - 1].command.status <= 0) {
+                  canExecute = false;
+                }
+              }
+            } else {
+              var rq = tasks[t].requires[r];
+              if (!tasks[rq].command.status || tasks[rq].command.status <= 0) {
+                canExecute = false;
+              }
+            }
+          }
+        }
+        if (canExecute) {
+          tasks[t].command.execute();
+        }
+      }
+    }
+  }
+  function ProcedureEvents(event) {
+    console.log('ProcedureEvents: ' + event);
+    var tasks = self.contents.tasks;
+    var allTasksDone = true; // until proved wrong ...
+    switch (event) {
+      case 'Completed':
+        for (var t in tasks) {
+          if (tasks.hasOwnProperty(t)) {
+            if (!tasks[t].command.status || tasks[t].command.status == 0) {
+              allTasksDone = false;
+            }
+          }
+        }
+        if (allTasksDone)
+          self.complete(); // todo when all run
+        else
+          ProcedureExecute();
+        break;
+    }
+  }
 };
 Command.prototype.abort = function () {
   this.emitEvent('Aborted');
-  this.emitEvent('Completed');
   this.status = -1;
+  this.emitEvent('Completed');
 };
 Command.prototype.complete = function () {
-  this.emitEvent('Completed');
   this.status = 1;
+  this.emitEvent('Completed');
 };
-
 ;
 /**
  * tequila
@@ -2119,7 +2196,7 @@ var Procedure = function (args) {
   }
 };
 Procedure.prototype.getValidationErrors = function () {
-  var i, j;
+  var i, j, k;
   var unusedProperties;
   if (this.tasks && !(this.tasks instanceof Array)) return ['tasks is not an array'];
   var badJooJoo = [];
@@ -2133,14 +2210,20 @@ Procedure.prototype.getValidationErrors = function () {
       if (typeof task.command != 'undefined' && !(task.command instanceof Command))
         badJooJoo.push('task[' + i + '].command must be a Command object');
       // make sure requires valid if specified
-      if (!task.requires)
+      if (typeof task.requires == 'undefined')
         task.requires = -1; // default to
       if (!(task.requires instanceof Array)) task.requires = [task.requires]; // coerce to array
       for (j in task.requires) {
-        if (task.requires.hasOwnProperty(j))
+        if (task.requires.hasOwnProperty(j) && task.requires[j] != null)
           switch (typeof task.requires[j]) {
             case 'string':
-              throw new Error('wtf string requires in task[' + i + ']');
+              // make sure label exists
+              var gotLabel = false;
+              for (k=0; !gotLabel && k<this.tasks.length; k++ )
+                if (task.requires[j] == this.tasks[k].label)
+                  gotLabel = true;
+              if (!gotLabel)
+                throw new Error('missing label: ' + task.requires[j]);
               break;
             case 'number':
               if (task.requires[j] >= this.tasks.length) throw new Error('missing task #' + task.requires[j] + ' for requires in task[' + i + ']');
@@ -2753,9 +2836,11 @@ RemoteStore.prototype.deleteModel = function (model, callBack) {
       var c = msg.contents;
       model.attributes = [];
       for (var a in c.attributes) {
-        var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
-        attrib.value = c.attributes[a].value;
-        model.attributes.push(attrib);
+        if (c.attributes.hasOwnProperty(a)) {
+          var attrib = new Attribute(c.attributes[a].name, c.attributes[a].type);
+          attrib.value = c.attributes[a].value;
+          model.attributes.push(attrib);
+        }
       }
       if (typeof c == 'string')
         callBack(model, c);
@@ -3032,14 +3117,16 @@ MongoStore.prototype.putModel = function (model, callBack) {
     var newModel = false;
     var id = model.attributes[0].value;
     for (a in model.attributes) {
-      if (model.attributes[a].name == 'id') {
-        if (!model.attributes[a].value)
-          newModel = true;
-      } else {
-        if (model.attributes[a].type == 'ID') {
-          modelData[model.attributes[a].name] = mongo.ObjectID.createFromHexString(model.attributes[a].value);
+      if (model.attributes.hasOwnProperty(a)) {
+        if (model.attributes[a].name == 'id') {
+          if (!model.attributes[a].value)
+            newModel = true;
         } else {
-          modelData[model.attributes[a].name] = model.attributes[a].value;
+          if (model.attributes[a].value && model.attributes[a].type == 'ID') {
+            modelData[model.attributes[a].name] = mongo.ObjectID.createFromHexString(model.attributes[a].value);
+          } else {
+            modelData[model.attributes[a].name] = model.attributes[a].value;
+          }
         }
       }
     }
@@ -3052,12 +3139,14 @@ MongoStore.prototype.putModel = function (model, callBack) {
         } else {
           // Get resulting data
           for (a in model.attributes) {
-            if (model.attributes[a].name == 'id')
-              model.attributes[a].value = modelData['_id'].toString();
-            else if (model.attributes[a].type == 'ID')
-              model.attributes[a].value = (modelData[model.attributes[a].name]).toString();
-            else
-              model.attributes[a].value = modelData[model.attributes[a].name];
+            if (model.attributes.hasOwnProperty(a)) {
+              if (model.attributes[a].name == 'id')
+                model.attributes[a].value = modelData['_id'].toString();
+              else if (modelData[model.attributes[a].name] && model.attributes[a].type == 'ID')
+                model.attributes[a].value = (modelData[model.attributes[a].name]).toString();
+              else
+                model.attributes[a].value = modelData[model.attributes[a].name];
+            }
           }
           callBack(model);
         }
@@ -3071,8 +3160,10 @@ MongoStore.prototype.putModel = function (model, callBack) {
         } else {
           // Get resulting data
           for (a in model.attributes) {
-            if (model.attributes[a].name != 'id') // Keep original ID intact
-              model.attributes[a].value = modelData[model.attributes[a].name];
+            if (model.attributes.hasOwnProperty(a)) {
+              if (model.attributes[a].name != 'id') // Keep original ID intact
+                model.attributes[a].value = modelData[model.attributes[a].name];
+            }
           }
           callBack(model);
         }
@@ -3110,12 +3201,14 @@ MongoStore.prototype.getModel = function (model, callBack) {
         callBack(model, Error('id not found in store'));
       } else {
         for (a in model.attributes) {
-          if (model.attributes[a].name == 'id')
-            model.attributes[a].value = item['_id'].toString();
-          else if (model.attributes[a].type == 'ID')
-            model.attributes[a].value = (item[model.attributes[a].name]).toString();
-          else
-            model.attributes[a].value = item[model.attributes[a].name];
+          if (model.attributes.hasOwnProperty(a)) {
+            if (model.attributes[a].name == 'id')
+              model.attributes[a].value = item['_id'].toString();
+            else if (item[model.attributes[a].name] && model.attributes[a].type == 'ID')
+              model.attributes[a].value = (item[model.attributes[a].name]).toString();
+            else
+              model.attributes[a].value = item[model.attributes[a].name];
+          }
         }
         callBack(model);
       }
@@ -3144,8 +3237,10 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
         return;
       }
       for (a in model.attributes) {
-        if (model.attributes[a].name == 'id')
-          model.attributes[a].value = null;
+        if (model.attributes.hasOwnProperty(a)) {
+          if (model.attributes[a].name == 'id')
+            model.attributes[a].value = null;
+        }
       }
       callBack(model);
     });
@@ -4482,7 +4577,7 @@ test.runnerCommand = function () {
       });
       test.heading('execute', function () {
         test.paragraph('executes task');
-        test.example('see integration tests', Error('command not implemented'), function () {
+        test.example('see integration tests', Error('command type Stub not implemented'), function () {
           new Command().execute();
         });
       });
@@ -5418,7 +5513,7 @@ test.runnerApplicationModel = function () {
     test.heading('METHODS', function () {
       test.heading('run()', function () {
         test.paragraph('The run method executes the application.');
-        test.example('with no parameters default command will be executed', Error('command not implemented'), function () {
+        test.example('with no parameters default command will be executed', Error('command type Stub not implemented'), function () {
           new Application().run();
         });
       });
@@ -6233,7 +6328,7 @@ test.runnerCommandIntegration = function () {
     test.paragraph('test each command type');
 
     // Stub
-    test.example('Stub', Error('command not implemented'), function () {
+    test.example('Stub', Error('command type Stub not implemented'), function () {
       var cmd = new Command({
         name: 'stubCommand',
         description: 'stub command test',
@@ -6244,7 +6339,7 @@ test.runnerCommandIntegration = function () {
     });
 
     // Menu
-    test.example('Menu', Error('command not implemented'), function () {
+    test.example('Menu', Error('command type Menu not implemented'), function () {
       var cmd = new Command({
         name: 'menuCommand',
         description: 'menu command test',
@@ -6256,7 +6351,7 @@ test.runnerCommandIntegration = function () {
     });
 
     // Presentation
-    test.example('Presentation', Error('command not implemented'), function () {
+    test.example('Presentation', Error('command type Presentation not implemented'), function () {
       var cmd = new Command({
         name: 'presentationCommand',
         description: 'presentation command test',
@@ -6326,7 +6421,7 @@ test.runnerCommandIntegration = function () {
     });
 
     // Procedure
-    test.example('Procedure', Error('command not implemented'), function () {
+    test.xexample('Procedure', Error('command type Procedure not implemented'), function () {
       var cmd = new Command({
         name: 'procedureCommand',
         description: 'procedure command test',
@@ -6345,6 +6440,130 @@ test.runnerCommandIntegration = function () {
  */
 test.runnerProcedureIntegration = function () {
   test.heading('Procedure Integration', function () {
+    test.example('synchronous sequential tasks are the default when tasks has no', test.asyncResponse('abc123'), function (testNode, returnResponse) {
+      var cmd = new Command({name: 'cmdProcedure', type: 'Procedure', contents: new Procedure({tasks: [
+        {
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              var self = this;
+              setTimeout(function () {
+                self._parentProcedure.bucket += '1';
+                self.complete();
+              }, 250); // delayed to test that order is maintained
+            }
+          })
+        },
+        {
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              this._parentProcedure.bucket += '2';
+              this.complete();
+            }
+          })
+        },
+        function () { // shorthand version of command function ...
+          this._parentProcedure.bucket += '3';
+          this.complete();
+        }
+      ]})});
+      cmd.onEvent('*', function (event) {
+        if (event == 'Completed') returnResponse(testNode, cmd.bucket);
+      });
+      cmd.bucket = 'abc';
+      cmd.execute();
+    });
+    test.example('async tasks are designated when requires is set to null', test.asyncResponse('eenie meenie miney mo'), function (testNode, returnResponse) {
+      var cmd = new Command({name: 'cmdProcedure', type: 'Procedure', contents: new Procedure({tasks: [
+        {
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              var self = this;
+              setTimeout(function () {
+                self._parentProcedure.bucket += ' mo';
+                self.complete();
+              }, 500); // This will be done last
+            }
+          })
+        },
+        {
+          requires: null, // no wait to run this
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              this._parentProcedure.bucket += ' miney';
+              this.complete();
+            }
+          })
+        }
+      ]})});
+      cmd.onEvent('*', function (event) {
+        if (event == 'Completed') returnResponse(testNode, cmd.bucket);
+      });
+      cmd.bucket = 'eenie meenie';
+      cmd.execute();
+    });
+    test.example('this example shows multiple dependencies', test.asyncResponse('todo: drugs sex rock & roll'), function (testNode, returnResponse) {
+      var cmd = new Command({name: 'cmdProcedure', type: 'Procedure', contents: new Procedure({tasks: [
+        {
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              var self = this;
+              setTimeout(function () {
+                self._parentProcedure.bucket += ' rock';
+                self.complete();
+              }, 300);
+            }
+          })
+        },
+        {
+          requires: null, // no wait to run this
+          label: 'sex',
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              var self = this;
+              setTimeout(function () {
+                self._parentProcedure.bucket += ' sex';
+                self.complete();
+              }, 200);
+            }
+          })
+        },
+        {
+          requires: null, // no wait to run this
+          label: 'drugs',
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              var self = this;
+              setTimeout(function () {
+                self._parentProcedure.bucket += ' drugs';
+                self.complete();
+              }, 100);
+            }
+          })
+        },
+        {
+          requires: ['sex', 'drugs', 0], // need these labels and array index 0
+          command: new Command({
+            type: 'Function',
+            contents: function () {
+              this._parentProcedure.bucket += ' & roll';
+              this.complete();
+            }
+          })
+        }
+      ]})});
+      cmd.onEvent('*', function (event) {
+        if (event == 'Completed') returnResponse(testNode, cmd.bucket);
+      });
+      cmd.bucket = 'todo:';
+      cmd.execute();
+    });
   });
 };
 ;

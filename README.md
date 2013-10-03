@@ -12,6 +12,12 @@ TODO DOUG:
 - thought you had phonegap app for tests - test localstore with it
 ==========================
 
+GETLIST
+- needs next item to detect end ? or need hasMoreItems ?
+
+HAWT
+- make remote command type or flag as remote
+
 From PCM experience:
 (done?) - Make ID fields stored as ObjectIDs in mongo
 - make a prettyprint function for model
