@@ -211,16 +211,17 @@ test.renderDetail = function (isBrowser) {
       var dotCount = curSection.match(/\./g) ? curSection.match(/\./g).length : 0;
       var isInScope = curSection.indexOf(filterSection) == 0;
       var isFiltered = false; // If true will not be rendered
-      switch (test.filterLevel) {
-        case 'TOC':
-          test.filterLevel = 'TOC';
-          if (!isInScope && dotCount > 2) isFiltered = true;
-          break;
-        case 'Inf':
-          test.filterLevel = 'Inf'; // TOC with paragraph text
-          if (!isInScope && dotCount > 2) isFiltered = true;
-          break;
-      }
+      if (!test.filterSection)
+        switch (test.filterLevel) {
+          case 'TOC':
+            test.filterLevel = 'TOC';
+            if (!isInScope && dotCount > 2) isFiltered = true;
+            break;
+          case 'Inf':
+            test.filterLevel = 'Inf'; // TOC with paragraph text
+            if (!isInScope && dotCount > 2) isFiltered = true;
+            break;
+        }
       if (test.filterSection && curSection.indexOf(filterSection) != 0) {
         isFiltered = true;
         if (testNodeType != 'e' && filterSection.indexOf(curSection) == 0) {
@@ -257,7 +258,7 @@ test.renderDetail = function (isBrowser) {
           }
           break;
         case 'p':
-          if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
+          if (!isFiltered && (test.filterSection || dotCount < 2 || test.filterLevel != 'TOC')) {
             var p = document.createElement("p");
             p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
             test.innerDiv.appendChild(p);
@@ -409,6 +410,10 @@ test.renderDetail = function (isBrowser) {
             }
           }
           var showExample = test.showExamples;
+          if (test.filterSection)
+            showExample = 'Y';
+          // filterSection
+
           if (isFiltered) showExample = false;
           if (ranTest && (!testPassed || gotFailedAssertions)) showExample = true;
           if (test.nodes[i].asyncTest) {
@@ -506,7 +511,7 @@ test.show = function (value) {
       return;
     }
     if (value !== undefined) {
-      test.showWork.push(JSON.stringify(value));
+      test.showWork.push(JSON.stringify(value,null,' '));
       return;
     }
     test.showWork.push(value);

@@ -25,7 +25,6 @@ $(document).ready(function () {
 // Render Framework
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.renderFramework = function () {
-  console.log('suck')
   myInterface.renderNavBar();
 };
 
@@ -110,9 +109,21 @@ myInterface.renderNavBar = function () {
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar List Item
 // -------------------------------------------------------------------------------------------------------------------
+myInterface.navPicked = function (name) {
+  console.log('name '+ name);
+};
+
+// -------------------------------------------------------------------------------------------------------------------
+// Render NavBar List Item
+// -------------------------------------------------------------------------------------------------------------------
 myInterface.renderNavBarListItem = function (parent, name) {
   var listItem = document.createElement('li');
-  listItem.innerHTML = '<a href="#">' + name + '</a>';
+  console.log(parent + ' ' + name)
+  listItem.innerHTML = '<a href="javascript:myInterface.navPicked(\'' + name + '\')">' + name + '</a>';
+
+  // myInterface.navBarBrand.innerHTML = '<a href="javascript:alert(\'wtf\')">' + 'tequila.js' + '</a>';
+
+
   parent.appendChild(listItem);
 };
 

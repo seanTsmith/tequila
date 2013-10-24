@@ -2,16 +2,6 @@
 
 Tequila es bueno!
 
-==========================
-TODO DOUG:
-==========================
-- implement /lib/stores/local-test.js & /lib/stores/local-store.js
-- install http://redis.io/ on tgiCloud Server
-- implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
-- test with /test-spec/integration/test-store-integration.js
-- thought you had phonegap app for tests - test localstore with it
-==========================
-
 GETLIST
 - needs next item to detect end ? or need hasMoreItems ?
 
@@ -30,10 +20,19 @@ App
 
 Interface
 - Start (command, callback)
+-or-
+- Render (callback)
 
 Attribute
 - image type
 - visible property
+
+
+- implement /lib/stores/local-test.js & /lib/stores/local-store.js
+- install http://redis.io/ on tgiCloud Server
+- implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
+- test with /test-spec/integration/test-store-integration.js
+- thought you had phonegap app for tests - test localstore with it
 
 * Session Model
 * make validation for types
