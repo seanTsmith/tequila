@@ -3,10 +3,9 @@
 <head>
   <title>tequila-interface-bootstrap3-prototype</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="css/bootstrap.css" rel="stylesheet" media="screen">
-  <link href="css/bootstrap-theme.min.css" rel="stylesheet">
-  <link href="css/bootstrap-glyphicons.css" rel="stylesheet">
-  <link href="css/interface.css" rel="stylesheet" media="screen">
+  <link href="vendor/css/bootstrap.css" rel="stylesheet">
+  <link href="vendor/css/bootstrap-theme.min.css" rel="stylesheet">
+  <link href="interface.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" id="loadingPanel">
@@ -14,7 +13,7 @@
   <img style="display: block; margin-left: auto; margin-right: auto;" src="img/ajax-loader.gif">
 
   <!--navbar: Navigation Bar -->
-  <div class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" id="navbar">
+  <div class="navbar navbar-inverse navbar-fixed-top" id="navbar">
     <!--<div class="container">-->
 
 
@@ -74,16 +73,75 @@
     </div>
   </div>
 
+  <div class="page-header">
+    <h1>Panels</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Panel title</h3>
+        </div>
+        <div class="panel-body">
+          Panel content
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Panel title</h3>
+        </div>
+        <div class="panel-body">
+          Panel content
+        </div>
+      </div>
+    </div><!-- /.col-sm-4 -->
+    <div class="col-sm-4">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <h3 class="panel-title">Panel title</h3>
+        </div>
+        <div class="panel-body">
+          Panel content
+        </div>
+      </div>
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title">Panel title</h3>
+        </div>
+        <div class="panel-body">
+          Panel content
+        </div>
+      </div>
+    </div><!-- /.col-sm-4 -->
+    <div class="col-sm-4">
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+          <h3 class="panel-title">Panel title</h3>
+        </div>
+        <div class="panel-body">
+          Panel content
+        </div>
+      </div>
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <h3 class="panel-title">Panel title</h3>
+        </div>
+        <div class="panel-body">
+          Panel content
+        </div>
+      </div>
+    </div><!-- /.col-sm-4 -->
+  </div>
+
 
 </div>
 
 
 
 <div id="scripts">
-  <script src="vendor/jquery-1.10.2.min.js"></script>
-  <script src="vendor/bootstrap.min.js"></script>
-  <!--<script type="text/javascript" src="/socket.io/socket.io.js"></script>-->
-  <!--<script src="vendor/tequila.js"></script>-->
+  <script src="vendor/js/jquery-2.0.3.min.js"></script>
+  <script src="vendor/js/bootstrap.min.js"></script>
+  <script src="vendor/js/holder.js"></script>
   <script src="interface.js"></script>
 </div>
 </body>

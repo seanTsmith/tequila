@@ -26,15 +26,20 @@ $(document).ready(function () {
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.renderFramework = function () {
   myInterface.renderNavBar();
-  myInterface.renderPanel('Hello World');
-  myInterface.renderPanel('Wasup');
-  myInterface.renderPanel('How ya doin');
+  myInterface.renderPanel('Panel type default','default');
+  myInterface.renderPanel('Panel type primary','primary');
+  myInterface.renderPanel('Panel type success','success');
+  myInterface.renderPanel('Panel type info','info');
+  myInterface.renderPanel('Panel type warning','warning');
+  myInterface.renderPanel('Panel type danger','danger');
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Render Panel
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.renderPanel = function (name) {
+myInterface.renderPanel = function (name, panelType /* default primary success info warning danger */) {
+
+  panelType = panelType || "default"
 
   // Container so bootstrap centers
   if (!myInterface.panelContainer) {
@@ -46,13 +51,23 @@ myInterface.renderPanel = function (name) {
 
 
   var newPanel = document.createElement("div");
-  newPanel.className = "panel";
+  newPanel.className = "panel panel-"+panelType;
   myInterface.panelContainer.appendChild(newPanel);
 
   var panelHeading = document.createElement("div");
   panelHeading.className = "panel-heading";
-  panelHeading.innerHTML = name;
+  // panelHeading.innerHTML = name;
   newPanel.appendChild(panelHeading);
+
+  var paneTitle = document.createElement("h3");
+  paneTitle.className = "panel-title";
+  paneTitle.innerHTML = name;
+  panelHeading.appendChild(paneTitle);
+
+  var panelBody = document.createElement("div");
+  panelBody.className = "panel-body";
+  panelBody.innerHTML = 'This is the body of the panel.';
+  newPanel.appendChild(panelBody);
 
 
 };
@@ -73,6 +88,10 @@ myInterface.renderNavBar = function () {
   // Add a gap below navbar if not small view -->
   var navBreak = document.createElement("br");
   navBreak.className = "hidden-sm";
+  document.body.appendChild(navBreak);
+  document.body.appendChild(navBreak);
+  document.body.appendChild(navBreak);
+  document.body.appendChild(navBreak);
   document.body.appendChild(navBreak);
 
   //   <br class="hidden-sm">
