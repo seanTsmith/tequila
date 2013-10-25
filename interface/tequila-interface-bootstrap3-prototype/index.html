@@ -12,7 +12,73 @@
 <div class="container" id="loadingPanel">
   <h4 style="display: block; text-align: center;">Loading...</h4>
   <img style="display: block; margin-left: auto; margin-right: auto;" src="img/ajax-loader.gif">
+
+  <!--navbar: Navigation Bar -->
+  <div class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" id="navbar">
+    <!--<div class="container">-->
+
+
+    <a class="navbar-brand hidden-sm" href="javascript:command('home')">Private Club</a>
+    <button type="button" onclick="command('newMember')" class="btn-primary btn-cell visible-sm">
+      <span class="glyphicon the-icons glyphicon-plus"></span></button>
+    <button type="button" onclick="command('checkIn')" class="btn-primary btn-cell visible-sm"><span
+            class="glyphicon the-icons glyphicon-ok"></span></button>
+    <button type="button" onclick="command('matchPlay')" class="btn-primary btn-cell visible-sm"><span
+            class="glyphicon the-icons glyphicon-resize-small"></span></button>
+    <button type="button" onclick="command('viewMember')" class="btn-primary btn-cell visible-sm"><span
+            class="glyphicon the-icons glyphicon-user"></span></button>
+    <button type="button" onclick="command('optionsMenu')" class="btn-primary btn-cell visible-sm"><span
+            class="glyphicon the-icons glyphicon-cog"></span></button>
+
+
+    <div id="navCollapse" class="nav-collapse collapse navbar-responsive-collapse">
+      <ul class="nav navbar-nav">
+        <li id="newMemberNavBtn">
+          <a href="javascript:command('newMember')"><span class="glyphicon glyphicon-plus"> New Member</span></a></li>
+        <li id="checkInNavBtn">
+          <a href="javascript:command('checkIn')"><span class="glyphicon glyphicon-ok"> Check In</span></a></li>
+        <li id="matchPlayNavBtn"><a href="javascript:command('matchPlay')"><span
+                class="glyphicon glyphicon-resize-small"> Match Play</span></a></li>
+        <li id="viewMemberNavBtn"><a href="javascript:command('viewMember')"><span
+                class="glyphicon glyphicon-user"> View Member</span></a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"> Options</span><span
+                  class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="javascript:command('makeCards')">Print Member Cards</a></li>
+            <li><a href="javascript:command('systemConfig')">System Config</a></li>
+            <li><a href="javascript:command('userList')">User List</a></li>
+            <li><a href="javascript:command('groupList')">Group List</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <!--</div>-->
+  </div>
+
+  <!-- Add a gap below navbar if not small view -->
+  <br class="hidden-sm">
+
+  <!-- alertDangerDiv: for error messages -->
+  <div style="margin-bottom: 4px;" class="alert alert-danger" id="alertDangerDiv">
+    <button type="button" onclick="$('#alertDangerDiv').hide()" class="close" aria-hidden="true">&times;</button>
+    <h4 id="alertDangerText" style="margin: 0px; padding: 0px;">UNKNOWN ERROR</h4>
+  </div>
+
+  <!-- optionsMenuPanel: Home Screen -->
+  <div class="panel" id="homePanel">
+    <div class="panel-heading">Home</div>
+    <div id="homeInfo" class="well well-large">
+      eat shiteat shiteat shiteat shiteat shiteat shiteat shiteat shiteat shiteat shit
+    </div>
+  </div>
+
+
 </div>
+
+
+
 <div id="scripts">
   <script src="vendor/jquery-1.10.2.min.js"></script>
   <script src="vendor/bootstrap.min.js"></script>

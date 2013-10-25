@@ -26,6 +26,35 @@ $(document).ready(function () {
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.renderFramework = function () {
   myInterface.renderNavBar();
+  myInterface.renderPanel('Hello World');
+  myInterface.renderPanel('Wasup');
+  myInterface.renderPanel('How ya doin');
+};
+
+// -------------------------------------------------------------------------------------------------------------------
+// Render Panel
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.renderPanel = function (name) {
+
+  // Container so bootstrap centers
+  if (!myInterface.panelContainer) {
+    myInterface.panelContainer = document.createElement("div");
+    myInterface.panelContainer.id = "panelContainer";
+    myInterface.panelContainer.className = "container";
+    document.body.appendChild(myInterface.panelContainer);
+  }
+
+
+  var newPanel = document.createElement("div");
+  newPanel.className = "panel";
+  myInterface.panelContainer.appendChild(newPanel);
+
+  var panelHeading = document.createElement("div");
+  panelHeading.className = "panel-heading";
+  panelHeading.innerHTML = name;
+  newPanel.appendChild(panelHeading);
+
+
 };
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -40,6 +69,14 @@ myInterface.renderNavBar = function () {
 //  myInterface.navBar.className = "navbar navbar-inverse navbar-fixed-top";
   myInterface.navBar.setAttribute('role', 'banner');
   document.body.appendChild(myInterface.navBar);
+
+  // Add a gap below navbar if not small view -->
+  var navBreak = document.createElement("br");
+  navBreak.className = "hidden-sm";
+  document.body.appendChild(navBreak);
+
+  //   <br class="hidden-sm">
+
 
   // Container so bootstrap centers
   myInterface.navContainer = document.createElement("div");
@@ -103,6 +140,13 @@ myInterface.renderNavBar = function () {
   myInterface.renderNavBarListItem(myInterface.superhero, 'Batman');
   myInterface.renderNavBarListItem(myInterface.superhero, 'Spiderman');
 
+  // fucking with some pull-right shit
+  myInterface.cart = document.createElement("a");
+  myInterface.cart.setAttribute('type', 'button');
+  myInterface.cart.className = "btn btn-default navbar-btn pull-right";
+  myInterface.cart.innerHTML = '<span class="glyphicon glyphicon-log-out"></span> logout'
+  myInterface.collapsibleNavBar.appendChild(myInterface.cart);
+
 
 };
 
@@ -110,7 +154,7 @@ myInterface.renderNavBar = function () {
 // Render NavBar List Item
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.navPicked = function (name) {
-  console.log('name '+ name);
+  console.log('name ' + name);
 };
 
 // -------------------------------------------------------------------------------------------------------------------
