@@ -2,47 +2,17 @@
  * interface.css
  */
 
-.the-icons {
-    padding: 0px;
-    margin: 0px;
-    font-size: 32px;
-    /*line-height: 2;*/
-    /*color: #333;*/
-    text-align: center;
-}
-.the-icons .glyphicon {
-    /*padding-left: 15px;*/
-    /*padding-right: 15px;*/
-}
-
-.btn-cell {
-    position: relative;
-    float:left;
-    width: 48px;
-    height: 48px;
-    padding: 5px 5px;
-    margin-top: 2px;
-    margin-right: 4px;
-    margin-bottom: 2px;
-    /*background-color: transparent;*/
-    border: 1px solid #4f4f4f;
-    border-radius: 9px;
-}
-
-.btn-cell-right {
-    position: relative;
-    float:right;
-    width: 64px;
-    height: 34px;
-    padding: 6px 12px;
-    margin-top: 8px;
-    margin-right: 8px;
-    /*margin-bottom: 8px;*/
-    /*background-color: transparent;*/
-    border: 1px solid #4f4f4f;
-    border-radius: 9px;
-}
 
 body {
     padding-top: 50px; /* fixed navbar */
+}
+
+.panel-glyphs {
+    padding: 0px;
+    margin-top: -2px;
+    margin-right: 0px;
+    margin-left: 10px;
+    margin-bottom: 0px;
+    font-size: 18px;
+    text-align: center;
 }
