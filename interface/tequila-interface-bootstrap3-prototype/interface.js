@@ -27,10 +27,8 @@ $(document).ready(function () {
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.renderFramework = function () {
   myInterface.renderNavBar();
-  myInterface.renderPanel('tequila.js','primary');
-//  myInterface.renderPanel('Panel type primary','primary');
-//  myInterface.renderPanel('Panel type success','success');
-//  myInterface.renderPanel('Panel type info','info');
-//  myInterface.renderPanel('Panel type warning','warning');
-//  myInterface.renderPanel('Panel type danger','danger');
+  myInterface.homePanel();
+  myInterface.renderPanel({label:'Eat'});
+  myInterface.renderPanel({label:'More'});
+  myInterface.renderPanel({label:'Chiken'});
 };

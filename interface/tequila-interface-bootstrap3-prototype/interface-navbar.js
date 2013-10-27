@@ -11,8 +11,8 @@ myInterface.renderNavBar = function () {
   // Main navbar
   myInterface.navBar = document.createElement("header");
   myInterface.navBar.id = "navBar";
-  myInterface.navBar.className = "navbar navbar-default navbar-fixed-top";
-//  myInterface.navBar.className = "navbar navbar-inverse navbar-fixed-top";
+//  myInterface.navBar.className = "navbar navbar-default navbar-fixed-top";
+  myInterface.navBar.className = "navbar navbar-inverse navbar-fixed-top";
   myInterface.navBar.setAttribute('role', 'banner');
   document.body.appendChild(myInterface.navBar);
 
@@ -52,11 +52,8 @@ myInterface.renderNavBar = function () {
   myInterface.navBarBrand = document.createElement("a");
   myInterface.navBarBrand.id = "navBarBrand";
   myInterface.navBarBrand.className = "navbar-brand";
-  myInterface.navBarBrand.innerHTML = '<a href="javascript:myInterface.navPicked(\'tequila.js\')">' + 'tequila.js' + '</a>';
+  myInterface.navBarBrand.innerHTML = '<a href="javascript:myInterface.homePanel()">' + 'tequila.js' + '</a>';
   myInterface.navResponsiveHeader.appendChild(myInterface.navBarBrand);
-
-//  <li class="active"><a style="display: block; text-align: center;" href="javascript:loadStore()">TRY AGAIN</a></li>
-
 
   // Collapsible navbar
   myInterface.collapsibleNavBar = document.createElement("div");
@@ -94,8 +91,9 @@ myInterface.renderNavBar = function () {
   myInterface.navListRight.className = "nav navbar-nav navbar-right";
   myInterface.collapsibleNavBar.appendChild(myInterface.navListRight);
 
-  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, 'Clark Kent');
-  myInterface.renderNavBarListItem(myInterface.user, 'Logout', 'glyphicon-log-out');
+  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, '<i class="fa fa-user fa-lg"></i>  Clark Kent');
+  myInterface.renderNavBarListItem(myInterface.user, '<i class="fa fa-gear"></i>  Options');
+  myInterface.renderNavBarListItem(myInterface.user, '<i class="fa fa-sign-out"></i>  Logout');
 
   // Search right justified
   myInterface.navSearch = document.createElement("form");
@@ -110,23 +108,20 @@ myInterface.renderNavBar = function () {
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar List Item
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.navPicked = function (name) {
-  myInterface.renderPanel(name, 'default');
+myInterface.navPicked = function (label) {
+  var action = {};
+  action.label = label;
+  myInterface.renderPanel(action);
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar List Item
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.renderNavBarListItem = function (parent, name, glyph) {
+myInterface.renderNavBarListItem = function (parent, label) {
   var listItem = document.createElement('li');
-  console.log(parent + ' ' + name)
-  if (glyph) {
-    listItem.innerHTML = '<a href="javascript:myInterface.navPicked(\'' + name + '\')">' +
-      '<span class="glyphicon ' + glyph + '"></span> ' +
-      '' + name + '</a>';
-  } else {
-    listItem.innerHTML = '<a href="javascript:myInterface.navPicked(\'' + name + '\')">' + name + '</a>';
-  }
+  var html = '<a href="javascript:myInterface.navPicked(\'' + label + '\')">' + label + '</a>';
+  console.log(html);
+  listItem.innerHTML = html;
   parent.appendChild(listItem);
 };
 

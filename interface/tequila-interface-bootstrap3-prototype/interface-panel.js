@@ -3,14 +3,25 @@
  * interface-panel.js
  */
 
+
+// -------------------------------------------------------------------------------------------------------------------
+// Home Panel
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.homePanel = function () {
+  if (!myInterface.homePanelID) {
+    myInterface.homePanelID = myInterface.renderPanel({label: 'Home', type: 'home', style: 'primary', icon: 'fa-home'});
+  } else {
+    var num = myInterface.panels[myInterface.homePanelID].eleCount;
+    myInterface.panelContract(num);
+    myInterface.panelClicked(num);
+  }
+};
+
 // -------------------------------------------------------------------------------------------------------------------
 // Render Panel
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.renderPanel = function (name, panelType /* default primary success info warning danger */) {
-
-  panelType = panelType || "default";
-
-  myInterface.eleCount++;
+myInterface.lazyInitPanel = function () {
+  console.log('myInterface.lazyInitPanel()');
 
   // Container so bootstrap centers
   if (!myInterface.panelContainer) {
@@ -20,12 +31,49 @@ myInterface.renderPanel = function (name, panelType /* default primary success i
     document.body.appendChild(myInterface.panelContainer);
   }
 
+  // Keep track of panels by label#
+  myInterface.panels = {};
+
+  // Init is done so remember that
+  myInterface.lazyInitPanelDone = true;
+};
+
+
+// -------------------------------------------------------------------------------------------------------------------
+// Render Panel
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.renderPanel = function (action) {
+
+  myInterface.lazyInitPanelDone || myInterface.lazyInitPanel();
+
+  action = action || {};
+  var label = action.label || 'Panel';
+  var style = action.style || 'default';
+  var type  = action.type || 'unknown';
+  var icon = action.icon || 'fa-question-circle';
+
+  // This will be the panel DOM element
   var newPanel = document.createElement("div");
-  newPanel.className = "panel panel-" + panelType;
-  newPanel.id = "panel" + myInterface.eleCount;
+
+  // Bump element count and add panel to list
+  myInterface.eleCount++;
+  var panelID = "panel" + myInterface.eleCount;
+  myInterface.panels[panelID] = {
+    eleCount: myInterface.eleCount,
+    panel: newPanel,
+    expanded: true
+  };
+
+  // Finish making the DOM panel
+  newPanel.className = "panel panel-" + style;
+  newPanel.id = panelID;
   if (myInterface.panelContainer.hasChildNodes()) {
     var firstBorn = myInterface.panelContainer.firstChild;
-    myInterface.panelContainer.insertBefore(newPanel, firstBorn);
+    var lastBorn = firstBorn.nextSibling;
+    if (lastBorn)
+      myInterface.panelContainer.insertBefore(newPanel, lastBorn);
+    else
+      myInterface.panelContainer.appendChild(newPanel);
   } else {
     myInterface.panelContainer.appendChild(newPanel);
   }
@@ -34,15 +82,12 @@ myInterface.renderPanel = function (name, panelType /* default primary success i
   panelHeading.className = "panel-heading";
   newPanel.appendChild(panelHeading);
 
+  var txtTitle = '<a href="javascript:myInterface.panelClicked(' + myInterface.eleCount + ')"><i class="fa ' + icon + '"></i> ' + label + '</a>';
+
   var panelTitle = document.createElement("h3");
   panelTitle.className = "panel-title";
-  panelTitle.innerHTML = name;
+  panelTitle.innerHTML = txtTitle;
   panelHeading.appendChild(panelTitle);
-
-  var panelCloseButton = document.createElement("a");
-  panelCloseButton.innerHTML = '<span class="glyphicon glyphicon-remove panel-glyphs pull-right"></span>';
-  panelCloseButton.setAttribute('href', "javascript:myInterface.panelClose(" + myInterface.eleCount + ")");
-  panelTitle.appendChild(panelCloseButton);
 
   var panelContractButton = document.createElement("a");
   panelContractButton.id = "panelContractButton" + myInterface.eleCount;
@@ -56,10 +101,17 @@ myInterface.renderPanel = function (name, panelType /* default primary success i
   panelExpandButton.setAttribute('href', "javascript:myInterface.panelExpand(" + myInterface.eleCount + ")");
   panelTitle.appendChild(panelExpandButton);
 
-  var html = '<h1>Panel</h1>' +
+  if (type != 'home') {
+    var panelCloseButton = document.createElement("a");
+    panelCloseButton.innerHTML = '<span class="glyphicon glyphicon-remove panel-glyphs pull-right"></span>';
+    panelCloseButton.setAttribute('href', "javascript:myInterface.panelClose(" + myInterface.eleCount + ")");
+    panelTitle.appendChild(panelCloseButton);
+  }
+
+  var html = '<div class="well well-sm"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
     '<p>This is a panel with no defined type.</p>' +
     '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
-    ' some awesome code.</p>';
+    ' some awesome code.</p></div>';
 
   var panelBody = document.createElement("div");
   panelBody.className = "panel-body";
@@ -69,6 +121,14 @@ myInterface.renderPanel = function (name, panelType /* default primary success i
 
   $('#panelExpandButton' + myInterface.eleCount).hide();
 
+  // Close the home panel
+  if (myInterface.homePanelID) {
+    var num = myInterface.panels[myInterface.homePanelID].eleCount;
+    myInterface.panelContract(num);
+  }
+
+  return panelID;
+
 };
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -77,7 +137,36 @@ myInterface.renderPanel = function (name, panelType /* default primary success i
 myInterface.panelClose = function (num) {
   var panelID = 'panel' + num;
   var panel = document.getElementById(panelID);
+
+  try {
+    delete myInterface.panels[panelID];
+  } catch (e) {
+    console.log('error deleting panel:' + panel);
+  }
+
   myInterface.panelContainer.removeChild(panel);
+};
+
+// -------------------------------------------------------------------------------------------------------------------
+// Panel Clicked
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.panelClicked = function (num) {
+  // This panel
+  var panelID = "panel" + num;
+  var wasExpanded = myInterface.panels[panelID].expanded;
+
+  // Contract all panels
+  for (var p in myInterface.panels) {
+    if (myInterface.panels.hasOwnProperty(p)) {
+      if (myInterface.panels[p].expanded) {
+        myInterface.panelContract(myInterface.panels[p].eleCount);
+      }
+    }
+  }
+
+  // Now show if need
+  if (!wasExpanded)
+    myInterface.panelExpand(num);
 };
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -87,7 +176,11 @@ myInterface.panelExpand = function (num) {
   $('#panelBody' + num).show();
   $('#panelExpandButton' + num).hide();
   $('#panelContractButton' + num).show();
+
+  var panelID = "panel" + num;
+  myInterface.panels[panelID].expanded=true;
 };
+
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Contract
 // -------------------------------------------------------------------------------------------------------------------
@@ -95,4 +188,7 @@ myInterface.panelContract = function (num) {
   $('#panelBody' + num).hide();
   $('#panelExpandButton' + num).show();
   $('#panelContractButton' + num).hide();
+
+  var panelID = "panel" + num;
+  myInterface.panels[panelID].expanded=false;
 };
