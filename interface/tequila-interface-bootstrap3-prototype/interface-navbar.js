@@ -52,7 +52,7 @@ myInterface.renderNavBar = function () {
   myInterface.navBarBrand = document.createElement("a");
   myInterface.navBarBrand.id = "navBarBrand";
   myInterface.navBarBrand.className = "navbar-brand";
-  myInterface.navBarBrand.innerHTML = '<a href="javascript:alert(\'wtf\')">' + 'tequila.js' + '</a>';
+  myInterface.navBarBrand.innerHTML = '<a href="javascript:myInterface.navPicked(\'tequila.js\')">' + 'tequila.js' + '</a>';
   myInterface.navResponsiveHeader.appendChild(myInterface.navBarBrand);
 
 //  <li class="active"><a style="display: block; text-align: center;" href="javascript:loadStore()">TRY AGAIN</a></li>
@@ -97,7 +97,7 @@ myInterface.renderNavBar = function () {
   myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, 'Clark Kent');
   myInterface.renderNavBarListItem(myInterface.user, 'Logout', 'glyphicon-log-out');
 
-  // Search
+  // Search right justified
   myInterface.navSearch = document.createElement("form");
   myInterface.navSearch.className = "navbar-form navbar-right";
   myInterface.navSearch.innerHTML = '<div class="form-group">' +
@@ -105,38 +105,13 @@ myInterface.renderNavBar = function () {
     '<a type="button" href="javascript:myInterface.navPicked(\'Search\')" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></a>';
   myInterface.collapsibleNavBar.appendChild(myInterface.navSearch);
 
-//  // Collapsible navbar right
-//  myInterface.collapsibleRightNavBar = document.createElement("nav");
-//  myInterface.collapsibleRightNavBar.id = "collapsibleRightNavBar";
-//  myInterface.collapsibleRightNavBar.className = "navbar-collapse collapse navbar-right";
-//  myInterface.collapsibleRightNavBar.setAttribute('role', 'navigation');
-//  myInterface.navContainer.appendChild(myInterface.collapsibleRightNavBar);
-//
-//  // navbar list
-//  myInterface.navListRight = document.createElement("ul");
-//  myInterface.navListRight.id = "navListRight";
-//  myInterface.navListRight.className = "nav navbar-nav";
-//  myInterface.collapsibleRightNavBar.appendChild(myInterface.navListRight);
-//
-//  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, 'guest');
-
-
-
-//  // fucking with some pull-right shit
-//  myInterface.cart = document.createElement("a");
-//  myInterface.cart.setAttribute('type', 'button');
-//  myInterface.cart.className = "btn btn-default navbar-btn pull-right";
-//  myInterface.cart.innerHTML = '<span class="glyphicon glyphicon-log-out"></span> logout'
-//  myInterface.collapsibleNavBar.appendChild(myInterface.cart);
-
-
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar List Item
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.navPicked = function (name) {
-  myInterface.renderPanel('Panel ' + name, 'default');
+  myInterface.renderPanel(name, 'default');
 };
 
 // -------------------------------------------------------------------------------------------------------------------

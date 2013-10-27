@@ -27,7 +27,7 @@ $(document).ready(function () {
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.renderFramework = function () {
   myInterface.renderNavBar();
-  myInterface.renderPanel('Panel type default','default');
+  myInterface.renderPanel('tequila.js','primary');
 //  myInterface.renderPanel('Panel type primary','primary');
 //  myInterface.renderPanel('Panel type success','success');
 //  myInterface.renderPanel('Panel type info','info');

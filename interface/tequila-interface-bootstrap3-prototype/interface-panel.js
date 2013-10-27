@@ -56,16 +56,15 @@ myInterface.renderPanel = function (name, panelType /* default primary success i
   panelExpandButton.setAttribute('href', "javascript:myInterface.panelExpand(" + myInterface.eleCount + ")");
   panelTitle.appendChild(panelExpandButton);
 
-  var spam = 'This is the body of the panel for ' + name + '.  ';
-  spam += spam;
-  spam += spam;
-  spam += spam;
-  spam += spam;
+  var html = '<h1>Panel</h1>' +
+    '<p>This is a panel with no defined type.</p>' +
+    '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
+    ' some awesome code.</p>';
 
   var panelBody = document.createElement("div");
   panelBody.className = "panel-body";
   panelBody.id = "panelBody" + myInterface.eleCount;
-  panelBody.innerHTML = '<p>' + spam  + '</p>' + '<p>' + spam  + '</p>';
+  panelBody.innerHTML = html;
   newPanel.appendChild(panelBody);
 
   $('#panelExpandButton' + myInterface.eleCount).hide();
