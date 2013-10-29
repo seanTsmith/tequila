@@ -1,0 +1,4 @@
+/**
+ * tequila
+ * interface-panel-home
+ */

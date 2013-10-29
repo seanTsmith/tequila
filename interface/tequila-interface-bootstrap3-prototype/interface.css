@@ -22,8 +22,9 @@ body {
 }
 
 .ti-shortcut-panel-body {
-    margin: 4px;
-    padding: 0px;
+    margin: 0px;
+    padding: 4px;
+    background-color: #bebebe;
     vertical-align: middle;
 }
 
@@ -32,12 +33,12 @@ body {
     height: 88px;
     width: 88px;
     font-size: 12px;
-    line-height: 1.25;
+    line-height: 1.5;
     margin-top: 1px;
     margin-right: 1px;
     margin-left: 1px;
     margin-bottom: 1px;
-    padding-top: 16px;
+    padding-top: 12px;
     padding-right: 0px;
     padding-left: 0px;
     padding-bottom: 0px;

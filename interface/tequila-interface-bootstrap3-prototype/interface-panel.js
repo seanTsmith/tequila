@@ -3,7 +3,6 @@
  * interface-panel.js
  */
 
-
 // -------------------------------------------------------------------------------------------------------------------
 // Home Panel
 // -------------------------------------------------------------------------------------------------------------------
@@ -39,7 +38,6 @@ myInterface.lazyInitPanel = function () {
   // Init is done so remember that
   myInterface.lazyInitPanelDone = true;
 };
-
 
 // -------------------------------------------------------------------------------------------------------------------
 // Render Panel
@@ -141,7 +139,6 @@ myInterface.renderPanel = function (action) {
   var panelTitle = document.createElement("h3");
   var panelCloseButton = document.createElement("a");
   var html;
-  var html;
 
   if (type == 'home') { // HOME panel
 
@@ -151,11 +148,11 @@ myInterface.renderPanel = function (action) {
 
     //txtTitle = '<a class="btn btn-primary active" href="#"><i class="fa fa-home fa-2x"></i><br>Home</a>' +
     txtTitle = '' +
-      '<a class="btn btn-primary" id="homeSlice1" href="javascript:myInterface.homeSlice(1)"><i class="fa fa-home fa-2x"></i><br>Home</a>' +
-      '<a class="btn btn-primary" id="homeSlice2" href="javascript:myInterface.homeSlice(2)"><i class="fa fa-search fa-2x"></i><br>Find</a>' +
-      '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-star fa-2x"></i><br>Starred</a>' +
-      '<a class="btn btn-primary" id="homeSlice4" href="javascript:myInterface.homeSlice(4)"><i class="fa fa-book fa-2x"></i><br>History</a>' +
-      '<a class="btn btn-primary" id="homeSlice5" href="javascript:myInterface.homeSlice(5)"><i class="fa fa-info-circle fa-2x"></i><br>Info</a>';
+      '<a class="btn btn-primary" id="homeSlice1" href="javascript:myInterface.homeSlice(1)"><i class="fa fa-home fa-2x"></i><span class="hidden-xs">Home</span></a>' +
+      '<a class="btn btn-primary" id="homeSlice2" href="javascript:myInterface.homeSlice(2)"><i class="fa fa-search fa-2x"></i><span class="hidden-xs">Find</span></a>' +
+      '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-star fa-2x"></i><span class="hidden-xs">Starred</span></a>' +
+      '<a class="btn btn-primary" id="homeSlice4" href="javascript:myInterface.homeSlice(4)"><i class="fa fa-book fa-2x"></i><span class="hidden-xs">History</span></a>' +
+      '<a class="btn btn-primary" id="homeSlice5" href="javascript:myInterface.homeSlice(5)"><i class="fa fa-info-circle fa-2x"></i><span class="hidden-xs">Info</span></a>';
 
     var panelHomeButtonGroup = document.createElement("div");
     panelHomeButtonGroup.className = "btn-group btn-group-justified";
@@ -167,48 +164,48 @@ myInterface.renderPanel = function (action) {
     panelBody = document.createElement("div");
     panelBody.className = "panel-body ti-shortcut-panel-body";
     panelBody.id = "homePanel1";
-    panelBody.innerHTML = '<div align="center" class="">' +
+    panelBody.innerHTML = '<div class="">' +
+
+      '<a class="btn btn-warning ti-shortcut-button" href="#">' +
+      '<i class="fa fa-group fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Contacts</div>' +
+      '</a>' +
+
+      '<a class="btn btn-primary ti-shortcut-button" href="#">' +
+      '<i class="fa fa-suitcase fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Projects</div>' +
+      '</a>' +
 
       '<a class="btn btn-success ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
+      '<i class="fa fa-user fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Customers</div>' +
       '</a>' +
+
       '<a class="btn btn-danger ti-shortcut-button" href="#">' +
-      '<i class="fa fa-coffee fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Drugs</div>' +
+      '<i class="fa fa-truck fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Vendors</div>' +
       '</a>' +
-      '<a class="btn btn-warning ti-shortcut-button" href="#">' +
-      '<i class="fa fa-music fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Rock & Roll</div>' +
+
+      '<a class="btn btn-primary ti-shortcut-button" href="#">' +
+      '<i class="fa fa-gears fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Products & Services</div>' +
       '</a>' +
+
       '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
+      '<i class="fa fa-money fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Financial</div>' +
       '</a>' +
-      '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
+
+      '<a class="btn btn-primary ti-shortcut-button" href="#">' +
+      '<i class="fa fa-sitemap fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Organization</div>' +
       '</a>' +
-      '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
+
+      '<a class="btn btn-default ti-shortcut-button" href="#">' +
+      '<i class="fa fa-gear fa-2x"></i>' +
+      '<div style="white-space: normal; word-wrap: break-word" class="">Options</div>' +
       '</a>' +
-      '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
-      '</a>' +
-      '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
-      '</a>' +
-      '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
-      '</a>' +
-      '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-female fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Sex</div>' +
-      '</a>' +
+
 
       '</div>';
 
