@@ -91,17 +91,19 @@ myInterface.renderNavBar = function () {
   myInterface.navListRight.className = "nav navbar-nav navbar-right";
   myInterface.collapsibleNavBar.appendChild(myInterface.navListRight);
 
-  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, '<i class="fa fa-user fa-lg"></i>  Clark Kent');
-  myInterface.renderNavBarListItem(myInterface.user, '<i class="fa fa-gear"></i>  Options');
-  myInterface.renderNavBarListItem(myInterface.user, '<i class="fa fa-sign-out"></i>  Logout');
+  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, '<i class="fa fa-user fa-lg"></i> Guest');
+  myInterface.renderNavBarListItem(myInterface.user, 'Options','<i class="fa fa-gear"></i> ');
+  myInterface.renderNavBarListItem(myInterface.user, 'Logout','<i class="fa fa-sign-out"></i> ');
 
-  // Search right justified
-  myInterface.navSearch = document.createElement("form");
-  myInterface.navSearch.className = "navbar-form navbar-right";
-  myInterface.navSearch.innerHTML = '<div class="form-group">' +
-    '<input type="text" class="form-control" placeholder="Search"></div>' +
-    '<a type="button" href="javascript:myInterface.navPicked(\'Search\')" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></a>';
-  myInterface.collapsibleNavBar.appendChild(myInterface.navSearch);
+//  // Search right justified
+//  myInterface.navSearch = document.createElement("form");
+//  myInterface.navSearch.className = "navbar-form navbar-right";
+//  myInterface.navSearch.innerHTML = '<div class="form-group">' +
+//    '<input type="text" class="form-control" placeholder="Search">' +
+//    '</div>' +
+//    '<a type="button" href="javascript:myInterface.navPicked(\'Search\')" class="btn btn-default">' +
+//    '<span class="glyphicon glyphicon-search"></span></a>';
+//  myInterface.collapsibleNavBar.appendChild(myInterface.navSearch);
 
 };
 
@@ -117,9 +119,10 @@ myInterface.navPicked = function (label) {
 // -------------------------------------------------------------------------------------------------------------------
 // Render NavBar List Item
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.renderNavBarListItem = function (parent, label) {
+myInterface.renderNavBarListItem = function (parent, label, icon) {
   var listItem = document.createElement('li');
-  var html = '<a href="javascript:myInterface.navPicked(\'' + label + '\')">' + label + '</a>';
+  icon = icon || '';
+  var html = '<a href="javascript:myInterface.navPicked(\'' + label + '\')">' + icon + label + '</a>';
   console.log(html);
   listItem.innerHTML = html;
   parent.appendChild(listItem);
