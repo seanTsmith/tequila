@@ -11,7 +11,6 @@ myInterface.renderNavBar = function () {
   // Main navbar
   myInterface.navBar = document.createElement("header");
   myInterface.navBar.id = "navBar";
-//  myInterface.navBar.className = "navbar navbar-default navbar-fixed-top";
   myInterface.navBar.className = "navbar navbar-inverse navbar-fixed-top";
   myInterface.navBar.setAttribute('draggable', 'true'); // so you can't select text
   myInterface.navBar.setAttribute('role', 'banner');

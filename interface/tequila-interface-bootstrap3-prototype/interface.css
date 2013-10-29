@@ -45,9 +45,9 @@ body {
 }
 
 .panel {
-    -moz-box-shadow:    2px 2px 5px 1px #becedd;
-    -webkit-box-shadow: 2px 2px 5px 1px #becedd;
-    box-shadow:         2px 2px 5px 1px #becedd;
+    -moz-box-shadow:    2px 2px 5px 1px #bebebe;
+    -webkit-box-shadow: 2px 2px 5px 1px #bebebe;
+    box-shadow:         2px 2px 5px 1px #bebebe;
     margin-bottom: 12px;
 }
 

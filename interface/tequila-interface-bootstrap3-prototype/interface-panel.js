@@ -75,7 +75,8 @@ myInterface.renderPanel = function (action) {
       this.style.opacity = '0.4';
       myInterface.dragSrcEl = this;
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', this.innerHTML); // todo this needs to move entire element!
+      e.dataTransfer.setData('text/html', this.id); // todo this needs to move entire element!
+      e.dataTransfer.clearData();
     }, false);
 
     newPanel.addEventListener('drop', function (e) {
@@ -83,11 +84,11 @@ myInterface.renderPanel = function (action) {
       if (e.stopPropagation) {
         e.stopPropagation(); // Stops some browsers from redirecting.
       }
-      // Don't do anything if dropping the same column we're dragging.
-      if (myInterface.dragSrcEl != this) {
-        // Set the source column's HTML to the HTML of the column we dropped on.
-        myInterface.dragSrcEl.innerHTML = this.innerHTML;
-        this.innerHTML = e.dataTransfer.getData('text/html');
+      // Only drag if got one and not same is original
+      if (myInterface.dragSrcEl && myInterface.dragSrcEl != this) {
+        console.log('moving ' + myInterface.dragSrcEl.id + ' to ' +this.id);
+        myInterface.dragSrcEl.parentNode.insertBefore(myInterface.dragSrcEl,this);
+        myInterface.dragSrcEl = false;
       }
       return false;
     }, false);
@@ -108,6 +109,7 @@ myInterface.renderPanel = function (action) {
 
     newPanel.addEventListener('dragend', function (e) {
       // Clean up
+      myInterface.dragSrcEl = false;
       for (var p in myInterface.panels) {
         if (myInterface.panels.hasOwnProperty(p)) {
           myInterface.panels[p].panel.style.opacity = '1';
