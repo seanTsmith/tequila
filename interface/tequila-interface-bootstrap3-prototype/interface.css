@@ -4,10 +4,44 @@
 
 
 body {
-    padding-top: 50px; /* fixed navbar */
+    padding-top: 12px;
+    background-color: #e0e0e0;
+}
 
-    background-color: #e0e7f0;
+.navbar-shunt {
+    height: 50px;
+    margin: 0px;
+    padding: 0px;
+}
 
+.navbar-menu {
+    padding-right: 4px  !important;
+    padding-left: 6px !important;
+}
+
+.navbar-brand {
+    max-width: 164px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+@media (min-width: 1024px) {
+    .navbar-menu {
+        padding-right: 18px  !important;
+        padding-left: 18px !important;
+    }
+}
+
+@media (max-width: 1000px) {
+    .navbar-brand {
+        max-width: 96px;
+    }
+}
+@media (max-width: 768px) {
+    .navbar-brand {
+        max-width: 164px;
+    }
 }
 
 .panel {

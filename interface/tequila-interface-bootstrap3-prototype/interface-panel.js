@@ -164,51 +164,6 @@ myInterface.renderPanel = function (action) {
     panelBody = document.createElement("div");
     panelBody.className = "panel-body ti-shortcut-panel-body";
     panelBody.id = "homePanel1";
-    panelBody.innerHTML = '<div class="">' +
-
-      '<a class="btn btn-warning ti-shortcut-button" href="#">' +
-      '<i class="fa fa-group fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Contacts</div>' +
-      '</a>' +
-
-      '<a class="btn btn-primary ti-shortcut-button" href="#">' +
-      '<i class="fa fa-suitcase fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Projects</div>' +
-      '</a>' +
-
-      '<a class="btn btn-success ti-shortcut-button" href="#">' +
-      '<i class="fa fa-user fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Customers</div>' +
-      '</a>' +
-
-      '<a class="btn btn-danger ti-shortcut-button" href="#">' +
-      '<i class="fa fa-truck fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Vendors</div>' +
-      '</a>' +
-
-      '<a class="btn btn-primary ti-shortcut-button" href="#">' +
-      '<i class="fa fa-gears fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Products & Services</div>' +
-      '</a>' +
-
-      '<a class="btn btn-info ti-shortcut-button" href="#">' +
-      '<i class="fa fa-money fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Financial</div>' +
-      '</a>' +
-
-      '<a class="btn btn-primary ti-shortcut-button" href="#">' +
-      '<i class="fa fa-sitemap fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Organization</div>' +
-      '</a>' +
-
-      '<a class="btn btn-default ti-shortcut-button" href="#">' +
-      '<i class="fa fa-gear fa-2x"></i>' +
-      '<div style="white-space: normal; word-wrap: break-word" class="">Options</div>' +
-      '</a>' +
-
-
-      '</div>';
-
     newPanel.appendChild(panelBody);
 
     panelBody = document.createElement("div");
@@ -293,11 +248,7 @@ myInterface.renderPanel = function (action) {
 
     $('#panelExpandButton' + myInterface.eleCount).hide();
 
-    // Close the home panel
-    if (myInterface.homePanelID) {
-      var num = myInterface.panels[myInterface.homePanelID].eleCount;
-      myInterface.panelContract(num);
-    }
+    myInterface.closeHome();
 
   }
 
@@ -308,31 +259,6 @@ myInterface.renderPanel = function (action) {
 
 };
 
-// -------------------------------------------------------------------------------------------------------------------
-// home Buttons on top
-// -------------------------------------------------------------------------------------------------------------------
-myInterface.homeSlice = function (num) {
-  var hsButton = document.getElementById('homeSlice' + num);
-  var wasActive = (hsButton.className == "btn btn-primary active");
-  document.getElementById('homeSlice1').className = "btn btn-primary";
-  document.getElementById('homeSlice2').className = "btn btn-primary";
-  document.getElementById('homeSlice3').className = "btn btn-primary";
-  document.getElementById('homeSlice4').className = "btn btn-primary";
-  document.getElementById('homeSlice5').className = "btn btn-primary";
-
-  $('#homePanel1').hide();
-  $('#homePanel2').hide();
-  $('#homePanel3').hide();
-  $('#homePanel4').hide();
-  $('#homePanel5').hide();
-
-  if (wasActive)
-    hsButton.className = "btn btn-primary";
-  else {
-    hsButton.className = "btn btn-primary active";
-    $('#homePanel' + num).show();
-  }
-};
 
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Close
@@ -368,22 +294,29 @@ myInterface.panelClicked = function (num) {
       }
     }
   }
-
-  // Close Home
-  document.getElementById('homeSlice1').className = "btn btn-primary";
-  document.getElementById('homeSlice2').className = "btn btn-primary";
-  document.getElementById('homeSlice3').className = "btn btn-primary";
-  document.getElementById('homeSlice4').className = "btn btn-primary";
-  document.getElementById('homeSlice5').className = "btn btn-primary";
-  $('#homePanel1').hide();
-  $('#homePanel2').hide();
-  $('#homePanel3').hide();
-  $('#homePanel4').hide();
-  $('#homePanel5').hide();
+  myInterface.closeHome();
 
   // Now show if need
   if (!wasExpanded || expandedCount != 1)
     myInterface.panelExpand(num);
+};
+
+// -------------------------------------------------------------------------------------------------------------------
+// Close Home
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.closeHome = function () {
+  if (myInterface.homePanelID) {
+    document.getElementById('homeSlice1').className = "btn btn-primary";
+    document.getElementById('homeSlice2').className = "btn btn-primary";
+    document.getElementById('homeSlice3').className = "btn btn-primary";
+    document.getElementById('homeSlice4').className = "btn btn-primary";
+    document.getElementById('homeSlice5').className = "btn btn-primary";
+    $('#homePanel1').hide();
+    $('#homePanel2').hide();
+    $('#homePanel3').hide();
+    $('#homePanel4').hide();
+    $('#homePanel5').hide();
+  }
 };
 
 // -------------------------------------------------------------------------------------------------------------------

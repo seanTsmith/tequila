@@ -13,17 +13,16 @@ myInterface.renderNavBar = function () {
   myInterface.navBar.id = "navBar";
 //  myInterface.navBar.className = "navbar navbar-default navbar-fixed-top";
   myInterface.navBar.className = "navbar navbar-inverse navbar-fixed-top";
+  myInterface.navBar.setAttribute('draggable', 'true'); // so you can't select text
   myInterface.navBar.setAttribute('role', 'banner');
   document.body.appendChild(myInterface.navBar);
 
-  // Add a gap below navbar if not small view -->
-  var navBreak = document.createElement("br");
-  navBreak.className = "hidden-sm";
-  document.body.appendChild(navBreak);
-  document.body.appendChild(navBreak);
-  document.body.appendChild(navBreak);
-  document.body.appendChild(navBreak);
-  document.body.appendChild(navBreak);
+  // Fake div to offset fixed navbar in body
+  myInterface.navBarShunt = document.createElement("div");
+  myInterface.navBarShunt.id = "navBarShunt";
+  myInterface.navBarShunt.className = "navbar-shunt";
+  myInterface.navBarShunt.setAttribute('draggable', 'true'); // so you can't select text
+  document.body.appendChild(myInterface.navBarShunt);
 
   // Container so bootstrap centers
   myInterface.navContainer = document.createElement("div");
@@ -68,22 +67,34 @@ myInterface.renderNavBar = function () {
   myInterface.navList.className = "nav navbar-nav";
   myInterface.collapsibleNavBar.appendChild(myInterface.navList);
 
-  myInterface.stooges = myInterface.renderNavBarListMenu(myInterface.navList, 'Stooges');
+  myInterface.stooges = myInterface.renderNavBarListMenu(myInterface.navList, 'Contacts');
   myInterface.renderNavBarListItem(myInterface.stooges, 'Moe');
   myInterface.renderNavBarListItem(myInterface.stooges, 'Larry');
   myInterface.renderNavBarListItem(myInterface.stooges, 'Curly');
 
-  myInterface.fruit = myInterface.renderNavBarListMenu(myInterface.navList, 'Fruit');
+  myInterface.fruit = myInterface.renderNavBarListMenu(myInterface.navList, 'Projects');
   myInterface.renderNavBarListItem(myInterface.fruit, 'Apple');
   myInterface.renderNavBarListItem(myInterface.fruit, 'Banana');
   myInterface.renderNavBarListItem(myInterface.fruit, 'Cherry');
   myInterface.renderNavBarListItem(myInterface.fruit, 'Peach');
 
-  myInterface.superhero = myInterface.renderNavBarListMenu(myInterface.navList, 'Super Heroes');
+  myInterface.superhero = myInterface.renderNavBarListMenu(myInterface.navList, 'Customers');
   myInterface.renderNavBarListItem(myInterface.superhero, 'Superman');
   myInterface.renderNavBarListItem(myInterface.superhero, 'Batman');
   myInterface.renderNavBarListItem(myInterface.superhero, 'Spiderman');
 
+  myInterface.vendor = myInterface.renderNavBarListMenu(myInterface.navList, 'Vendors');
+  myInterface.renderNavBarListItem(myInterface.vendor, 'Lex Luther');
+  myInterface.renderNavBarListItem(myInterface.vendor, 'Tom');
+  myInterface.renderNavBarListItem(myInterface.vendor, 'Jerry');
+
+  myInterface.pns = myInterface.renderNavBarListMenu(myInterface.navList, 'Product');
+  myInterface.renderNavBarListItem(myInterface.pns, 'Meth');
+  myInterface.renderNavBarListItem(myInterface.pns, 'Crack');
+
+  myInterface.fin = myInterface.renderNavBarListMenu(myInterface.navList, 'Financial');
+  myInterface.renderNavBarListItem(myInterface.fin, 'Wooden Nickel');
+  myInterface.renderNavBarListItem(myInterface.fin, 'Sawbuck');
 
   // login right justified
   myInterface.navListRight = document.createElement("ul");
@@ -91,19 +102,10 @@ myInterface.renderNavBar = function () {
   myInterface.navListRight.className = "nav navbar-nav navbar-right";
   myInterface.collapsibleNavBar.appendChild(myInterface.navListRight);
 
-  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, '<i class="fa fa-user fa-lg"></i> Guest');
+  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, '<i class="fa fa-user fa-lg"></i> Guest0123456789');
+  myInterface.renderNavBarListItem(myInterface.user, 'Organization','<i class="fa fa-sitemap"></i> ');
   myInterface.renderNavBarListItem(myInterface.user, 'Options','<i class="fa fa-gear"></i> ');
   myInterface.renderNavBarListItem(myInterface.user, 'Logout','<i class="fa fa-sign-out"></i> ');
-
-//  // Search right justified
-//  myInterface.navSearch = document.createElement("form");
-//  myInterface.navSearch.className = "navbar-form navbar-right";
-//  myInterface.navSearch.innerHTML = '<div class="form-group">' +
-//    '<input type="text" class="form-control" placeholder="Search">' +
-//    '</div>' +
-//    '<a type="button" href="javascript:myInterface.navPicked(\'Search\')" class="btn btn-default">' +
-//    '<span class="glyphicon glyphicon-search"></span></a>';
-//  myInterface.collapsibleNavBar.appendChild(myInterface.navSearch);
 
 };
 
@@ -113,6 +115,32 @@ myInterface.renderNavBar = function () {
 myInterface.navPicked = function (label) {
   var action = {};
   action.label = label;
+  switch (label) {
+    case 'Contacts':
+      action.style = 'primary';
+      break;
+    case 'Customers':
+      action.style = 'success';
+      break;
+    case 'Vendors':
+      action.style = 'danger';
+      break;
+    case 'Projects':
+      action.style = 'primary';
+      break;
+    case 'Products & Services':
+      action.style = 'warning';
+      break;
+    case 'Financial':
+      action.style = 'info';
+      break;
+    case 'Organization':
+      action.style = 'primary';
+      break;
+    case 'Options':
+      action.style = 'default';
+      break;
+  }
   myInterface.renderPanel(action);
 };
 
@@ -135,7 +163,7 @@ myInterface.renderNavBarListMenu = function (parent, name) {
 
   var dropDown = document.createElement('li');
   dropDown.className = "dropdown";
-  dropDown.innerHTML = '<a href="#" class="dropdown-toggle" data-toggle="dropdown">' + name + '<b class="caret"></b></a>'
+  dropDown.innerHTML = '<a href="#" class="dropdown-toggle navbar-menu" data-toggle="dropdown">' + name + '<b class="caret"></b></a>'
   parent.appendChild(dropDown);
 
   var dropDownMenu = document.createElement('ul');
