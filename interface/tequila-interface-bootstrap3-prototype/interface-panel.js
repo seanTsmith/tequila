@@ -155,6 +155,30 @@ myInterface.renderPanel = function (action) {
     panelCloseButton.setAttribute('data-toggle', 'tooltip');
     panelCloseButton.setAttribute('title', 'Close Panel');
     panelTitle.appendChild(panelCloseButton);
+
+    var theStatus = (myInterface.eleCount-2) % 5;
+    if (theStatus>0) {
+    var panelLabel = document.createElement("span");
+      switch (theStatus) {
+        case 1:
+          panelLabel.innerHTML = 'error';
+          panelLabel.className = "label label-danger pull-right";
+          break;
+        case 2:
+          panelLabel.innerHTML = 'changed';
+          panelLabel.className = "label label-warning pull-right";
+          break;
+        case 3:
+          panelLabel.innerHTML = 'saved';
+          panelLabel.className = "label label-success pull-right";
+          break;
+        case 4:
+          panelLabel.innerHTML = 'new';
+          panelLabel.className = "label label-info pull-right";
+          break;
+      }
+      panelTitle.appendChild(panelLabel);
+    }
   }
 
   // Panel Body is rendered by handler for type

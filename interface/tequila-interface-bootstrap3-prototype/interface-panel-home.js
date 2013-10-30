@@ -13,9 +13,10 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   var txtTitle = '' +
     '<a class="btn btn-primary" id="homeSlice1" href="javascript:myInterface.homeSlice(1)"><i class="fa fa-th fa-2x"></i><span class="hidden-xs">App</span></a>' +
     '<a class="btn btn-primary" id="homeSlice2" href="javascript:myInterface.homeSlice(2)"><i class="fa fa-search fa-2x"></i><span class="hidden-xs">Find</span></a>' +
-    '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-star fa-2x"></i><span class="hidden-xs">Starred</span></a>' +
+    '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-bookmark fa-2x"></i><span class="hidden-xs">Bookmarks</span></a>' +
     '<a class="btn btn-primary" id="homeSlice4" href="javascript:myInterface.homeSlice(4)"><i class="fa fa-book fa-2x"></i><span class="hidden-xs">History</span></a>' +
-    '<a class="btn btn-primary" id="homeSlice5" href="javascript:myInterface.homeSlice(5)"><i class="fa fa-info-circle fa-2x"></i><span class="hidden-xs">Info</span></a>';
+    '<a class="btn btn-primary" id="homeSlice5" href="javascript:myInterface.homeSlice(5)"><i class="fa fa-info-circle fa-2x"></i><span class="hidden-xs">Info</span></a>' +
+    '<a class="btn btn-primary" id="homeSlice6" href="javascript:myInterface.homeSlice(6)"><i class="fa fa-magic fa-2x text-muted"></i><span class="hidden-xs text-muted">Icons</span></a>';
 
   var panelHomeButtonGroup = document.createElement("div");
   panelHomeButtonGroup.className = "btn-group btn-group-justified";
@@ -90,6 +91,9 @@ myInterface.homePanel = function () {
 // home Buttons on top
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.homeSlice = function (num) {
+
+  if (num==6)
+    return;
 
   // First reset all home panels and hide
   var hsButton = document.getElementById('homeSlice' + num);

@@ -6,34 +6,42 @@
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Handler: options
 // -------------------------------------------------------------------------------------------------------------------
+myInterface.OptionChange = function (ele) {
+  console.log('change ele');
+  return ele;
+};
+
+// -------------------------------------------------------------------------------------------------------------------
+// Panel Handler: options
+// -------------------------------------------------------------------------------------------------------------------
 myInterface.addPanelHandler(myInterface.COMMAND.OPTIONS, function (ele) {
+
   ele.innerHTML = '' +
-    '<form role="form">' +
-
     '<div class="form-group">' +
-    '<label for="exampleInputEmail1">Email address</label>' +
-    '<input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">' +
+    '<label>Navigation</label><p class="text-muted">Select navigation panels to display</p>' +
+    '<div class="btn-group" data-toggle="buttons">' +
+    '<label id="navOptionNavigationNavbar" class="btn btn-default"><input type="radio" name="options"> Navbar </label>' +
+    '<label id="navOptionNavigationAppbar" class="btn btn-default"><input type="radio" name="options"> Appbar </label>' +
+    '<label id="navOptionNavigationBoth" class="btn btn-default active"><input type="radio" name="options"> Both </label>' +
     '</div>' +
+    '</div>'
 
-    '<div class="form-group">' +
-    '<label for="exampleInputPassword1">Password</label>' +
-    '<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">' +
-    '</div>' +
+  $('#navOptionNavigationNavbar').bind('click',function(event){
+    $("#panel1").hide();
+    $("#navBar").show();
+    $("#navBarShunt").show();
+  });
+  $('#navOptionNavigationAppbar').bind('click',function(event){
+    $("#panel1").show();
+    $("#navBar").hide();
+    $("#navBarShunt").hide();
+  });
+  $('#navOptionNavigationBoth').bind('click',function(event){
+    $("#panel1").show();
+    $("#navBar").show();
+    $("#navBarShunt").show();
+  });
 
-    '<div class="form-group">' +
-    '<label for="exampleInputFile">File input</label>' +
-    '<input type="file" id="exampleInputFile">' +
-    '<p class="help-block">Example block-level help text here.</p>' +
-    '</div>' +
 
-    '<div class="checkbox">' +
-    '<label>' +
-    '<input type="checkbox"> Check me out' +
-    '</label>' +
-    '</div>' +
-
-    '<button type="submit" class="btn btn-default">Submit</button>' +
-
-    '</form>';
   return true;
 });
