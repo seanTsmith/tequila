@@ -6,7 +6,7 @@
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Handler: options
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.addPanelHandler('options', function (ele) {
+myInterface.addPanelHandler(myInterface.COMMAND.OPTIONS, function (ele) {
   ele.innerHTML = '' +
     '<form role="form">' +
 

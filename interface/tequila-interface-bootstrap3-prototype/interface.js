@@ -2,9 +2,19 @@
  * myInterface.js
  */
 
+// -------------------------------------------------------------------------------------------------------------------
+// Library exposed through myInterface
+// -------------------------------------------------------------------------------------------------------------------
 myInterface = {};
 myInterface.panelHandlers = [];
 myInterface.eleCount = 0;
+
+// -------------------------------------------------------------------------------------------------------------------
+// Define Commands for App Interface
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.COMMAND = {};
+myInterface.COMMAND.HOME = 'home';
+myInterface.COMMAND.OPTIONS = 'options';
 
 // -------------------------------------------------------------------------------------------------------------------
 // Entry point when document ready
@@ -29,8 +39,8 @@ $(document).ready(function () {
 myInterface.renderFramework = function () {
   myInterface.renderNavBar();
   myInterface.homePanel();
-  myInterface.renderPanel({label:'Eat'});
-  myInterface.renderPanel({label:'More'});
-  myInterface.renderPanel({label:'Chiken'});
+//  myInterface.renderPanel({label:'Eat'});
+//  myInterface.renderPanel({label:'More'});
+//  myInterface.renderPanel({label:'Chiken'});
 };
 

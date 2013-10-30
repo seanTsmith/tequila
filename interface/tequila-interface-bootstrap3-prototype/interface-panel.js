@@ -4,7 +4,7 @@
  */
 
 // -------------------------------------------------------------------------------------------------------------------
-// Render Panel
+// Panel Initialization
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.lazyInitPanel = function () {
   console.log('myInterface.lazyInitPanel()');
@@ -127,80 +127,13 @@ myInterface.renderPanel = function (action) {
   var panelCloseButton = document.createElement("a");
   var html;
 
-  if (type == 'home') { // HOME panel
+  panelTitle.className = "panel-title";
+  panelHeading.appendChild(panelTitle);
+  panelContractButton.innerHTML = '<span class="glyphicon glyphicon-chevron-left panel-glyphs pull-right text-muted"></span>';
+  panelExpandButton.innerHTML = '<span class="glyphicon glyphicon-chevron-up panel-glyphs pull-right text-muted"></span>';
 
-    panelTitle.className = "panel-title";
-    // panelTitle.innerHTML = txtTitle;
-    panelHeading.appendChild(panelTitle);
-
-    //txtTitle = '<a class="btn btn-primary active" href="#"><i class="fa fa-home fa-2x"></i><br>Home</a>' +
-    txtTitle = '' +
-      '<a class="btn btn-primary" id="homeSlice1" href="javascript:myInterface.homeSlice(1)"><i class="fa fa-home fa-2x"></i><span class="hidden-xs">Home</span></a>' +
-      '<a class="btn btn-primary" id="homeSlice2" href="javascript:myInterface.homeSlice(2)"><i class="fa fa-search fa-2x"></i><span class="hidden-xs">Find</span></a>' +
-      '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-star fa-2x"></i><span class="hidden-xs">Starred</span></a>' +
-      '<a class="btn btn-primary" id="homeSlice4" href="javascript:myInterface.homeSlice(4)"><i class="fa fa-book fa-2x"></i><span class="hidden-xs">History</span></a>' +
-      '<a class="btn btn-primary" id="homeSlice5" href="javascript:myInterface.homeSlice(5)"><i class="fa fa-info-circle fa-2x"></i><span class="hidden-xs">Info</span></a>';
-
-    var panelHomeButtonGroup = document.createElement("div");
-    panelHomeButtonGroup.className = "btn-group btn-group-justified";
-    panelHomeButtonGroup.innerHTML = txtTitle;
-    panelTitle.appendChild(panelHomeButtonGroup);
-
-    var panelBody;
-    panelBody = document.createElement("div");
-    panelBody.className = "panel-body ti-shortcut-panel-body";
-    panelBody.id = "homePanel1";
-    newPanel.appendChild(panelBody);
-
-    panelBody = document.createElement("div");
-    panelBody.className = "panel-body";
-    panelBody.id = "homePanel2";
-    panelBody.innerHTML = '<div class="well well-sm well-tight">' +
-      '<h1>Find Panel</h1>' +
-      '<p>Oh look!</p>' +
-      '<p>I have fallen in a well.</p>' +
-      '</div>';
-    newPanel.appendChild(panelBody);
-
-    panelBody = document.createElement("div");
-    panelBody.className = "panel-body";
-    panelBody.id = "homePanel3";
-    panelBody.innerHTML = '<div class="well well-sm well-tight">' +
-      '<h1>Favorites (Starred) Panel</h1>' +
-      '<p>Oh look!</p>' +
-      '<p>I have fallen in a well.</p>' +
-      '</div>';
-    newPanel.appendChild(panelBody);
-
-    panelBody = document.createElement("div");
-    panelBody.className = "panel-body";
-    panelBody.id = "homePanel4";
-    panelBody.innerHTML = '<div class="well well-sm well-tight">' +
-      '<h1>History Panel</h1>' +
-      '<p>Oh look!</p>' +
-      '<p>I have fallen in a well.</p>' +
-      '</div>';
-    newPanel.appendChild(panelBody);
-
-    panelBody = document.createElement("div");
-    panelBody.className = "panel-body";
-    panelBody.id = "homePanel5";
-    panelBody.innerHTML = '<div class="well well-sm well-tight">' +
-      '<h1>Info Panel</h1>' +
-      '<p>Oh look!</p>' +
-      '<p>I have fallen in a well.</p>' +
-      '</div>';
-    newPanel.appendChild(panelBody);
-    myInterface.homeSlice(1);
-
-  } else { // All panels but home ...
-
-    panelContractButton.innerHTML = '<span class="glyphicon glyphicon-chevron-left panel-glyphs pull-right text-muted"></span>';
-    panelExpandButton.innerHTML = '<span class="glyphicon glyphicon-chevron-up panel-glyphs pull-right text-muted"></span>';
-
-    panelTitle.className = "panel-title";
+  if (type != 'home') {
     panelTitle.innerHTML = txtTitle;
-    panelHeading.appendChild(panelTitle);
 
     panelContractButton.id = "panelContractButton" + myInterface.eleCount;
     panelContractButton.setAttribute('href', "javascript:myInterface.panelContract(" + myInterface.eleCount + ")");
@@ -214,28 +147,27 @@ myInterface.renderPanel = function (action) {
     panelExpandButton.setAttribute('title', 'Expand Panel');
     panelTitle.appendChild(panelExpandButton);
 
-    // Close button
-    panelCloseButton.innerHTML = '<span class="glyphicon glyphicon-remove panel-glyphs pull-right text-muted"></span>';
-    panelCloseButton.setAttribute('href', "javascript:myInterface.panelClose(" + myInterface.eleCount + ")");
-    panelCloseButton.setAttribute('data-toggle', 'tooltip');
-    panelCloseButton.setAttribute('title', 'Close Panel');
-    panelTitle.appendChild(panelCloseButton);
+      // Close button
+      panelCloseButton.innerHTML = '<span class="glyphicon glyphicon-remove panel-glyphs pull-right text-muted"></span>';
+      panelCloseButton.setAttribute('href', "javascript:myInterface.panelClose(" + myInterface.eleCount + ")");
+      panelCloseButton.setAttribute('data-toggle', 'tooltip');
+      panelCloseButton.setAttribute('title', 'Close Panel');
+      panelTitle.appendChild(panelCloseButton);
+    }
 
     // Panel Body is rendered by handler for type
     var panelBody = document.createElement("div");
     panelBody.className = "panel-body panel-body-" + style;
     panelBody.id = "panelBody" + myInterface.eleCount;
     newPanel.appendChild(panelBody);
-    if (!myInterface.invokePanelHandler(type, panelBody)) {
+    if (!myInterface.invokePanelHandler(type, panelBody, panelTitle)) {
       panelBody.innerHTML = '<div class="well well-sm well-tight"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
         '<p>This is a panel with no handler for type "' + type + '".</p>' +
         '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
         ' some awesome code.</p></div>';
     }
-
     $('#panelExpandButton' + myInterface.eleCount).hide();
     myInterface.closeHome();
-  }
 
   // Scroll to top
   window.scrollTo(0, 0);
@@ -254,10 +186,10 @@ myInterface.addPanelHandler = function (type, callback) {
 // -------------------------------------------------------------------------------------------------------------------
 // Invoke Panel Handler
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.invokePanelHandler = function (type, panelBody) {
+myInterface.invokePanelHandler = function (type, panelBody, panelTitle) {
   for (p in myInterface.panelHandlers) {
     if (myInterface.panelHandlers[p].type == type) {
-      return myInterface.panelHandlers[p].callback(panelBody);
+      return myInterface.panelHandlers[p].callback(panelBody, panelTitle);
     }
   }
   return false;
@@ -302,24 +234,6 @@ myInterface.panelClicked = function (num) {
   // Now show if need
   if (!wasExpanded || expandedCount != 1)
     myInterface.panelExpand(num);
-};
-
-// -------------------------------------------------------------------------------------------------------------------
-// Close Home
-// -------------------------------------------------------------------------------------------------------------------
-myInterface.closeHome = function () {
-  if (myInterface.homePanelID) {
-    document.getElementById('homeSlice1').className = "btn btn-primary";
-    document.getElementById('homeSlice2').className = "btn btn-primary";
-    document.getElementById('homeSlice3').className = "btn btn-primary";
-    document.getElementById('homeSlice4').className = "btn btn-primary";
-    document.getElementById('homeSlice5').className = "btn btn-primary";
-    $('#homePanel1').hide();
-    $('#homePanel2').hide();
-    $('#homePanel3').hide();
-    $('#homePanel4').hide();
-    $('#homePanel5').hide();
-  }
 };
 
 // -------------------------------------------------------------------------------------------------------------------
