@@ -39,8 +39,21 @@ $(document).ready(function () {
 myInterface.renderFramework = function () {
   myInterface.renderNavBar();
   myInterface.homePanel();
+  myInterface.renderPageFooter();
 //  myInterface.renderPanel({label:'Eat'});
 //  myInterface.renderPanel({label:'More'});
 //  myInterface.renderPanel({label:'Chiken'});
 };
 
+// -------------------------------------------------------------------------------------------------------------------
+// Render Debug Footer
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.renderPageFooter = function () {
+  myInterface.debugFooter = document.createElement("footer");
+  myInterface.debugFooter.id = "pageFooter";
+  myInterface.debugFooter.className = "container";
+  myInterface.debugFooter.setAttribute('draggable', 'true'); // so you can't select text
+  myInterface.debugFooter.setAttribute('role', 'banner');
+  myInterface.debugFooter.innerHTML = '<p class="text-muted">Simple page footer here.</p>';
+  document.body.appendChild(myInterface.debugFooter);
+};

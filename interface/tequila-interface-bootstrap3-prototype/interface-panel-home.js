@@ -11,7 +11,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   var newPanel = panelBody.parentNode;
 
   var txtTitle = '' +
-    '<a class="btn btn-primary" id="homeSlice1" href="javascript:myInterface.homeSlice(1)"><i class="fa fa-home fa-2x"></i><span class="hidden-xs">Home</span></a>' +
+    '<a class="btn btn-primary" id="homeSlice1" href="javascript:myInterface.homeSlice(1)"><i class="fa fa-th fa-2x"></i><span class="hidden-xs">App</span></a>' +
     '<a class="btn btn-primary" id="homeSlice2" href="javascript:myInterface.homeSlice(2)"><i class="fa fa-search fa-2x"></i><span class="hidden-xs">Find</span></a>' +
     '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-star fa-2x"></i><span class="hidden-xs">Starred</span></a>' +
     '<a class="btn btn-primary" id="homeSlice4" href="javascript:myInterface.homeSlice(4)"><i class="fa fa-book fa-2x"></i><span class="hidden-xs">History</span></a>' +
@@ -22,51 +22,50 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   panelHomeButtonGroup.innerHTML = txtTitle;
   panelTitle.appendChild(panelHomeButtonGroup);
 
-//  var panelBody;
-//  panelBody = document.createElement("div");
+  // wtf this is shitty code ...
   panelBody.className = "panel-body panel-body-home";
   panelBody.id = "homePanel1";
-//  newPanel.appendChild(panelBody);
 
-  panelBody = document.createElement("div");
-  panelBody.className = "panel-body";
-  panelBody.id = "homePanel2";
-  panelBody.innerHTML = '<div class="well well-sm well-tight">' +
+  var panelBodyInserts;
+  panelBodyInserts = document.createElement("div");
+  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.id = "homePanel2";
+  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
     '<h1>Find Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
     '</div>';
-  newPanel.appendChild(panelBody);
+  newPanel.appendChild(panelBodyInserts);
 
-  panelBody = document.createElement("div");
-  panelBody.className = "panel-body";
-  panelBody.id = "homePanel3";
-  panelBody.innerHTML = '<div class="well well-sm well-tight">' +
+  panelBodyInserts = document.createElement("div");
+  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.id = "homePanel3";
+  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
     '<h1>Favorites (Starred) Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
     '</div>';
-  newPanel.appendChild(panelBody);
+  newPanel.appendChild(panelBodyInserts);
 
-  panelBody = document.createElement("div");
-  panelBody.className = "panel-body";
-  panelBody.id = "homePanel4";
-  panelBody.innerHTML = '<div class="well well-sm well-tight">' +
+  panelBodyInserts = document.createElement("div");
+  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.id = "homePanel4";
+  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
     '<h1>History Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
     '</div>';
-  newPanel.appendChild(panelBody);
+  newPanel.appendChild(panelBodyInserts);
 
-  panelBody = document.createElement("div");
-  panelBody.className = "panel-body";
-  panelBody.id = "homePanel5";
-  panelBody.innerHTML = '<div class="well well-sm well-tight">' +
+  panelBodyInserts = document.createElement("div");
+  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.id = "homePanel5";
+  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
     '<h1>Info Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
     '</div>';
-  newPanel.appendChild(panelBody);
+  newPanel.appendChild(panelBodyInserts);
   myInterface.homeSlice(1);
 
   return true;

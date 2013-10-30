@@ -135,39 +135,41 @@ myInterface.renderPanel = function (action) {
   if (type != 'home') {
     panelTitle.innerHTML = txtTitle;
 
+    // Contract Button
     panelContractButton.id = "panelContractButton" + myInterface.eleCount;
     panelContractButton.setAttribute('href', "javascript:myInterface.panelContract(" + myInterface.eleCount + ")");
     panelContractButton.setAttribute('data-toggle', 'tooltip');
     panelContractButton.setAttribute('title', 'Contract Panel');
     panelTitle.appendChild(panelContractButton);
 
+    // Expand Button
     panelExpandButton.id = "panelExpandButton" + myInterface.eleCount;
     panelExpandButton.setAttribute('href', "javascript:myInterface.panelExpand(" + myInterface.eleCount + ")");
     panelExpandButton.setAttribute('data-toggle', 'tooltip');
     panelExpandButton.setAttribute('title', 'Expand Panel');
     panelTitle.appendChild(panelExpandButton);
 
-      // Close button
-      panelCloseButton.innerHTML = '<span class="glyphicon glyphicon-remove panel-glyphs pull-right text-muted"></span>';
-      panelCloseButton.setAttribute('href', "javascript:myInterface.panelClose(" + myInterface.eleCount + ")");
-      panelCloseButton.setAttribute('data-toggle', 'tooltip');
-      panelCloseButton.setAttribute('title', 'Close Panel');
-      panelTitle.appendChild(panelCloseButton);
-    }
+    // Contract Button
+    panelCloseButton.innerHTML = '<span class="glyphicon glyphicon-remove panel-glyphs pull-right text-muted"></span>';
+    panelCloseButton.setAttribute('href', "javascript:myInterface.panelClose(" + myInterface.eleCount + ")");
+    panelCloseButton.setAttribute('data-toggle', 'tooltip');
+    panelCloseButton.setAttribute('title', 'Close Panel');
+    panelTitle.appendChild(panelCloseButton);
+  }
 
-    // Panel Body is rendered by handler for type
-    var panelBody = document.createElement("div");
-    panelBody.className = "panel-body panel-body-" + style;
-    panelBody.id = "panelBody" + myInterface.eleCount;
-    newPanel.appendChild(panelBody);
-    if (!myInterface.invokePanelHandler(type, panelBody, panelTitle)) {
-      panelBody.innerHTML = '<div class="well well-sm well-tight"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
-        '<p>This is a panel with no handler for type "' + type + '".</p>' +
-        '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
-        ' some awesome code.</p></div>';
-    }
-    $('#panelExpandButton' + myInterface.eleCount).hide();
-    myInterface.closeHome();
+  // Panel Body is rendered by handler for type
+  var panelBody = document.createElement("div");
+  panelBody.className = "panel-body panel-body-" + style;
+  panelBody.id = "panelBody" + myInterface.eleCount;
+  newPanel.appendChild(panelBody);
+  if (!myInterface.invokePanelHandler(type, panelBody, panelTitle)) {
+    panelBody.innerHTML = '<div class="well well-sm well-tight"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
+      '<p>This is a panel with no handler for type "' + type + '".</p>' +
+      '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
+      ' some awesome code.</p></div>';
+  }
+  $('#panelExpandButton' + myInterface.eleCount).hide();
+  myInterface.closeHome();
 
   // Scroll to top
   window.scrollTo(0, 0);
