@@ -3,6 +3,7 @@
  */
 
 myInterface = {};
+myInterface.panelHandlers = [];
 myInterface.eleCount = 0;
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -28,7 +29,8 @@ $(document).ready(function () {
 myInterface.renderFramework = function () {
   myInterface.renderNavBar();
   myInterface.homePanel();
-//  myInterface.renderPanel({label:'Eat'});
-//  myInterface.renderPanel({label:'More'});
-//  myInterface.renderPanel({label:'Chiken'});
+  myInterface.renderPanel({label:'Eat'});
+  myInterface.renderPanel({label:'More'});
+  myInterface.renderPanel({label:'Chiken'});
 };
+

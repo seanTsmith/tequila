@@ -4,21 +4,6 @@
  */
 
 // -------------------------------------------------------------------------------------------------------------------
-// Home Panel
-// -------------------------------------------------------------------------------------------------------------------
-myInterface.homePanel = function () {
-  if (!myInterface.homePanelID) {
-    myInterface.homePanelID = myInterface.renderPanel({label: 'Home', type: 'home', style: 'primary', icon: 'fa-home'});
-  } else {
-    var num = myInterface.panels[myInterface.homePanelID].eleCount;
-    myInterface.panelContract(num);
-    myInterface.panelClicked(num);
-    document.getElementById('homeSlice1').className = "btn btn-primary";
-    myInterface.homeSlice(1);
-  }
-};
-
-// -------------------------------------------------------------------------------------------------------------------
 // Render Panel
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.lazyInitPanel = function () {
@@ -28,7 +13,7 @@ myInterface.lazyInitPanel = function () {
   if (!myInterface.panelContainer) {
     myInterface.panelContainer = document.createElement("div");
     myInterface.panelContainer.id = "panelContainer";
-    myInterface.panelContainer.className = "container";
+    myInterface.panelContainer.className = "container panel-container";
     document.body.appendChild(myInterface.panelContainer);
   }
 
@@ -86,8 +71,8 @@ myInterface.renderPanel = function (action) {
       }
       // Only drag if got one and not same is original
       if (myInterface.dragSrcEl && myInterface.dragSrcEl != this) {
-        console.log('moving ' + myInterface.dragSrcEl.id + ' to ' +this.id);
-        myInterface.dragSrcEl.parentNode.insertBefore(myInterface.dragSrcEl,this);
+        console.log('moving ' + myInterface.dragSrcEl.id + ' to ' + this.id);
+        myInterface.dragSrcEl.parentNode.insertBefore(myInterface.dragSrcEl, this);
         myInterface.dragSrcEl = false;
       }
       return false;
@@ -162,7 +147,6 @@ myInterface.renderPanel = function (action) {
     panelTitle.appendChild(panelHomeButtonGroup);
 
     var panelBody;
-
     panelBody = document.createElement("div");
     panelBody.className = "panel-body ti-shortcut-panel-body";
     panelBody.id = "homePanel1";
@@ -237,21 +221,20 @@ myInterface.renderPanel = function (action) {
     panelCloseButton.setAttribute('title', 'Close Panel');
     panelTitle.appendChild(panelCloseButton);
 
-    html = '<div class="well well-sm well-tight"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
-      '<p>This is a panel with no defined type.</p>' +
-      '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
-      ' some awesome code.</p></div>';
-
+    // Panel Body is rendered by handler for type
     var panelBody = document.createElement("div");
-    panelBody.className = "panel-body";
+    panelBody.className = "panel-body panel-body-" + style;
     panelBody.id = "panelBody" + myInterface.eleCount;
-    panelBody.innerHTML = html;
     newPanel.appendChild(panelBody);
+    if (!myInterface.invokePanelHandler(type, panelBody)) {
+      panelBody.innerHTML = '<div class="well well-sm well-tight"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
+        '<p>This is a panel with no handler for type "' + type + '".</p>' +
+        '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
+        ' some awesome code.</p></div>';
+    }
 
     $('#panelExpandButton' + myInterface.eleCount).hide();
-
     myInterface.closeHome();
-
   }
 
   // Scroll to top
@@ -261,6 +244,24 @@ myInterface.renderPanel = function (action) {
 
 };
 
+// -------------------------------------------------------------------------------------------------------------------
+// Add Panel Handler
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.addPanelHandler = function (type, callback) {
+  myInterface.panelHandlers.push({type: type, callback: callback});
+};
+
+// -------------------------------------------------------------------------------------------------------------------
+// Invoke Panel Handler
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.invokePanelHandler = function (type, panelBody) {
+  for (p in myInterface.panelHandlers) {
+    if (myInterface.panelHandlers[p].type == type) {
+      return myInterface.panelHandlers[p].callback(panelBody);
+    }
+  }
+  return false;
+};
 
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Close

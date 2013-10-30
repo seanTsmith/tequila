@@ -2,10 +2,25 @@
  * tequila
  * interface-panel-home
  */
+
+// -------------------------------------------------------------------------------------------------------------------
+// Home Panel
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.homePanel = function () {
+  if (!myInterface.homePanelID) {
+    myInterface.homePanelID = myInterface.renderPanel({label: 'Home', type: 'home', style: 'primary', icon: 'fa-home'});
+  } else {
+    var num = myInterface.panels[myInterface.homePanelID].eleCount;
+    myInterface.panelContract(num);
+    myInterface.panelClicked(num);
+    document.getElementById('homeSlice1').className = "btn btn-primary";
+    myInterface.homeSlice(1);
+  }
+};
+
 // -------------------------------------------------------------------------------------------------------------------
 // home Buttons on top
 // -------------------------------------------------------------------------------------------------------------------
-
 myInterface.homeSlice = function (num) {
 
   // First reset all home panels and hide

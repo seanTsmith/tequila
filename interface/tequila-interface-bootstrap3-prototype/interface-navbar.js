@@ -138,6 +138,7 @@ myInterface.navPicked = function (label) {
       break;
     case 'Options':
       action.style = 'default';
+      action.type = 'options';
       break;
   }
   myInterface.renderPanel(action);
