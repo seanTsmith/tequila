@@ -67,7 +67,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
     '<p>I have fallen in a well.</p>' +
     '</div>';
   newPanel.appendChild(panelBodyInserts);
-  myInterface.homeSlice(1);
+  myInterface.homeSlice(1,true);
 
   return true;
 });
@@ -91,7 +91,7 @@ myInterface.homePanel = function () {
 // -------------------------------------------------------------------------------------------------------------------
 // home Buttons on top
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.homeSlice = function (num) {
+myInterface.homeSlice = function (num, quick) {
 
   if (num==6)
     return;
@@ -104,11 +104,13 @@ myInterface.homeSlice = function (num) {
   document.getElementById('homeSlice3').className = "btn btn-primary";
   document.getElementById('homeSlice4').className = "btn btn-primary";
   document.getElementById('homeSlice5').className = "btn btn-primary";
-  $('#homePanel1').hide(250);
-  $('#homePanel2').hide(250);
-  $('#homePanel3').hide(250);
-  $('#homePanel4').hide(250);
-  $('#homePanel5').hide(250);
+  var anim = 250
+  if (quick) anim = 0;
+  $('#homePanel1').hide(anim);
+  $('#homePanel2').hide(anim);
+  $('#homePanel3').hide(anim);
+  $('#homePanel4').hide(anim);
+  $('#homePanel5').hide(anim);
 
   // If we clicked on open one then just leave while all closed
   if (wasActive) {

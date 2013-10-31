@@ -5,6 +5,14 @@
 body {
     padding-top: 0px;
     background-color: #e0e0e0;
+    background-image: url('img/blue_agave.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.blue-badge {
+    background-color: #428bca;
 }
 
 .navbar-shunt {
@@ -18,7 +26,26 @@ body {
     padding-left: 6px !important;
 }
 
+.navbar-icons {
+    padding-right: 0px !important;
+    padding-left: 4px !important;
+    margin: 0;
+}
+
+.navbar-icon-gap {
+    padding-left: 16px !important;
+}
+
 .navbar-brand {
+    max-width: 164px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.navbar-user-name {
+    margin: 0;
+    padding: 0;
     max-width: 164px;
     white-space: nowrap;
     overflow: hidden;
@@ -27,8 +54,8 @@ body {
 
 @media (min-width: 1024px) {
     .navbar-menu {
-        padding-right: 18px !important;
-        padding-left: 18px !important;
+        padding-right: 12px !important;
+        padding-left: 12px !important;
     }
 }
 
@@ -36,10 +63,22 @@ body {
     .navbar-brand {
         max-width: 96px;
     }
+
+    .navbar-user-name {
+        max-width: 32px;
+    }
+
+    .navbar-icon-gap {
+        padding-left: 2px !important;
+    }
 }
 
 @media (max-width: 768px) {
     .navbar-brand {
+        max-width: 164px;
+    }
+
+    .navbar-user-name {
         max-width: 164px;
     }
 }
@@ -217,6 +256,7 @@ fieldset[disabled] .btn-dude.active {
 .alert-dude .alert-link {
     color: #69872d;
 }
+
 .progress-bar-dude {
     background-color: #c0de5b;
 }
@@ -315,11 +355,10 @@ fieldset[disabled] .btn-sweet.active {
 .alert-sweet .alert-link {
     color: #692d87;
 }
+
 .progress-bar-sweet {
     background-color: #c05bde;
 }
-
-
 
 .well-fucking-well {
     min-height: 20px;

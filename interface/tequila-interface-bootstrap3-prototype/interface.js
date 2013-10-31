@@ -54,6 +54,6 @@ myInterface.renderPageFooter = function () {
   myInterface.debugFooter.className = "container";
   myInterface.debugFooter.setAttribute('draggable', 'true'); // so you can't select text
   myInterface.debugFooter.setAttribute('role', 'banner');
-  myInterface.debugFooter.innerHTML = '<p class="text-muted">Simple page footer here.</p>';
+  myInterface.debugFooter.innerHTML = '<a href="https://github.com/dremoor/tequila"><p class="text-muted text-center"><i class="fa fa-github"> tequila.js</p></a>';
   document.body.appendChild(myInterface.debugFooter);
 };

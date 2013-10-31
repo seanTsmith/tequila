@@ -46,6 +46,18 @@ myInterface.renderNavBar = function () {
   myInterface.navBarToggle.innerHTML = iconBar + iconBar + iconBar;
   myInterface.navResponsiveHeader.appendChild(myInterface.navBarToggle);
 
+//  // Message Icon
+//  myInterface.navEmail2 = document.createElement("button");
+//  myInterface.navEmail2.className = "navbar-toggle navbar-icons";
+//  myInterface.navEmail2.innerHTML = '<a href="#" class="navbar-icons"><i class="fa fa-envelope"> <span class="badge blue-badge">999</span></a>';
+//  myInterface.navResponsiveHeader.appendChild(myInterface.navEmail2);
+//
+//  // Calendar Icon
+//  myInterface.navCalendar2 = document.createElement("button");
+//  myInterface.navCalendar2.className = "navbar-toggle navbar-icons";
+//  myInterface.navCalendar2.innerHTML = '<a href="#" class="navbar-icons"><i class="fa fa-calendar"> <span class="badge blue-badge">999</span></a>';
+//  myInterface.navResponsiveHeader.appendChild(myInterface.navCalendar2);
+
   // Brand
   myInterface.navBarBrand = document.createElement("a");
   myInterface.navBarBrand.id = "navBarBrand";
@@ -95,13 +107,25 @@ myInterface.renderNavBar = function () {
   myInterface.renderNavBarListItem(myInterface.fin, 'Wooden Nickel');
   myInterface.renderNavBarListItem(myInterface.fin, 'Sawbuck');
 
-  // login right justified
+  // Message Icon
+  myInterface.navEmail = document.createElement("li");
+  myInterface.navEmail.className = "navbar-icons navbar-icon-gap";
+  myInterface.navEmail.innerHTML = '<a href="#" class="navbar-icons"><i class="fa fa-envelope"> <span class="badge blue-badge">999</span></a>';
+  myInterface.navList.appendChild(myInterface.navEmail);
+
+  // Calendar Icon
+  myInterface.navCalendar = document.createElement("li");
+  myInterface.navCalendar.className = "navbar-icons";
+  myInterface.navCalendar.innerHTML = '<a href="#" class="navbar-icons"><i class="fa fa-calendar"> <span class="badge blue-badge">999</span></a>';
+  myInterface.navList.appendChild(myInterface.navCalendar);
+
+  // User Drop Down
   myInterface.navListRight = document.createElement("ul");
   myInterface.navListRight.id = "navListRight";
   myInterface.navListRight.className = "nav navbar-nav navbar-right";
   myInterface.collapsibleNavBar.appendChild(myInterface.navListRight);
 
-  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, '<i class="fa fa-user fa-lg"></i> Guest0123456789');
+  myInterface.user = myInterface.renderNavBarListMenu(myInterface.navListRight, '<i class="fa fa-user fa-lg"></i> <i class="fa navbar-user-name">Guest0123456789</i>');
   myInterface.renderNavBarListItem(myInterface.user, 'Organization','<i class="fa fa-sitemap"></i> ');
   myInterface.renderNavBarListItem(myInterface.user, 'Options','<i class="fa fa-gear"></i> ');
   myInterface.renderNavBarListItem(myInterface.user, 'Logout','<i class="fa fa-sign-out"></i> ');
