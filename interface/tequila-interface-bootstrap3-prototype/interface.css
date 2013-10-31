@@ -2,7 +2,6 @@
  * interface.css
  */
 
-
 body {
     padding-top: 0px;
     background-color: #e0e0e0;
@@ -15,7 +14,7 @@ body {
 }
 
 .navbar-menu {
-    padding-right: 4px  !important;
+    padding-right: 4px !important;
     padding-left: 6px !important;
 }
 
@@ -28,7 +27,7 @@ body {
 
 @media (min-width: 1024px) {
     .navbar-menu {
-        padding-right: 18px  !important;
+        padding-right: 18px !important;
         padding-left: 18px !important;
     }
 }
@@ -38,6 +37,7 @@ body {
         max-width: 96px;
     }
 }
+
 @media (max-width: 768px) {
     .navbar-brand {
         max-width: 164px;
@@ -45,9 +45,9 @@ body {
 }
 
 .panel {
-    -moz-box-shadow:    2px 2px 5px 1px #bebebe;
+    -moz-box-shadow: 2px 2px 5px 1px #bebebe;
     -webkit-box-shadow: 2px 2px 5px 1px #bebebe;
-    box-shadow:         2px 2px 5px 1px #bebebe;
+    box-shadow: 2px 2px 5px 1px #bebebe;
     margin-bottom: 12px;
 }
 
@@ -59,15 +59,15 @@ body {
     background-color: #428bca;
 }
 
-.panel-success  {
+.panel-success {
     background-color: #dff0d8;
 }
 
-.panel-warning  {
+.panel-warning {
     background-color: #fcf8e3;
 }
 
-.panel-danger  {
+.panel-danger {
     background-color: #f2dede;
 }
 
@@ -76,7 +76,14 @@ body {
 }
 
 .panel-body {
-    padding: 12px;
+    padding: 6px;
+}
+
+.panel-body-no-well {
+    padding-top: 8px;
+    padding-right: 16px;
+    padding-left: 16px;
+    padding-bottom: 0px;
 }
 
 .panel.over {
@@ -116,43 +123,240 @@ body {
     text-align: center;
 }
 
+.panel-dude {
+    border-color: #e8f1bc;
+    background-color: #edf7d9;
+}
+
+.panel-dude > .panel-heading {
+    color: #87ad3a;
+    background-color: #edf7d9;
+    border-color: #e8f1bc;
+}
+
+.panel-dude > .panel-heading + .panel-collapse .panel-body {
+    border-top-color: #e8f1bc;
+}
+
+.panel-dude > .panel-footer + .panel-collapse .panel-body {
+    border-bottom-color: #e8f1bc;
+}
+
+.text-dude {
+    color: #87ad3a;
+}
+
+.btn-dude {
+    color: #ffffff;
+    background-color: #c0de5b;
+    border-color: #b8da46;
+}
+
+.btn-dude:hover,
+.btn-dude:focus,
+.btn-dude:active,
+.btn-dude.active,
+.open .dropdown-toggle.btn-dude {
+    color: #ffffff;
+    background-color: #b3d739;
+    border-color: #9abc26;
+}
+
+.btn-dude:active,
+.btn-dude.active,
+.open .dropdown-toggle.btn-dude {
+    background-image: none;
+}
+
+.btn-dude.disabled,
+.btn-dude[disabled],
+fieldset[disabled] .btn-dude,
+.btn-dude.disabled:hover,
+.btn-dude[disabled]:hover,
+fieldset[disabled] .btn-dude:hover,
+.btn-dude.disabled:focus,
+.btn-dude[disabled]:focus,
+fieldset[disabled] .btn-dude:focus,
+.btn-dude.disabled:active,
+.btn-dude[disabled]:active,
+fieldset[disabled] .btn-dude:active,
+.btn-dude.disabled.active,
+.btn-dude[disabled].active,
+fieldset[disabled] .btn-dude.active {
+    background-color: #c0de5b;
+    border-color: #b8da46;
+}
+
+.btn-dude .caret {
+    border-top-color: #fff;
+}
+
+.dropup .btn-dude .caret {
+    border-bottom-color: #fff;
+}
+
+.label-dude {
+    background-color: #c0de5b;
+}
+
+.label-dude[href]:hover,
+.label-dude[href]:focus {
+    background-color: #b0d531;
+}
+
+.alert-dude {
+    color: #87ad3a;
+    background-color: #edf7d9;
+    border-color: #e8f1bc;
+}
+
+.alert-dude hr {
+    border-top-color: #e1eca6;
+}
+
+.alert-dude .alert-link {
+    color: #69872d;
+}
+.progress-bar-dude {
+    background-color: #c0de5b;
+}
+
+.panel-sweet {
+    border-color: #e8bcf1;
+    background-color: #edd9f7;
+}
+
+.panel-sweet > .panel-heading {
+    color: #873aad;
+    background-color: #edd9f7;
+    border-color: #e8bcf1;
+}
+
+.panel-sweet > .panel-heading + .panel-collapse .panel-body {
+    border-top-color: #e8bcf1;
+}
+
+.panel-sweet > .panel-footer + .panel-collapse .panel-body {
+    border-bottom-color: #e8bcf1;
+}
+
+.text-sweet {
+    color: #873aad;
+}
+
+.btn-sweet {
+    color: #ffffff;
+    background-color: #c05bde;
+    border-color: #b846da;
+}
+
+.btn-sweet:hover,
+.btn-sweet:focus,
+.btn-sweet:active,
+.btn-sweet.active,
+.open .dropdown-toggle.btn-sweet {
+    color: #ffffff;
+    background-color: #b339d7;
+    border-color: #9a26bc;
+}
+
+.btn-sweet:active,
+.btn-sweet.active,
+.open .dropdown-toggle.btn-sweet {
+    background-image: none;
+}
+
+.btn-sweet.disabled,
+.btn-sweet[disabled],
+fieldset[disabled] .btn-sweet,
+.btn-sweet.disabled:hover,
+.btn-sweet[disabled]:hover,
+fieldset[disabled] .btn-sweet:hover,
+.btn-sweet.disabled:focus,
+.btn-sweet[disabled]:focus,
+fieldset[disabled] .btn-sweet:focus,
+.btn-sweet.disabled:active,
+.btn-sweet[disabled]:active,
+fieldset[disabled] .btn-sweet:active,
+.btn-sweet.disabled.active,
+.btn-sweet[disabled].active,
+fieldset[disabled] .btn-sweet.active {
+    background-color: #c05bde;
+    border-color: #b846da;
+}
+
+.btn-sweet .caret {
+    border-top-color: #fff;
+}
+
+.dropup .btn-sweet .caret {
+    border-bottom-color: #fff;
+}
+
+.label-sweet {
+    background-color: #c05bde;
+}
+
+.label-sweet[href]:hover,
+.label-sweet[href]:focus {
+    background-color: #b031d5;
+}
+
+.alert-sweet {
+    color: #873aad;
+    background-color: #edd9f7;
+    border-color: #e8bcf1;
+}
+
+.alert-sweet hr {
+    border-top-color: #e1a6ec;
+}
+
+.alert-sweet .alert-link {
+    color: #692d87;
+}
+.progress-bar-sweet {
+    background-color: #c05bde;
+}
+
+
+
 .well-fucking-well {
-    border-radius: 3px;
     min-height: 20px;
-    padding: 9px;
+    padding-top: 0;
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-bottom: 0;
     margin-bottom: 0;
     background-color: rgba(250, 250, 250, 0.85);
     border: 1px solid #e3e3e3;
-    border-radius: 4px;
+    border-radius: 2px;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .panel-heading-home {
-    padding-right: 5px;
-    padding-left: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
 }
 
 @media (max-width: 480px) {
     .panel-container {
-        padding:0px;
+        padding: 0px;
     }
+
     .panel {
         margin-bottom: 2px;
+        border-radius: 0;
     }
+
     .panel-heading-home {
-        padding-right: 2px;
-        padding-left: 2px;
-        padding-top: 2px;
-        padding-bottom: 2px;
+        padding: 1px;
     }
+
     .navbar-shunt {
         height: 50px;
     }
 }
-
 
 .navbar-collapse {
     padding-right: 0;

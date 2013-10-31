@@ -6,16 +6,8 @@
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Handler: options
 // -------------------------------------------------------------------------------------------------------------------
-myInterface.OptionChange = function (ele) {
-  console.log('change ele');
-  return ele;
-};
-
-// -------------------------------------------------------------------------------------------------------------------
-// Panel Handler: options
-// -------------------------------------------------------------------------------------------------------------------
 myInterface.addPanelHandler(myInterface.COMMAND.OPTIONS, function (ele) {
-
+  $(ele).addClass("panel-body-no-well");
   ele.innerHTML = '' +
     '<div class="form-group">' +
     '<label>Navigation</label><p class="text-muted">Select navigation panels to display</p>' +
@@ -41,7 +33,5 @@ myInterface.addPanelHandler(myInterface.COMMAND.OPTIONS, function (ele) {
     $("#navBar").show();
     $("#navBarShunt").show();
   });
-
-
   return true;
 });

@@ -125,10 +125,10 @@ myInterface.homeSlice = function (num) {
 
     case 1: // Home
       var menu = [];
-      menu.push(['Contacts','fa-group','btn-primary']);
+      menu.push(['Contacts','fa-group','btn-dude']);
       menu.push(['Customers','fa-user','btn-success']);
       menu.push(['Vendors','fa-truck','btn-danger']);
-      menu.push(['Projects','fa-suitcase','btn-primary']);
+      menu.push(['Projects','fa-suitcase','btn-sweet']);
       menu.push(['Products & Services','fa-gears','btn-warning']);
       menu.push(['Financial','fa-money','btn-info']);
       menu.push(['Organization','fa-sitemap','btn-primary']);

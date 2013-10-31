@@ -253,7 +253,7 @@ myInterface.panelClicked = function (num) {
   // Contract all panels
   for (var p in myInterface.panels) {
     if (myInterface.panels.hasOwnProperty(p)) {
-      if (myInterface.panels[p].expanded) {
+      if (myInterface.panels[p].expanded && p != panelID) {
         expandedCount++;
         myInterface.panelContract(myInterface.panels[p].eleCount);
       }
@@ -270,7 +270,7 @@ myInterface.panelClicked = function (num) {
 // Panel Expand
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.panelExpand = function (num) {
-  $('#panelBody' + num).show(250,'swing');
+  $('#panelBody' + num).show(250, 'swing');
   $('#panelExpandButton' + num).hide();
   $('#panelContractButton' + num).show();
 
@@ -282,7 +282,7 @@ myInterface.panelExpand = function (num) {
 // Panel Contract
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.panelContract = function (num) {
-  $('#panelBody' + num).hide(150,'swing');
+  $('#panelBody' + num).hide(150, 'swing');
   $('#panelExpandButton' + num).show();
   $('#panelContractButton' + num).hide();
 

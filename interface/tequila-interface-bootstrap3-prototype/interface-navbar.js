@@ -116,7 +116,7 @@ myInterface.navPicked = function (label) {
   action.label = label;
   switch (label) {
     case 'Contacts':
-      action.style = 'primary';
+      action.style = 'dude';
       break;
     case 'Customers':
       action.style = 'success';
@@ -125,7 +125,7 @@ myInterface.navPicked = function (label) {
       action.style = 'danger';
       break;
     case 'Projects':
-      action.style = 'primary';
+      action.style = 'sweet';
       break;
     case 'Products & Services':
       action.style = 'warning';
