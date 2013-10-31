@@ -156,9 +156,9 @@ myInterface.renderPanel = function (action) {
     panelCloseButton.setAttribute('title', 'Close Panel');
     panelTitle.appendChild(panelCloseButton);
 
-    var theStatus = (myInterface.eleCount-2) % 5;
-    if (theStatus>0) {
-    var panelLabel = document.createElement("span");
+    var theStatus = (myInterface.eleCount - 2) % 6;
+    if (theStatus > 0) {
+      var panelLabel = document.createElement("span");
       switch (theStatus) {
         case 1:
           panelLabel.innerHTML = 'error';
@@ -176,6 +176,10 @@ myInterface.renderPanel = function (action) {
           panelLabel.innerHTML = 'new';
           panelLabel.className = "label label-info pull-right";
           break;
+        case 5:
+          panelLabel.innerHTML = 'view';
+          panelLabel.className = "label label-default pull-right";
+          break;
       }
       panelTitle.appendChild(panelLabel);
     }
@@ -187,7 +191,7 @@ myInterface.renderPanel = function (action) {
   panelBody.id = "panelBody" + myInterface.eleCount;
   newPanel.appendChild(panelBody);
   if (!myInterface.invokePanelHandler(type, panelBody, panelTitle)) {
-    panelBody.innerHTML = '<div class="well well-sm well-tight"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
+    panelBody.innerHTML = '<div class="well-fucking-well"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
       '<p>This is a panel with no handler for type "' + type + '".</p>' +
       '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
       ' some awesome code.</p></div>';
@@ -266,7 +270,7 @@ myInterface.panelClicked = function (num) {
 // Panel Expand
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.panelExpand = function (num) {
-  $('#panelBody' + num).show();
+  $('#panelBody' + num).show(250,'swing');
   $('#panelExpandButton' + num).hide();
   $('#panelContractButton' + num).show();
 
@@ -278,7 +282,7 @@ myInterface.panelExpand = function (num) {
 // Panel Contract
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.panelContract = function (num) {
-  $('#panelBody' + num).hide();
+  $('#panelBody' + num).hide(150,'swing');
   $('#panelExpandButton' + num).show();
   $('#panelContractButton' + num).hide();
 

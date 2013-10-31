@@ -31,7 +31,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   panelBodyInserts = document.createElement("div");
   panelBodyInserts.className = "panel-body";
   panelBodyInserts.id = "homePanel2";
-  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
+  panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>Find Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
@@ -41,7 +41,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   panelBodyInserts = document.createElement("div");
   panelBodyInserts.className = "panel-body";
   panelBodyInserts.id = "homePanel3";
-  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
+  panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>Favorites (Starred) Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
@@ -51,7 +51,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   panelBodyInserts = document.createElement("div");
   panelBodyInserts.className = "panel-body";
   panelBodyInserts.id = "homePanel4";
-  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
+  panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>History Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
@@ -61,7 +61,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   panelBodyInserts = document.createElement("div");
   panelBodyInserts.className = "panel-body";
   panelBodyInserts.id = "homePanel5";
-  panelBodyInserts.innerHTML = '<div class="well well-sm well-tight">' +
+  panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>Info Panel</h1>' +
     '<p>Oh look!</p>' +
     '<p>I have fallen in a well.</p>' +
@@ -82,8 +82,9 @@ myInterface.homePanel = function () {
     var num = myInterface.panels[myInterface.homePanelID].eleCount;
     myInterface.panelContract(num);
     myInterface.panelClicked(num);
-    document.getElementById('homeSlice1').className = "btn btn-primary";
-    myInterface.homeSlice(1);
+    //document.getElementById('homeSlice1').className = "btn btn-primary";
+    //myInterface.homeSlice(1);
+    myInterface.closeHome();
   }
 };
 
@@ -103,11 +104,11 @@ myInterface.homeSlice = function (num) {
   document.getElementById('homeSlice3').className = "btn btn-primary";
   document.getElementById('homeSlice4').className = "btn btn-primary";
   document.getElementById('homeSlice5').className = "btn btn-primary";
-  $('#homePanel1').hide();
-  $('#homePanel2').hide();
-  $('#homePanel3').hide();
-  $('#homePanel4').hide();
-  $('#homePanel5').hide();
+  $('#homePanel1').hide(250);
+  $('#homePanel2').hide(250);
+  $('#homePanel3').hide(250);
+  $('#homePanel4').hide(250);
+  $('#homePanel5').hide(250);
 
   // If we clicked on open one then just leave while all closed
   if (wasActive) {
@@ -163,7 +164,7 @@ myInterface.homeSlice = function (num) {
 
   }
 
-  $('#homePanel' + num).show();
+  $('#homePanel' + num).show(250);
 
 };
 
@@ -177,10 +178,10 @@ myInterface.closeHome = function () {
     document.getElementById('homeSlice3').className = "btn btn-primary";
     document.getElementById('homeSlice4').className = "btn btn-primary";
     document.getElementById('homeSlice5').className = "btn btn-primary";
-    $('#homePanel1').hide();
-    $('#homePanel2').hide();
-    $('#homePanel3').hide();
-    $('#homePanel4').hide();
-    $('#homePanel5').hide();
+    $('#homePanel1').hide(250);
+    $('#homePanel2').hide(250);
+    $('#homePanel3').hide(250);
+    $('#homePanel4').hide(250);
+    $('#homePanel5').hide(250);
   }
 };
