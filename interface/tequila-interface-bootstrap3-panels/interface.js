@@ -31,6 +31,9 @@ $(document).ready(function () {
   } catch (e) {
   }
 
+  // Change background from white in loader
+  document.body.style.backgroundColor="#e0e0e0";
+
 });
 
 // -------------------------------------------------------------------------------------------------------------------
