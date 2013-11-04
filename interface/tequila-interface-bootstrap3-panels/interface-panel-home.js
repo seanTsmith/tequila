@@ -16,7 +16,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
     '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-bookmark fa-2x"></i><span class="hidden-xs">Bookmarks</span></a>' +
     '<a class="btn btn-primary" id="homeSlice4" href="javascript:myInterface.homeSlice(4)"><i class="fa fa-book fa-2x"></i><span class="hidden-xs">History</span></a>' +
     '<a class="btn btn-primary" id="homeSlice5" href="javascript:myInterface.homeSlice(5)"><i class="fa fa-info-circle fa-2x"></i><span class="hidden-xs">Info</span></a>' +
-    '<a class="btn btn-primary" id="homeSlice6" href="javascript:myInterface.homeSlice(6)"><i class="fa fa-magic fa-2x text-muted"></i><span class="hidden-xs text-muted">Icons</span></a>';
+    '<a class="btn btn-primary" id="homeSlice6" href="javascript:myInterface.homeSlice(6)"><i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">Show</span></a>';
 
   var panelHomeButtonGroup = document.createElement("div");
   panelHomeButtonGroup.className = "btn-group btn-group-justified";
@@ -29,7 +29,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
 
   var panelBodyInserts;
   panelBodyInserts = document.createElement("div");
-  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.className = "panel-body panel-body-home-inside";
   panelBodyInserts.id = "homePanel2";
   panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>Find Panel</h1>' +
@@ -39,7 +39,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   newPanel.appendChild(panelBodyInserts);
 
   panelBodyInserts = document.createElement("div");
-  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.className = "panel-body panel-body-home-inside";
   panelBodyInserts.id = "homePanel3";
   panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>Favorites (Starred) Panel</h1>' +
@@ -49,7 +49,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   newPanel.appendChild(panelBodyInserts);
 
   panelBodyInserts = document.createElement("div");
-  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.className = "panel-body panel-body-home-inside";
   panelBodyInserts.id = "homePanel4";
   panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>History Panel</h1>' +
@@ -59,7 +59,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
   newPanel.appendChild(panelBodyInserts);
 
   panelBodyInserts = document.createElement("div");
-  panelBodyInserts.className = "panel-body";
+  panelBodyInserts.className = "panel-body panel-body-home-inside";
   panelBodyInserts.id = "homePanel5";
   panelBodyInserts.innerHTML = '<div class="well-fucking-well">' +
     '<h1>Info Panel</h1>' +
@@ -67,10 +67,52 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
     '<p>I have fallen in a well.</p>' +
     '</div>';
   newPanel.appendChild(panelBodyInserts);
-  myInterface.homeSlice(1,true);
+
+  myInterface.panelToolbar = document.createElement("div");
+  myInterface.panelToolbar.className = "panel-footer-home";
+
+  myInterface.panelToolbar.innerHTML = '<div class="btn-group btn-group-justified">' +
+    myInterface.toolBar('fa-home', 'Home View') +
+    myInterface.toolBar('fa-chevron-circle-left', 'Collapse All Panels') +
+    myInterface.toolBar('fa-chevron-circle-up', 'Expand All Panels') +
+    myInterface.toolBar('fa-plus-circle', 'Show Active') +
+    myInterface.toolBar('fa-minus-circle', 'Close Inactive') +
+    myInterface.toolBar('fa-home', 'XXX') +
+    myInterface.toolBar('fa-home', 'XXX') +
+    myInterface.toolBar('fa-home', 'XXX') +
+    myInterface.toolBar('fa-home', 'XXX') +
+    myInterface.toolBar('fa-home', 'XXX') +
+    '</div>';
+
+  newPanel.appendChild(myInterface.panelToolbar);
+
+  // Home Command
+  myInterface.homeSlice(1, true);
 
   return true;
 });
+
+// -------------------------------------------------------------------------------------------------------------------
+// ToolBar
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.toolBar = function (icon, tooltip) {
+  var click = "javascript:myInterface.toolBarClicked('" + icon + "')";
+  if (tooltip)
+    return '<a class="btn btn-primary btn-toolbar" href="' + click + '" data-toggle="tooltip" title="' + tooltip + '"><i class="fa ' + icon + ' fa-2x"></i></a>';
+  else
+    return '<a class="btn btn-primary btn-toolbar" href="' + click + '"><i class="fa ' + icon + ' fa-2x"></i></a>';
+};
+
+// -------------------------------------------------------------------------------------------------------------------
+// ToolBar
+// -------------------------------------------------------------------------------------------------------------------
+myInterface.toolBarClicked = function (action) {
+  switch (action) {
+    case 'fa-home':
+      myInterface.homePanel();
+      break;
+  }
+};
 
 // -------------------------------------------------------------------------------------------------------------------
 // Home Panel
@@ -82,8 +124,6 @@ myInterface.homePanel = function () {
     var num = myInterface.panels[myInterface.homePanelID].eleCount;
     myInterface.panelContract(num);
     myInterface.panelClicked(num);
-    //document.getElementById('homeSlice1').className = "btn btn-primary";
-    //myInterface.homeSlice(1);
     myInterface.closeHome();
   }
 };
@@ -93,8 +133,18 @@ myInterface.homePanel = function () {
 // -------------------------------------------------------------------------------------------------------------------
 myInterface.homeSlice = function (num, quick) {
 
-  if (num==6)
+  if (num == 6) {
+    var hp6 = document.getElementById('homeSlice6');
+    var tb = $(myInterface.panelToolbar);
+    if (tb.is(":visible")) {
+      hp6.innerHTML = '<i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">Show</span>';
+      tb.hide();
+    } else {
+      hp6.innerHTML = '<i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">Hide</span>';
+      tb.show();
+    }
     return;
+  }
 
   // First reset all home panels and hide
   var hsButton = document.getElementById('homeSlice' + num);
@@ -127,27 +177,26 @@ myInterface.homeSlice = function (num, quick) {
 
     case 1: // Home
       var menu = [];
-      menu.push(['Contacts','fa-group','btn-dude']);
-      menu.push(['Customers','fa-user','btn-success']);
-      menu.push(['Vendors','fa-truck','btn-danger']);
-      menu.push(['Projects','fa-suitcase','btn-sweet']);
-      menu.push(['Products & Services','fa-gears','btn-warning']);
-      menu.push(['Financial','fa-money','btn-info']);
-      menu.push(['Organization','fa-sitemap','btn-primary']);
-      menu.push(['Options','fa-gear','btn-default']);
+      menu.push(['Contacts', 'fa-group', 'btn-info']);
+      menu.push(['Customers', 'fa-user', 'btn-dude']);
+      menu.push(['Vendors', 'fa-truck', 'btn-danger']);
+      menu.push(['Projects', 'fa-suitcase', 'btn-sweet']);
+      menu.push(['Products & Services', 'fa-gears', 'btn-warning']);
+      menu.push(['Financial', 'fa-money', 'btn-success']);
+      menu.push(['Organization', 'fa-sitemap', 'btn-primary']);
+      menu.push(['Options', 'fa-gear', 'btn-default']);
 
       panelBody = document.getElementById("homePanel1");
       html = '<div class="">';
       for (var m in menu) {
-        html += '<a class="btn ' + menu[m][2]  + ' ti-shortcut-button" href="javascript:myInterface.navPicked(\'' + menu[m][0] + '\')">';
-        html += '<i class="fa ' + menu[m][1]  + ' fa-2x"></i>';
-        html += '<div style="white-space: normal; word-wrap: break-word" class="">' + menu[m][0]  + '</div>';
+        html += '<a class="btn ' + menu[m][2] + ' ti-shortcut-button" href="javascript:myInterface.navPicked(\'' + menu[m][0] + '\')">';
+        html += '<i class="fa ' + menu[m][1] + ' fa-2x"></i>';
+        html += '<div style="white-space: normal; word-wrap: break-word" class="">' + menu[m][0] + '</div>';
         html += '</a>';
       }
       html += '</div>';
       panelBody.innerHTML = html;
 
-//var html = '<a href="javascript:myInterface.navPicked(\'' + label + '\')">' + icon + label + '</a>';
       break;
 
     case 2: // Find
@@ -161,8 +210,6 @@ myInterface.homeSlice = function (num, quick) {
 
     case 5: // Info
       break;
-
-
 
   }
 

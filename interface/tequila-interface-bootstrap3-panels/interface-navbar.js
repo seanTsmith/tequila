@@ -140,10 +140,10 @@ myInterface.navPicked = function (label) {
   action.label = label;
   switch (label) {
     case 'Contacts':
-      action.style = 'dude';
+      action.style = 'info';
       break;
     case 'Customers':
-      action.style = 'success';
+      action.style = 'dude';
       break;
     case 'Vendors':
       action.style = 'danger';
@@ -155,7 +155,7 @@ myInterface.navPicked = function (label) {
       action.style = 'warning';
       break;
     case 'Financial':
-      action.style = 'info';
+      action.style = 'success';
       break;
     case 'Organization':
       action.style = 'primary';
