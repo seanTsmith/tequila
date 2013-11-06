@@ -4,12 +4,12 @@
 
 body {
     padding-top: 0px;
-    background-color: #ffffff;
+    /*background-color: #ffffff;*/
     /*background-color: #e0e0e0;*/
-    background-image: url('img/blue_agave.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
+    /*background-image: url('img/blue_agave.png');*/
+    /*background-repeat: no-repeat;*/
+    /*background-attachment: fixed;*/
+    /*background-position: center;*/
 }
 
 .blue-badge {

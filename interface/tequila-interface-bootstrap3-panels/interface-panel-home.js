@@ -184,7 +184,7 @@ myInterface.homeSlice = function (num, quick) {
       menu.push(['Products & Services', 'fa-gears', 'btn-warning']);
       menu.push(['Financial', 'fa-money', 'btn-success']);
       menu.push(['Organization', 'fa-sitemap', 'btn-primary']);
-      menu.push(['Options', 'fa-gear', 'btn-default']);
+      menu.push(['System', 'fa-power-off', 'btn-default']);
 
       panelBody = document.getElementById("homePanel1");
       html = '<div class="">';

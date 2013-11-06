@@ -160,7 +160,7 @@ myInterface.navPicked = function (label) {
     case 'Organization':
       action.style = 'primary';
       break;
-    case 'Options':
+    case 'System':
       action.style = 'default';
       action.type = 'options';
       break;
