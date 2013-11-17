@@ -2,6 +2,57 @@
 
 Tequila es bueno!
 
+---
+NOW
+app.run()
+app.setInferface(interface);
+app.getInferface();
+
+interface.requestResponse({request:object}, [callback]);
+interface.canMockResponses();
+
+---
+OLD DESIGN MOD
+App
+- Run (interface, callback)
+    callback invoked when app terminates
+Interface
+- Start (command, callback)
+-or-
+- Render (callback)
+
+--
+NEW DESIGN
+
+Application Model
+- config { // attribute loaded from tequila-config.json
+    - bootupStore
+}
+
+app.commandRequest(command)
+
+Interface
+interface.render(presentation, commandRequest);
+
+Presentation.attributes
+- model
+- layout
+- commands
+
+---
+
+
+Attribute
+- image type
+- visible property
+
+Misc
+- implement /lib/stores/local-test.js & /lib/stores/local-store.js
+- install http://redis.io/ on tgiCloud Server
+- implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
+- test with /test-spec/integration/test-store-integration.js
+- thought you had phonegap app for tests - test localstore with it
+
 GETLIST
 - needs next item to detect end ? or need hasMoreItems ?
 
@@ -13,26 +64,6 @@ From PCM experience:
 - make a prettyprint function for model
 - getList should do a list.firstItem();
 - model.set({name:value}) should be like model.set('name',value})
-
-App
-- Run (interface, callback)
-    callback invoked when app terminates
-
-Interface
-- Start (command, callback)
--or-
-- Render (callback)
-
-Attribute
-- image type
-- visible property
-
-
-- implement /lib/stores/local-test.js & /lib/stores/local-store.js
-- install http://redis.io/ on tgiCloud Server
-- implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
-- test with /test-spec/integration/test-store-integration.js
-- thought you had phonegap app for tests - test localstore with it
 
 * Session Model
 * make validation for types
