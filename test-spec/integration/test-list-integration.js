@@ -45,16 +45,18 @@ test.runnerListIntegration = function () {
 
         // Build List
         for (var i in actorsInfo) {
-          if (actorsInfo[i][2]) { // for some populate model then add to list
-            actor.set('name', actorsInfo[i][0]);
-            actor.set('born', actorsInfo[i][1]);
-            actor.set('isMale', actorsInfo[i][2]);
-            actors.addItem(actor);
-          } else {
-            actors.addItem(); // add blank then set attribs
-            actors.set('name', actorsInfo[i][0]);
-            actors.set('born', actorsInfo[i][1]);
-            actors.set('isMale', actorsInfo[i][2]);
+          if (actorsInfo.hasOwnProperty(i)) {
+            if (actorsInfo[i][2]) { // for some populate model then add to list
+              actor.set('name', actorsInfo[i][0]);
+              actor.set('born', actorsInfo[i][1]);
+              actor.set('isMale', actorsInfo[i][2]);
+              actors.addItem(actor);
+            } else {
+              actors.addItem(); // add blank then set attribs
+              actors.set('name', actorsInfo[i][0]);
+              actors.set('born', actorsInfo[i][1]);
+              actors.set('isMale', actorsInfo[i][2]);
+            }
           }
         }
 
@@ -65,8 +67,10 @@ test.runnerListIntegration = function () {
           actors.previousItem();  // can't go past top
         });
         actors.nextItem();
+        test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Meryl Streep');
         actors.lastItem();
+        test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Renée Zellweger');
 
         // Sort the list

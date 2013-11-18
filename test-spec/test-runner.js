@@ -302,7 +302,7 @@ test.renderDetail = function (isBrowser) {
               // Check assertions
               var gotFailedAssertions = false;
               for (var j in test.assertions) {
-                if (test.assertions.hasOwnProperty(i))
+                if (test.assertions.hasOwnProperty(j))
                   if (!test.assertions[j]) gotFailedAssertions = true;
               }
               if (test_Value !== expected_Value || gotFailedAssertions) {
@@ -366,7 +366,7 @@ test.renderDetail = function (isBrowser) {
               // Check assertions
               var gotFailedAssertions = false;
               for (var j in test.assertions) {
-                if (test.assertions.hasOwnProperty(i))
+                if (test.assertions.hasOwnProperty(j))
                   if (!test.assertions[j]) gotFailedAssertions = true;
               }
               if (testPassed && !gotFailedAssertions) {
