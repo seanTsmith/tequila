@@ -1,46 +1,27 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila)
-
 Tequila es bueno!
+
+<< FIX DESIGN FOR INTERFACE & PRESENTATION & MOCKS!!! >>
 
 ---
 NOW
 app.run()
 app.setInferface(interface);
 app.getInferface();
-
-interface.requestResponse({request:object}, [callback]);
-interface.canMockResponses();
-
 ---
 OLD DESIGN MOD
 App
 - Run (interface, callback)
     callback invoked when app terminates
-Interface
-- Start (command, callback)
--or-
-- Render (callback)
-
 --
 NEW DESIGN
-
 Application Model
 - config { // attribute loaded from tequila-config.json
     - bootupStore
 }
-
 app.commandRequest(command)
 
-Interface
-interface.render(presentation, commandRequest);
-
-Presentation.attributes
-- model
-- layout
-- commands
-
----
-
+<< TODO AFTER >>
 
 Attribute
 - image type
