@@ -1,63 +1,30 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila)
 Tequila es bueno!
 
-<< FIX DESIGN FOR INTERFACE & PRESENTATION & MOCKS!!! >>
-===
-
-NOW
-app.run()
-app.setInferface(interface);
-app.getInferface();
-OLD DESIGN MOD
----
-App
-- Run (interface, callback)
-    callback invoked when app terminates
-NEW DESIGN
---
-Application Model
-- config { // attribute loaded from tequila-config.json
-    - bootupStore
-}
-app.commandRequest(command)
-
-<< TODO AFTER >>
---
-
-Attribute
-- image type
-- visible property
-
-Misc
+##
+- Attribute image type
+- Attributevisible property
 - implement /lib/stores/local-test.js & /lib/stores/local-store.js
 - install http://redis.io/ on tgiCloud Server
 - implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
 - test with /test-spec/integration/test-store-integration.js
 - thought you had phonegap app for tests - test localstore with it
-
-GETLIST
-- needs next item to detect end ? or need hasMoreItems ?
-
-HAWT
 - make remote command type or flag as remote
-
-From PCM experience:
-(done?) - Make ID fields stored as ObjectIDs in mongo
+- getlist needs next item to detect end ? or need hasMoreItems ?
 - make a prettyprint function for model
 - getList should do a list.firstItem();
 - model.set({name:value}) should be like model.set('name',value})
-
-* Session Model
-* make validation for types
-* have stores validate before saving
-* create redis-store
-* create local-store
-* create json-file-store
-* create cookie-store
-* create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
-* tequilaStore needs to be set not hard coded
-* fix Test variations on getList method test for remote stores
-* Use confess / phantomJS to make cache manifest
+- Session Model
+- make validation for types
+- have stores validate before saving
+- create redis-store
+- create local-store
+- create json-file-store
+- create cookie-store
+- create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
+- tequilaStore needs to be set not hard coded
+- fix Test variations on getList method test for remote stores
+- Use confess / phantomJS to make cache manifest
 
 ## Project Root
 + **/bin** tequila command line interface
