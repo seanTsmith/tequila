@@ -1,7 +1,7 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila)
 Tequila es bueno!
 
-##
+## TODO
 - Attribute image type
 - Attributevisible property
 - implement /lib/stores/local-test.js & /lib/stores/local-store.js
