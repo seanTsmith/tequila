@@ -2,19 +2,19 @@
 Tequila es bueno!
 
 << FIX DESIGN FOR INTERFACE & PRESENTATION & MOCKS!!! >>
-
 ---
+
 NOW
 app.run()
 app.setInferface(interface);
 app.getInferface();
----
 OLD DESIGN MOD
+---
 App
 - Run (interface, callback)
     callback invoked when app terminates
---
 NEW DESIGN
+--
 Application Model
 - config { // attribute loaded from tequila-config.json
     - bootupStore
@@ -22,6 +22,7 @@ Application Model
 app.commandRequest(command)
 
 << TODO AFTER >>
+--
 
 Attribute
 - image type
