@@ -8,7 +8,6 @@ Tequila es bueno!
 - install http://redis.io/ on tgiCloud Server
 - implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
 - test with /test-spec/integration/test-store-integration.js
-- thought you had phonegap app for tests - test localstore with it
 - make remote command type or flag as remote
 - getlist needs next item to detect end ? or need hasMoreItems ?
 - make a prettyprint function for model
