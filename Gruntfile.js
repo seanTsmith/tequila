@@ -17,6 +17,7 @@ module.exports = function (grunt) {
           'lib/classes/message-class.js',
           'lib/classes/model-class.js',
           'lib/classes/procedure-class.js',
+          'lib/classes/request-class.js',
           'lib/classes/store-class.js',
           'lib/classes/transport-class.js',
 
@@ -54,6 +55,7 @@ module.exports = function (grunt) {
           'lib/classes/message-test.js',
           'lib/classes/model-test.js',
           'lib/classes/procedure-test.js',
+          'lib/classes/request-test.js',
           'lib/classes/store-test.js',
           'lib/classes/tequila-test.js',
           'lib/classes/transport-test.js',

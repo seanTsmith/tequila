@@ -16,6 +16,7 @@ test.heading('Classes', function () {
   test.runnerMessage();
   test.runnerModel(Model,false);
   test.runnerProcedure();
+  test.runnerRequest();
   test.runnerStore();
   test.runnerTransport();
 });
