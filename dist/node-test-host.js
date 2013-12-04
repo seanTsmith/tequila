@@ -559,7 +559,7 @@ Interface.prototype.requestResponse = function (obj, callback) {
     callback(obj);
   }, 0);
 };
-Interface.prototype.canMockRequests = function () {
+Interface.prototype.canMockResponse = function () {
   return false;
 };
 ;

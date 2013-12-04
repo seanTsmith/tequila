@@ -3,7 +3,7 @@ Tequila es bueno!
 
 ## TODO
 - Attribute image type
-- Attributevisible property
+- Attribute visible property
 - implement /lib/stores/local-test.js & /lib/stores/local-store.js
 - install http://redis.io/ on tgiCloud Server
 - implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis

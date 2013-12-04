@@ -1960,7 +1960,7 @@ Interface.prototype.requestResponse = function (obj, callback) {
     callback(obj);
   }, 0);
 };
-Interface.prototype.canMockRequests = function () {
+Interface.prototype.canMockResponse = function () {
   return false;
 };
 ;
@@ -4727,10 +4727,10 @@ test.runnerInterfaceMethodsTest = function (SurrogateInterface) {
         });
       });
     });
-    test.heading('canMockRequests()', function () {
+    test.heading('canMockResponse()', function () {
       test.example('see if mock responses allowed before testing', test.asyncResponse('mock check done'), function (testNode, returnResponse) {
         var ui = new SurrogateInterface();
-        if (ui.canMockRequests()) {
+        if (ui.canMockResponse()) {
           throw new Error('no test for mock');
         } else {
           test.shouldThrow(Error('mockResponse not available for Interface'), function () {
