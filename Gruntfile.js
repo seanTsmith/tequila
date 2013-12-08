@@ -76,6 +76,7 @@ module.exports = function (grunt) {
           'lib/interfaces/command-line-test.js',
           'lib/interfaces/mock-test.js',
           'test-spec/integration/test-list-integration.js',
+          'test-spec/integration/test-interface-integration.js',
           'test-spec/integration/test-store-integration.js',
           'test-spec/integration/test-command-integration.js',
           'test-spec/integration/test-procedure-integration.js',

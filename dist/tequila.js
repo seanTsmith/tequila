@@ -552,14 +552,14 @@ Interface.prototype.toString = function () {
 Interface.prototype.requestResponse = function (obj, callback) {
   if (obj == null || typeof obj !== 'object' || typeof callback !== 'function') throw new Error('requestResponse arguments required: object, callback');
   if (obj.request === undefined) throw new Error('requestResponse object has no request property');
-  if (obj.mockResponse !== undefined) throw new Error('mockResponse not available for Interface');
+  if (obj.mockRequest !== undefined) throw new Error('mockRequest not available for Interface');
   // Parameters are ok now handle the request
   setTimeout(function () {
     obj.response = new Error('invalid request: ' + obj.request);
     callback(obj);
   }, 0);
 };
-Interface.prototype.canMockResponse = function () {
+Interface.prototype.canMock = function () {
   return false;
 };
 ;
@@ -848,7 +848,7 @@ var Store = function (args) {
   args = args || {};
   this.storeType = args.storeType || "Store";
   this.name = args.name || 'a ' + this.storeType;
-  this.storeInterface = {
+  this.storeProperty = {
     isReady: true,
     canGetModel: false,
     canPutModel: false,
@@ -870,7 +870,7 @@ Store.prototype.toString = function () {
   }
 };
 Store.prototype.getServices = function () {
-  return this.storeInterface;
+  return this.storeProperty;
 };
 Store.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
@@ -1111,7 +1111,7 @@ var MemoryStore = function (args) {
   args = args || {};
   this.storeType = args.storeType || "MemoryStore";
   this.name = args.name || 'a ' + this.storeType;
-  this.storeInterface = {
+  this.storeProperty = {
     isReady: true,
     canGetModel: true,
     canPutModel: true,
@@ -1298,7 +1298,7 @@ var MongoStore = function (args) {
   this.storeType = args.storeType || "MongoStore";
   this.name = args.name || 'a ' + this.storeType;
 
-  this.storeInterface = {
+  this.storeProperty = {
     isReady: false,
     canGetModel: T.isServer(),
     canPutModel: T.isServer(),
@@ -1331,7 +1331,7 @@ var RemoteStore = function (args) {
   args = args || {};
   this.storeType = args.storeType || "RemoteStore";
   this.name = args.name || 'a ' + this.storeType;
-  this.storeInterface = {
+  this.storeProperty = {
     isReady: false,
     canGetModel: true,
     canPutModel: true,
@@ -1359,7 +1359,7 @@ RemoteStore.prototype.onConnect = function (location, callBack) {
       }
       if (msg.type == 'Connected') {
         console.log('Transport connected: ' + store.name);
-        store.storeInterface.isReady = true;
+        store.storeProperty.isReady = true;
         callBack(store);
         return;
       }
@@ -1589,7 +1589,7 @@ var LocalStore = function (args) {
   args = args || {};
   this.storeType = args.storeType || "LocalStore";
   this.name = args.name || 'a ' + this.storeType;
-  this.storeInterface = {
+  this.storeProperty = {
     isReady: false,
     canGetModel: false,
     canPutModel: false,
@@ -1617,7 +1617,7 @@ var RedisStore = function (args) {
   args = args || {};
   this.storeType = args.storeType || "RedisStore";
   this.name = args.name || 'a ' + this.storeType;
-  this.storeInterface = {
+  this.storeProperty = {
     isReady: false,
     canGetModel: false,
     canPutModel: false,
