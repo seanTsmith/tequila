@@ -10,20 +10,18 @@ test.runnerInterfaceIntegration = function () {
       // Send 4 mocks and make sure we get 4 callback calls
       self.callbackCount = 0;
       testInterface = new Interface();
-      testInterface.start(function(request) {
+      testInterface.start(new Application(), new Presentation(), function (request) {
         if (request.name == 'mock count')
           self.callbackCount++;
-        if (self.callbackCount>3)
+        if (self.callbackCount > 3)
           returnResponse(testNode, true);
       });
       var cmds = [];
       var i;
-      for (i=0; i<4; i++) {
-        cmds.push(new Command({name:'mock count'}));
+      for (i = 0; i < 4; i++) {
+        cmds.push(new Command({name: 'mock count'}));
       }
       testInterface.mockRequest(cmds);
-
-
     });
   });
 };
