@@ -5770,7 +5770,7 @@ test.runnerRedisStore = function () {
 ;
 /**
  * tequila
- * bootstrap3-test.js
+ * bootstrap3-panels-test.js
  */
 test.runnerBootstrap3Interface = function () {
   test.heading('Bootstrap3Interface', function () {

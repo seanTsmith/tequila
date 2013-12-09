@@ -33,7 +33,7 @@ module.exports = function (grunt) {
           'lib/stores/local-store.js',
           'lib/stores/redis-store.js',
 
-          'lib/interfaces/bootstrap3-interface.js',
+          'lib/interfaces/bootstrap3-panels-interface.js',
           'lib/interfaces/command-line-interface.js',
           'lib/interfaces/mock-interface.js'
         ],
@@ -72,7 +72,7 @@ module.exports = function (grunt) {
           'lib/stores/local-test.js',
           'lib/stores/redis-test.js',
 
-          'lib/interfaces/bootstrap3-test.js',
+          'lib/interfaces/bootstrap3-panels-test.js',
           'lib/interfaces/command-line-test.js',
           'lib/interfaces/mock-test.js',
           'test-spec/integration/test-list-integration.js',
