@@ -5,9 +5,8 @@
 test.runnerInterfaceIntegration = function () {
   test.heading('Interface Integration', function () {
     test.example('Test command execution mocking', test.asyncResponse(true), function (testNode, returnResponse) {
-      var self = this;
-
       // Send 4 mocks and make sure we get 4 callback calls
+      var self = this;
       self.callbackCount = 0;
       testInterface = new Interface();
       testInterface.start(new Application(), new Presentation(), function (request) {

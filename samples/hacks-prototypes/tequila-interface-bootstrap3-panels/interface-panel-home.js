@@ -16,7 +16,7 @@ myInterface.addPanelHandler('home', function (panelBody, panelTitle) {
     '<a class="btn btn-primary" id="homeSlice3" href="javascript:myInterface.homeSlice(3)"><i class="fa fa-bookmark fa-2x"></i><span class="hidden-xs">Bookmarks</span></a>' +
     '<a class="btn btn-primary" id="homeSlice4" href="javascript:myInterface.homeSlice(4)"><i class="fa fa-book fa-2x"></i><span class="hidden-xs">History</span></a>' +
     '<a class="btn btn-primary" id="homeSlice5" href="javascript:myInterface.homeSlice(5)"><i class="fa fa-info-circle fa-2x"></i><span class="hidden-xs">Info</span></a>' +
-    '<a class="btn btn-primary" id="homeSlice6" href="javascript:myInterface.homeSlice(6)"><i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">Show</span></a>';
+    '<a class="btn btn-primary" id="homeSlice6" href="javascript:myInterface.homeSlice(6)"><i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">More</span></a>';
 
   var panelHomeButtonGroup = document.createElement("div");
   panelHomeButtonGroup.className = "btn-group btn-group-justified";
@@ -137,10 +137,10 @@ myInterface.homeSlice = function (num, quick) {
     var hp6 = document.getElementById('homeSlice6');
     var tb = $(myInterface.panelToolbar);
     if (tb.is(":visible")) {
-      hp6.innerHTML = '<i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">Show</span>';
+      hp6.innerHTML = '<i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">More</span>';
       tb.hide();
     } else {
-      hp6.innerHTML = '<i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">Hide</span>';
+      hp6.innerHTML = '<i class="fa fa-ellipsis-horizontal fa-2x"></i><span class="hidden-xs">Less</span>';
       tb.show();
     }
     return;
