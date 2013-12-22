@@ -467,7 +467,6 @@ Command.prototype.execute = function () {
     }
   }
   function ProcedureEvents(event) {
-    console.log('ProcedureEvents: ' + event);
     var tasks = self.contents.tasks;
     var allTasksDone = true; // until proved wrong ...
     switch (event) {
@@ -525,42 +524,77 @@ function Interface(args) {
   args.name = args.name || '(unnamed)';
   args.description = args.description || 'a Interface';
   var i;
-  var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'tasksCompleted']);
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
   var badJooJoo = [];
   for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1)
     throw new Error('error creating Procedure: multiple errors');
   if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
-  // args ok, now copy to object and check for errors
+  // default state
+  this.startCallback = null;
+  this.stopCallback = null;
+  this.mocks = [];
+  this.mockPending = false;
+  // args ok, now copy to object
   for (i in args) this[i] = args[i];
-  badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
-  if (badJooJoo) {
-    if (badJooJoo.length > 1) throw new Error('error creating Procedure: multiple errors');
-    if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
-  }
 }
 /*
  * Methods
  */
-Interface.prototype.getValidationErrors = function () {
-  var badJooJoo = [];
-  return badJooJoo.length ? badJooJoo : null;
-};
 Interface.prototype.toString = function () {
   return this.description;
 };
-Interface.prototype.requestResponse = function (obj, callback) {
-  if (obj == null || typeof obj !== 'object' || typeof callback !== 'function') throw new Error('requestResponse arguments required: object, callback');
-  if (obj.request === undefined) throw new Error('requestResponse object has no request property');
-  if (obj.mockRequest !== undefined) throw new Error('mockRequest not available for Interface');
-  // Parameters are ok now handle the request
-  setTimeout(function () {
-    obj.response = new Error('invalid request: ' + obj.request);
-    callback(obj);
-  }, 0);
-};
 Interface.prototype.canMock = function () {
   return false;
+};
+Interface.prototype.doMock = function () {
+  // If no more elements then we are done
+  this.mockPending = false;
+  if (this.mocks.length < 1)
+    return;
+  // Get oldest ele and pass to callback if it is set
+  var thisMock = this.mocks.shift();
+  if (this.startCallback) {
+    this.startCallback(thisMock);
+  }
+  // Invoke for next element (delayed execution)
+  this.mockPending = true;
+  var self = this;
+  setTimeout(function () {
+    self.doMock();
+  }, 0);
+};
+Interface.prototype.mockRequest = function (args) {
+  if (!(args instanceof Array || args instanceof Command)) throw new Error('missing command parameter');
+  if (!(args instanceof Array)) args = [args]; // coerce to array
+  var i;
+  for (i = 0; i < args.length; i++) {
+    if (false === (args[i] instanceof Command)) throw new Error('invalid command parameter');
+  }
+  // All good stack them
+  for (i = 0; i < args.length; i++) {
+    this.mocks.push(args[i]);
+  }
+  // If mock is not pending then start it
+  if (!this.mockPending) {
+    this.doMock();
+  }
+};
+Interface.prototype.start = function (application, presentation, callBack) {
+  if (!(application instanceof Application)) throw new Error('Application required');
+  if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
+  if (typeof callBack != 'function') throw new Error('callback required');
+  this.startCallback = callBack;
+};
+Interface.prototype.stop = function (callBack) {
+  if (typeof callBack != 'function') throw new Error('callback required');
+};
+Interface.prototype.notify = function (request) {
+  if (false === (request instanceof Request)) throw new Error('Request required');
+};
+Interface.prototype.render = function (presentation, callBack) {
+  if (false === (presentation instanceof Presentation)) throw new Error('Presentation object required');
+  if (callBack && typeof callBack != 'function') throw new Error('optional second argument must a commandRequest callback function');
 };
 ;
 /**
@@ -839,6 +873,38 @@ Procedure.prototype.getValidationErrors = function () {
 ;
 /**
  * tequila
+ * Request-class
+ */
+/*
+ * Constructor
+ */
+function Request(args) {
+  if (false === (this instanceof Request)) throw new Error('new operator required');
+  if (typeof args == 'string') {
+    var quickType = args;
+    args = {};
+    args.type = quickType;
+  }
+  args = args || {};
+  this.type = args.type || null;
+  if (!this.type || typeof this.type != 'string') throw new Error('Request type required');
+}
+/*
+ * Methods
+ */
+Request.prototype.toString = function () {
+  switch (this.type) {
+    case 'Null':
+      return this.type + ' Request';
+      break;
+    default:
+      return this.type + ' Request: ' + this.contents;
+      break;
+  }
+};
+;
+/**
+ * tequila
  * store-class
  */
 
@@ -975,20 +1041,20 @@ var Application = function (args) {
   if (false === (this instanceof Application)) throw new Error('new operator required');
   Model.call(this, args);
   this.modelType = "Application";
-  this.interface = new Interface();
 };
 Application.prototype = T.inheritPrototype(Model.prototype);
 /*
  * Methods
  */
-Application.prototype.run = function () {
-  return new Command().execute();
+Application.prototype.start = function () {
+  if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
 };
-Application.prototype.setInterface = function (interface) {
-  if (false === (interface instanceof Interface)) throw new Error('instance of Interface a required parameter');
+Application.prototype.setInterface = function (primaryInterface) {
+  if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');
+  this.primaryInterface = primaryInterface;
 };
 Application.prototype.getInterface = function () {
-  return this.interface;
+  return this.primaryInterface;
 };
 ;
 /**
@@ -1048,11 +1114,36 @@ var Presentation = function (args) {
   if (!args.attributes) {
     args.attributes = [];
   }
-  args.attributes.push(new Attribute({name: 'name', type: 'String(20)'}));
+  args.attributes.push(new Attribute({name: 'name', type: 'String'}));
+  args.attributes.push(new Attribute({name: 'modelName', type: 'String'}));
+  args.attributes.push(new Attribute({name: 'contents', type: 'Object', value: []}));
   Model.call(this, args);
   this.modelType = "Presentation";
 };
-Presentation.prototype = T.inheritPrototype(Model.prototype);;
+Presentation.prototype = T.inheritPrototype(Model.prototype);
+/*
+ * Methods
+ */
+Presentation.prototype.getValidationErrors = function (modelCheckOnly) {
+  var i;
+  var errors = Model.prototype.getValidationErrors.call(this);
+  if (!modelCheckOnly && errors.length == 0) { // Only check if model it valid
+    var contents = this.get('contents');
+    var gotError = false;
+    if (contents instanceof Array) {
+      for (i=0; i<contents.length; i++) {
+        if (!(contents[i] instanceof Command || contents[i] instanceof Attribute))
+          gotError = true;
+      }
+      if (gotError)
+        errors.push('contents elements must be Command or Attribute');
+    } else {
+      errors.push('contents must be Array');
+    }
+  }
+  return errors;
+};
+;
 /**
  * tequila
  * user-core-model
@@ -1639,6 +1730,30 @@ RedisStore.prototype = T.inheritPrototype(Store.prototype);
  * tequila
  * bootstrap3-interface
  */
+function Bootstrap3PanelInterface(args) {
+  if (false === (this instanceof Bootstrap3PanelInterface)) throw new Error('new operator required');
+  args = args || {};
+  args.name = args.name || '(unnamed)';
+  args.description = args.description || 'a Interface';
+  var i;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
+  var badJooJoo = [];
+  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1)
+    throw new Error('error creating Procedure: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  // default state
+  this.startCallback = null;
+  this.stopCallback = null;
+  this.mocks = [];
+  this.mockPending = false;
+  // args ok, now copy to object
+  for (i in args) this[i] = args[i];
+}
+Bootstrap3PanelInterface.prototype = T.inheritPrototype(Interface.prototype);
+/*
+ * Methods
+ */
 ;
 /**
  * tequila
@@ -1649,6 +1764,36 @@ RedisStore.prototype = T.inheritPrototype(Store.prototype);
  * tequila
  * mock-interface.js
  */
+function MockInterface(args) {
+  if (false === (this instanceof MockInterface)) throw new Error('new operator required');
+  args = args || {};
+  args.name = args.name || '(unnamed)';
+  args.description = args.description || 'a Interface';
+  var i;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
+  var badJooJoo = [];
+  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1)
+    throw new Error('error creating Procedure: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  // default state
+  this.startCallback = null;
+  this.stopCallback = null;
+  this.mocks = [];
+  this.mockPending = false;
+  // args ok, now copy to object
+  for (i in args) this[i] = args[i];
+}
+MockInterface.prototype = T.inheritPrototype(Interface.prototype);
+/*
+ * Methods
+ */
+MockInterface.prototype.canMock = function () {
+  return true;
+};
+MockInterface.prototype.mockRequest = function (args) {
+  Interface.prototype.mockRequest.call(this, args);
+};
 ;
 /**
  * tequila

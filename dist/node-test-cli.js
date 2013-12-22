@@ -1868,7 +1868,6 @@ Command.prototype.execute = function () {
     }
   }
   function ProcedureEvents(event) {
-    console.log('ProcedureEvents: ' + event);
     var tasks = self.contents.tasks;
     var allTasksDone = true; // until proved wrong ...
     switch (event) {
@@ -1926,42 +1925,77 @@ function Interface(args) {
   args.name = args.name || '(unnamed)';
   args.description = args.description || 'a Interface';
   var i;
-  var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'tasksCompleted']);
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
   var badJooJoo = [];
   for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1)
     throw new Error('error creating Procedure: multiple errors');
   if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
-  // args ok, now copy to object and check for errors
+  // default state
+  this.startCallback = null;
+  this.stopCallback = null;
+  this.mocks = [];
+  this.mockPending = false;
+  // args ok, now copy to object
   for (i in args) this[i] = args[i];
-  badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
-  if (badJooJoo) {
-    if (badJooJoo.length > 1) throw new Error('error creating Procedure: multiple errors');
-    if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
-  }
 }
 /*
  * Methods
  */
-Interface.prototype.getValidationErrors = function () {
-  var badJooJoo = [];
-  return badJooJoo.length ? badJooJoo : null;
-};
 Interface.prototype.toString = function () {
   return this.description;
 };
-Interface.prototype.requestResponse = function (obj, callback) {
-  if (obj == null || typeof obj !== 'object' || typeof callback !== 'function') throw new Error('requestResponse arguments required: object, callback');
-  if (obj.request === undefined) throw new Error('requestResponse object has no request property');
-  if (obj.mockRequest !== undefined) throw new Error('mockRequest not available for Interface');
-  // Parameters are ok now handle the request
-  setTimeout(function () {
-    obj.response = new Error('invalid request: ' + obj.request);
-    callback(obj);
-  }, 0);
-};
 Interface.prototype.canMock = function () {
   return false;
+};
+Interface.prototype.doMock = function () {
+  // If no more elements then we are done
+  this.mockPending = false;
+  if (this.mocks.length < 1)
+    return;
+  // Get oldest ele and pass to callback if it is set
+  var thisMock = this.mocks.shift();
+  if (this.startCallback) {
+    this.startCallback(thisMock);
+  }
+  // Invoke for next element (delayed execution)
+  this.mockPending = true;
+  var self = this;
+  setTimeout(function () {
+    self.doMock();
+  }, 0);
+};
+Interface.prototype.mockRequest = function (args) {
+  if (!(args instanceof Array || args instanceof Command)) throw new Error('missing command parameter');
+  if (!(args instanceof Array)) args = [args]; // coerce to array
+  var i;
+  for (i = 0; i < args.length; i++) {
+    if (false === (args[i] instanceof Command)) throw new Error('invalid command parameter');
+  }
+  // All good stack them
+  for (i = 0; i < args.length; i++) {
+    this.mocks.push(args[i]);
+  }
+  // If mock is not pending then start it
+  if (!this.mockPending) {
+    this.doMock();
+  }
+};
+Interface.prototype.start = function (application, presentation, callBack) {
+  if (!(application instanceof Application)) throw new Error('Application required');
+  if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
+  if (typeof callBack != 'function') throw new Error('callback required');
+  this.startCallback = callBack;
+};
+Interface.prototype.stop = function (callBack) {
+  if (typeof callBack != 'function') throw new Error('callback required');
+};
+Interface.prototype.notify = function (request) {
+  if (false === (request instanceof Request)) throw new Error('Request required');
+};
+Interface.prototype.render = function (presentation, callBack) {
+  if (false === (presentation instanceof Presentation)) throw new Error('Presentation object required');
+  if (callBack && typeof callBack != 'function') throw new Error('optional second argument must a commandRequest callback function');
 };
 ;
 /**
@@ -2240,6 +2274,38 @@ Procedure.prototype.getValidationErrors = function () {
 ;
 /**
  * tequila
+ * Request-class
+ */
+/*
+ * Constructor
+ */
+function Request(args) {
+  if (false === (this instanceof Request)) throw new Error('new operator required');
+  if (typeof args == 'string') {
+    var quickType = args;
+    args = {};
+    args.type = quickType;
+  }
+  args = args || {};
+  this.type = args.type || null;
+  if (!this.type || typeof this.type != 'string') throw new Error('Request type required');
+}
+/*
+ * Methods
+ */
+Request.prototype.toString = function () {
+  switch (this.type) {
+    case 'Null':
+      return this.type + ' Request';
+      break;
+    default:
+      return this.type + ' Request: ' + this.contents;
+      break;
+  }
+};
+;
+/**
+ * tequila
  * store-class
  */
 
@@ -2376,20 +2442,20 @@ var Application = function (args) {
   if (false === (this instanceof Application)) throw new Error('new operator required');
   Model.call(this, args);
   this.modelType = "Application";
-  this.interface = new Interface();
 };
 Application.prototype = T.inheritPrototype(Model.prototype);
 /*
  * Methods
  */
-Application.prototype.run = function () {
-  return new Command().execute();
+Application.prototype.start = function () {
+  if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
 };
-Application.prototype.setInterface = function (interface) {
-  if (false === (interface instanceof Interface)) throw new Error('instance of Interface a required parameter');
+Application.prototype.setInterface = function (primaryInterface) {
+  if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');
+  this.primaryInterface = primaryInterface;
 };
 Application.prototype.getInterface = function () {
-  return this.interface;
+  return this.primaryInterface;
 };
 ;
 /**
@@ -2449,11 +2515,36 @@ var Presentation = function (args) {
   if (!args.attributes) {
     args.attributes = [];
   }
-  args.attributes.push(new Attribute({name: 'name', type: 'String(20)'}));
+  args.attributes.push(new Attribute({name: 'name', type: 'String'}));
+  args.attributes.push(new Attribute({name: 'modelName', type: 'String'}));
+  args.attributes.push(new Attribute({name: 'contents', type: 'Object', value: []}));
   Model.call(this, args);
   this.modelType = "Presentation";
 };
-Presentation.prototype = T.inheritPrototype(Model.prototype);;
+Presentation.prototype = T.inheritPrototype(Model.prototype);
+/*
+ * Methods
+ */
+Presentation.prototype.getValidationErrors = function (modelCheckOnly) {
+  var i;
+  var errors = Model.prototype.getValidationErrors.call(this);
+  if (!modelCheckOnly && errors.length == 0) { // Only check if model it valid
+    var contents = this.get('contents');
+    var gotError = false;
+    if (contents instanceof Array) {
+      for (i=0; i<contents.length; i++) {
+        if (!(contents[i] instanceof Command || contents[i] instanceof Attribute))
+          gotError = true;
+      }
+      if (gotError)
+        errors.push('contents elements must be Command or Attribute');
+    } else {
+      errors.push('contents must be Array');
+    }
+  }
+  return errors;
+};
+;
 /**
  * tequila
  * user-core-model
@@ -3040,6 +3131,30 @@ RedisStore.prototype = T.inheritPrototype(Store.prototype);
  * tequila
  * bootstrap3-interface
  */
+function Bootstrap3PanelInterface(args) {
+  if (false === (this instanceof Bootstrap3PanelInterface)) throw new Error('new operator required');
+  args = args || {};
+  args.name = args.name || '(unnamed)';
+  args.description = args.description || 'a Interface';
+  var i;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
+  var badJooJoo = [];
+  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1)
+    throw new Error('error creating Procedure: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  // default state
+  this.startCallback = null;
+  this.stopCallback = null;
+  this.mocks = [];
+  this.mockPending = false;
+  // args ok, now copy to object
+  for (i in args) this[i] = args[i];
+}
+Bootstrap3PanelInterface.prototype = T.inheritPrototype(Interface.prototype);
+/*
+ * Methods
+ */
 ;
 /**
  * tequila
@@ -3050,6 +3165,36 @@ RedisStore.prototype = T.inheritPrototype(Store.prototype);
  * tequila
  * mock-interface.js
  */
+function MockInterface(args) {
+  if (false === (this instanceof MockInterface)) throw new Error('new operator required');
+  args = args || {};
+  args.name = args.name || '(unnamed)';
+  args.description = args.description || 'a Interface';
+  var i;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
+  var badJooJoo = [];
+  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
+  if (badJooJoo.length > 1)
+    throw new Error('error creating Procedure: multiple errors');
+  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  // default state
+  this.startCallback = null;
+  this.stopCallback = null;
+  this.mocks = [];
+  this.mockPending = false;
+  // args ok, now copy to object
+  for (i in args) this[i] = args[i];
+}
+MockInterface.prototype = T.inheritPrototype(Interface.prototype);
+/*
+ * Methods
+ */
+MockInterface.prototype.canMock = function () {
+  return true;
+};
+MockInterface.prototype.mockRequest = function (args) {
+  Interface.prototype.mockRequest.call(this, args);
+};
 ;
 /**
  * tequila
@@ -3542,16 +3687,17 @@ test.renderDetail = function (isBrowser) {
       var dotCount = curSection.match(/\./g) ? curSection.match(/\./g).length : 0;
       var isInScope = curSection.indexOf(filterSection) == 0;
       var isFiltered = false; // If true will not be rendered
-      switch (test.filterLevel) {
-        case 'TOC':
-          test.filterLevel = 'TOC';
-          if (!isInScope && dotCount > 2) isFiltered = true;
-          break;
-        case 'Inf':
-          test.filterLevel = 'Inf'; // TOC with paragraph text
-          if (!isInScope && dotCount > 2) isFiltered = true;
-          break;
-      }
+      if (!test.filterSection)
+        switch (test.filterLevel) {
+          case 'TOC':
+            test.filterLevel = 'TOC';
+            if (!isInScope && dotCount > 2) isFiltered = true;
+            break;
+          case 'Inf':
+            test.filterLevel = 'Inf'; // TOC with paragraph text
+            if (!isInScope && dotCount > 2) isFiltered = true;
+            break;
+        }
       if (test.filterSection && curSection.indexOf(filterSection) != 0) {
         isFiltered = true;
         if (testNodeType != 'e' && filterSection.indexOf(curSection) == 0) {
@@ -3588,7 +3734,7 @@ test.renderDetail = function (isBrowser) {
           }
           break;
         case 'p':
-          if (!isFiltered && (dotCount < 2 || test.filterLevel != 'TOC')) {
+          if (!isFiltered && (test.filterSection || dotCount < 2 || test.filterLevel != 'TOC')) {
             var p = document.createElement("p");
             p.innerHTML = test.converter.makeHtml(test.nodes[i].text);
             test.innerDiv.appendChild(p);
@@ -3632,7 +3778,7 @@ test.renderDetail = function (isBrowser) {
               // Check assertions
               var gotFailedAssertions = false;
               for (var j in test.assertions) {
-                if (test.assertions.hasOwnProperty(i))
+                if (test.assertions.hasOwnProperty(j))
                   if (!test.assertions[j]) gotFailedAssertions = true;
               }
               if (test_Value !== expected_Value || gotFailedAssertions) {
@@ -3696,7 +3842,7 @@ test.renderDetail = function (isBrowser) {
               // Check assertions
               var gotFailedAssertions = false;
               for (var j in test.assertions) {
-                if (test.assertions.hasOwnProperty(i))
+                if (test.assertions.hasOwnProperty(j))
                   if (!test.assertions[j]) gotFailedAssertions = true;
               }
               if (testPassed && !gotFailedAssertions) {
@@ -3740,6 +3886,10 @@ test.renderDetail = function (isBrowser) {
             }
           }
           var showExample = test.showExamples;
+          if (test.filterSection)
+            showExample = 'Y';
+          // filterSection
+
           if (isFiltered) showExample = false;
           if (ranTest && (!testPassed || gotFailedAssertions)) showExample = true;
           if (test.nodes[i].asyncTest) {
@@ -3837,7 +3987,7 @@ test.show = function (value) {
       return;
     }
     if (value !== undefined) {
-      test.showWork.push(JSON.stringify(value));
+      test.showWork.push(JSON.stringify(value,null,' '));
       return;
     }
     test.showWork.push(value);
@@ -4132,7 +4282,7 @@ test.runnerAttribute = function () {
         new Attribute({eman: 'the'}); // 2 errors: name missing and eman an unknown property
       });
       test.heading('Attribute.ModelID', function () {
-        test.paragraph('Attribute.ModelID defines reference to ID in external mode.');
+        test.paragraph('Attribute.ModelID defines reference to ID in external model.');
         test.example('objects created should be an instance of Attribute.ModelID', true, function () {
           return new Attribute.ModelID(new Model()) instanceof Attribute.ModelID;
         });
@@ -4658,91 +4808,116 @@ test.runnerDelta = function () {
  * tequila
  * interface-test
  */
+
 test.runnerInterface = function () {
   test.heading('Interface Class', function () {
     test.paragraph('The Interface Class is an abstraction of a user interface.');
     test.runnerInterfaceMethodsTest(Interface);
   });
 };
-test.runnerInterfaceMethodsTest = function (SurrogateInterface) {
-  test.heading('CONSTRUCTOR', function () {
-    test.example('objects created should be an instance of SurrogateInterface', true, function () {
-      return new SurrogateInterface() instanceof SurrogateInterface;
-    });
-    test.example('should make sure new operator used', Error('new operator required'), function () {
-      SurrogateInterface();
-    });
-    test.example('should make sure argument properties are valid', Error('error creating Procedure: invalid property: yo'), function () {
-      new SurrogateInterface({yo: 'whatup'});
-    });
-  });
-  test.heading('PROPERTIES', function () {
-    test.heading('name', function () {
-      test.example('defaults to (unnamed)', '(unnamed)', function () {
-        return new SurrogateInterface().name;
+
+// Tests for all interface subclasses
+test.runnerInterfaceMethodsTest = function (SurrogateInterface, inheritanceTest) {
+  var inheritanceTestWas = T.inheritanceTest;
+  T.inheritanceTest = inheritanceTest;
+  test.heading('Interface Class', function () {
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of SurrogateInterface', true, function () {
+        var i = new SurrogateInterface();
+        return (i instanceof SurrogateInterface) && (i instanceof Interface);
+      });
+      test.example('should make sure new operator used', Error('new operator required'), function () {
+        SurrogateInterface();
+      });
+      test.example('should make sure argument properties are valid', Error('error creating Procedure: invalid property: yo'), function () {
+        new SurrogateInterface({yo: 'whatup'});
       });
     });
-    test.heading('description', function () {
-      test.example('defaults to a SurrogateInterface', 'a Interface', function () {
-        return new SurrogateInterface().description;
-      });
-    });
-  });
-  test.heading('METHODS', function () {
-    test.heading('toString()', function () {
-      test.example('should return a description of the message', 'Punched Card SurrogateInterface', function () {
-        return new SurrogateInterface({description: 'Punched Card SurrogateInterface'}).toString();
-      });
-    });
-    test.heading('getValidationErrors()', function () {
-      test.example('returns null when no errors', null, function () {
-        return new SurrogateInterface().getValidationErrors();
-      });
-    });
-    test.heading('requestResponse({request:object}, callback', function () {
-      test.paragraph('Subclasses of SurrogateInterface will use this to submit user (or agent) initiated requests.  ' +
-        'It can also be used by the app to push objects to the SurrogateInterface by passing {request:this...');
-      test.example('arguments must be in correct format', test.asyncResponse(Error('invalid request: null')), function (testNode, returnResponse) {
-        test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
-          new SurrogateInterface().requestResponse();
+    test.heading('PROPERTIES', function () {
+      test.heading('name', function () {
+        test.example('defaults to (unnamed)', '(unnamed)', function () {
+          return new SurrogateInterface().name;
         });
-        test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
-          new SurrogateInterface().requestResponse({}); // missing callback
+      });
+      test.heading('description', function () {
+        test.example('defaults to a SurrogateInterface', 'a Interface', function () {
+          return new SurrogateInterface().description;
         });
-        test.shouldThrow(Error('requestResponse arguments required: object, callback'), function () {
-          new SurrogateInterface().requestResponse("hello", function () {
-            // function part ok but not passing an object
+      });
+    });
+    test.heading('METHODS', function () {
+      test.heading('toString()', function () {
+        test.example('should return a description of the message', 'Punched Card SurrogateInterface', function () {
+          return new SurrogateInterface({description: 'Punched Card SurrogateInterface'}).toString();
+        });
+      });
+      test.heading('start()', function () {
+        test.paragraph('The start method initiates the interface and passes a callback for the interface to submit requests. ' +
+          'The callback must pass a Request object followed by an optional callback for responses to the request e.g. ' +
+          'interface.start ( function ( request, response(callback) ) ) {}');
+        test.example('Application parameter is required', Error('Application required'), function () {
+          new SurrogateInterface().start();
+        });
+        test.example('Presentation parameter is required', Error('Presentation required'), function () {
+          new SurrogateInterface().start(new Application());
+        });
+        test.example('callback parameter required', Error('callback required'), function () {
+          /* Example code:
+           myInterface.start(function(request,response) {
+           handle(request);
+           if (response)
+           response(...);
+           else
+           myInterface.notify(...);
+           });
+           */
+          new SurrogateInterface().start(new Application(),new Presentation());
+        });
+      });
+      test.heading('stop()', function () {
+        test.paragraph('calling stop will end the start() processing and release any resources');
+        test.example('must pass callback function', Error('callback required'), function () {
+          new SurrogateInterface().stop();
+        });
+      });
+      test.heading('notify()', function () {
+        test.paragraph('The notify method sends a Request to the Interface.  This can be the result of a request sent from the start() callback.');
+        test.example('must pass a Request object', Error('Request required'), function () {
+          new SurrogateInterface().notify();
+        });
+      });
+      test.heading('render()', function () {
+        test.example('first argument must be a Presentation instance', Error('Presentation object required'), function () {
+          new SurrogateInterface().render();
+        });
+        test.example('optional callback must be function', Error('optional second argument must a commandRequest callback function'), function () {
+          new SurrogateInterface().render(new Presentation, true);
+        });
+      });
+      test.heading('canMock()', function () {
+        test.example('returns boolean to indicate if interface has mocking ability', 'boolean', function () {
+          var canMock = new SurrogateInterface().canMock();
+          return typeof canMock;
+        });
+      });
+      test.heading('mockRequest()', function () {
+        test.example('parameter must be command or array of commands', undefined, function () {
+          var ui = new SurrogateInterface();
+          test.shouldThrow('Error: missing command parameter', function () {
+            ui.mockRequest();
+          });
+          // Empty Stub Commands are ignored in mocks
+          ui.mockRequest(new Command()); // Send single command
+          ui.mockRequest([new Command(), new Command()]); // Send array of commands
+          // Test when one of array elements is bad
+          test.shouldThrow('Error: invalid command parameter', function () {
+            ui.mockRequest([new Command(), 'wtf']);
           });
         });
-        test.shouldThrow(Error('requestResponse object has no request property'), function () {
-          new SurrogateInterface().requestResponse({}, function () {
-            // function part ok but not passing an object
-          });
-        });
-        // Any value can be set to request will be accepted on function call.
-        // If the value is not handled then the callback receives an error as the response.
-        // null should always return an error.
-        new SurrogateInterface().requestResponse({request: null}, function (obj) {
-          returnResponse(testNode, obj.response);
-        });
-      });
-    });
-    test.heading('canMock()', function () {
-      test.example('see if mock responses allowed before testing', test.asyncResponse('mock check done'), function (testNode, returnResponse) {
-        var ui = new SurrogateInterface();
-        if (ui.canMock()) {
-          throw new Error('no test for mock');
-        } else {
-          test.shouldThrow(Error('mockRequest not available for Interface'), function () {
-            new SurrogateInterface().requestResponse({request: null, mockRequest: null}, function (obj) {
-              returnResponse(testNode, 'mock check failed');
-            });
-          });
-          returnResponse(testNode, 'mock check done');
-        }
       });
     });
   });
+  T.inheritanceTest = inheritanceTestWas;
 };;
 /**
  * tequila
@@ -4918,11 +5093,13 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           return (goodModel.getValidationErrors().length == 0 && badModel.getValidationErrors().length == 1);
         });
         test.example('elements of array must be instance of Attribute', undefined, function () {
+          // passing true to getValidationErrors() means only check model and not subclass validations
+          // todo make unit test for above
           var model = new SurrogateModelClass();
           model.attributes = [new Attribute("ID", "ID")];
-          test.assertion(model.getValidationErrors().length == 0);
+          test.assertion(model.getValidationErrors(true).length == 0);
           model.attributes = [new Attribute("ID", "ID"), new SurrogateModelClass(), 0, 'a', {}, [], null];
-          test.assertion(model.getValidationErrors().length == 6);
+          test.assertion(model.getValidationErrors(true).length == 6);
         });
       });
       test.heading('value', function () {
@@ -5107,6 +5284,40 @@ test.runnerProcedure = function () {
 ;
 /**
  * tequila
+ * Request-test
+ */
+test.runnerRequest = function () {
+  test.heading('Request Class', function () {
+    test.paragraph('Requests handle the Request / Response design pattern.  They are used by the Interface class to ' +
+      'communicate with the Application Model');
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of Request', true, function () {
+        return new Request('Null') instanceof Request;
+      });
+      test.example('should make sure new operator used', Error('new operator required'), function () {
+        Request('Null');
+      });
+      test.example('request type must be specified', Error('Request type required'), function () {
+        new Request();
+      });
+      test.example('simple string parameter creates request of named type', 'example', function () {
+        return new Request('example').type;
+      });
+      test.example('type can be specified when object passed', 'example', function () {
+        return new Request({type: 'example'}).type;
+      });
+    });
+    test.heading('METHODS', function () {
+      test.heading('toString()', function () {
+        test.example('should return a description of the Request', 'Null Request', function () {
+          return new Request('Null').toString();
+        });
+      });
+    });
+  });
+};;
+/**
+ * tequila
  * store-test
  */
 test.runnerStore = function () {
@@ -5118,7 +5329,9 @@ test.runnerStore = function () {
     test.runnerStoreMethods(Store);
   });
 };
-test.runnerStoreConstructor = function (SurrogateStore) {
+test.runnerStoreConstructor = function (SurrogateStore, inheritanceTest) {
+  var inheritanceTestWas = T.inheritanceTest;
+  T.inheritanceTest = inheritanceTest;
   test.example('objects created should be an instance of Store', true, function () {
     return new SurrogateStore() instanceof Store;
   });
@@ -5128,11 +5341,14 @@ test.runnerStoreConstructor = function (SurrogateStore) {
   test.example('should make sure properties are valid', Error('error creating Store: invalid property: food'), function () {
     new SurrogateStore({food: 'twinkies'});
   });
+  T.inheritanceTest = inheritanceTestWas;
 };
-test.runnerStoreMethods = function (SurrogateStore) {
+test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
+  var inheritanceTestWas = T.inheritanceTest;
+  T.inheritanceTest = inheritanceTest;
   test.heading('METHODS', function () {
-    var services = new SurrogateStore().getServices();
-    test.example('getStoreInterface() returns an object with interface for the Store.', undefined, function () {
+    var services = new SurrogateStore().getServices();  // TODO change to methods ASAP!!!
+    test.example('getServices() returns an object with interface for the Store.', undefined, function () {
       test.show(services);
       test.assertion(services instanceof Object);
       test.assertion(typeof services['isReady'] == 'boolean'); // don't use until
@@ -5300,14 +5516,14 @@ test.runnerStoreMethods = function (SurrogateStore) {
         '_See integration test for more info._');
       if (services['isReady'] && services['canGetList']) {
         test.example('returns a List populated from store', undefined, function () {
-          test.shouldThrow(Error('argument must be a List'),function(){
+          test.shouldThrow(Error('argument must be a List'), function () {
             new SurrogateStore().getList();
           })
-          test.shouldThrow(Error('filter argument must be Object'),function(){
+          test.shouldThrow(Error('filter argument must be Object'), function () {
             new SurrogateStore().getList(new List(new Model()));
           })
-          test.shouldThrow(Error('callback required'),function(){
-            new SurrogateStore().getList(new List(new Model()),[]);
+          test.shouldThrow(Error('callback required'), function () {
+            new SurrogateStore().getList(new List(new Model()), []);
           })
           // See integration tests for examples of usage
         });
@@ -5337,6 +5553,7 @@ test.runnerStoreMethods = function (SurrogateStore) {
       });
     });
   });
+  T.inheritanceTest = inheritanceTestWas;
 };;
 /**
  * tequila
@@ -5511,12 +5728,6 @@ test.runnerApplicationModel = function () {
       });
     });
     test.heading('METHODS', function () {
-      test.heading('run()', function () {
-        test.paragraph('The run method executes the application.');
-        test.example('with no parameters default command will be executed', Error('command type Stub not implemented'), function () {
-          new Application().run();
-        });
-      });
       test.heading('setInterface(interface)', function () {
         test.paragraph('Setting the interface for the application determines the primary method of user interaction.');
         test.example('must supply Interface object', Error('instance of Interface a required parameter'), function () {
@@ -5525,8 +5736,21 @@ test.runnerApplicationModel = function () {
       });
       test.heading('getInterface()', function () {
         test.paragraph('returns primary user interface for application');
-        test.example('get default interface for applications', 'a Interface', function () {
-          return new Application().getInterface().toString();
+        test.example('default is undefined', true, function () {
+          return new Application().getInterface() == undefined;
+        });
+        test.example('returns value set by set Interface', true, function () {
+          var myInterface = new Interface();
+          var myApplication = new Application();
+          myApplication.setInterface(myInterface);
+          return (myApplication.getInterface() === myInterface);
+        });
+
+      });
+      test.heading('start()', function () {
+        test.paragraph('The start method executes the application.');
+        test.example('must set interface before starting', Error('error starting application: interface not set'), function () {
+          new Application().start();
         });
       });
     });
@@ -5581,46 +5805,57 @@ test.runnerLogModel = function () {
  */
 test.runnerPresentation = function () {
   test.heading('Presentation Model', function () {
-
     test.paragraph('The Presentation Model represents the way in which a model is to be presented to the user.  ' +
       'The presentation is meant to be a "hint" to a Interface object.  ' +
       'The specific Interface object will represent the model data according to the Presentation object.');
-
     test.heading('CONSTRUCTOR', function () {
-      test.example('objects created should be an instance of User', true, function () {
+      test.example('objects created should be an instance of Presentation', true, function () {
         return new Presentation() instanceof Presentation;
       });
+//      test.example('must create with model constructor', Error('must create with model constructor'), function () {
+//        new Presentation();
+//      });
       test.heading('Model tests are applied', function () {
         test.runnerModel(Presentation, true);
       });
     });
-
     test.heading('PROPERTIES', function () {
       test.heading('model', function () {
-        test.paragraph('points to model from which presentation is created and CRUD op');
-      });
-      test.heading('ID', function () {
-        test.paragraph('the ID of the model being presented - if null then new (n/a if no model)');
-      });
-      test.heading('attributes', function () {
-        test.paragraph('if null then model-attributes used for presentation (one or other needed)');
-      });
-      test.heading('commands', function () {
-        test.paragraph('commands available, if string then built in predefined command ex: \'store\'');
+        test.paragraph('This is a model instance for the presentation instance.');
       });
     });
-
     test.heading('ATTRIBUTES', function () {
       test.paragraph('Presentation extends model and inherits the attributes property.  All Presentation objects ' +
         'have the following attributes:');
+      test.example('following attributes are defined:', undefined, function () {
+        var presentation = new Presentation(); // default attributes and values
+        test.assertion(presentation.get('id') === null);
+        test.assertion(presentation.get('name') === null);
+        test.assertion(presentation.get('modelName') === null);
+        test.assertion(presentation.get('contents') instanceof Array);
+      });
     });
-    test.example('following attributes are defined:', undefined, function () {
-      var presentation = new Presentation(); // default attributes and values
-      test.assertion(presentation.get('id') === null);
-      test.assertion(presentation.get('name') === null);
+    test.heading('METHODS', function () {
+      test.heading('modelConstructor', function () {
+        test.paragraph('This is a reference to the constructor function to create a new model');
+      });
     });
+    test.heading('CONTENTS', function () {
+      test.paragraph('The contents attributes provides the structure for the presentation.');
+      test.example('content must be an array', 'contents must be Array', function () {
+        var pres = new Presentation();
+        pres.set('contents', true);
+        return pres.getValidationErrors();
+      });
+      test.example('array elements must be Command and Attribute objects', 'contents elements must be Command or Attribute', function () {
+        var pres = new Presentation();
+        pres.set('contents', [new Command(), new Attribute({name: 'meh'})]);
+        test.assertion(pres.getValidationErrors().length == 0);
+        pres.set('contents', [new Command(), new Attribute({name: 'meh'}), true]);
+        return pres.getValidationErrors();
+      });
 
-
+    });
   });
 };
 ;
@@ -5690,12 +5925,16 @@ test.runnerMemoryStore = function () {
   test.heading('MemoryStore', function () {
     test.paragraph('The MemoryStore is a simple volatile store.');
     test.heading('CONSTRUCTOR', function () {
+      test.heading('Store Constructor tests are applied', function () {
+        test.runnerStoreConstructor(MemoryStore,true);
+      });
       test.example('objects created should be an instance of MemoryStore', true, function () {
         return new MemoryStore() instanceof MemoryStore;
       });
-      test.runnerStoreConstructor(MemoryStore);
     });
-    test.runnerStoreMethods(MemoryStore);
+    test.heading('Store tests are applied', function () {
+      test.runnerStoreMethods(MemoryStore,true);
+    });
   });
 };
 ;
@@ -5706,14 +5945,18 @@ test.runnerMemoryStore = function () {
 
 test.runnerMongoStore = function () {
   test.heading('MongoStore', function () {
-    test.paragraph('The MongoStore is a simple volatile store.');
+    test.paragraph('The MongoStore handles data storage via MongoDB.');
     test.heading('CONSTRUCTOR', function () {
+      test.heading('Store Constructor tests are applied', function () {
+        test.runnerStoreConstructor(MongoStore,true);
+      });
       test.example('objects created should be an instance of MongoStore', true, function () {
         return new MongoStore() instanceof MongoStore;
       });
-      test.runnerStoreConstructor(MongoStore);
     });
-    test.runnerStoreMethods(MongoStore);
+    test.heading('Store tests are applied', function () {
+      test.runnerStoreMethods(MongoStore,true);
+    });
   });
 };
 ;
@@ -5725,12 +5968,16 @@ test.runnerRemoteStore = function () {
   test.heading('RemoteStore', function () {
     test.paragraph('The RemoteStore is a store that is maintained by a remote host.');
     test.heading('CONSTRUCTOR', function () {
+      test.heading('Store Constructor tests are applied', function () {
+        test.runnerStoreConstructor(RemoteStore,true);
+      });
       test.example('objects created should be an instance of RemoteStore', true, function () {
         return new RemoteStore() instanceof RemoteStore;
       });
-      test.runnerStoreConstructor(RemoteStore);
     });
-    test.runnerStoreMethods(RemoteStore);
+    test.heading('Store tests are applied', function () {
+      test.runnerStoreMethods(RemoteStore,true);
+    });
   });
 };
 ;
@@ -5740,14 +5987,18 @@ test.runnerRemoteStore = function () {
  */
 test.runnerLocalStore = function () {
   test.heading('Local Store', function () {
-    test.paragraph('The LocalStore is a simple volatile store.');
+    test.paragraph('The LocalStore abstracts local client storage.');
     test.heading('CONSTRUCTOR', function () {
+      test.heading('Store Constructor tests are applied', function () {
+        test.runnerStoreConstructor(LocalStore,true);
+      });
       test.example('objects created should be an instance of LocalStore', true, function () {
         return new LocalStore() instanceof LocalStore;
       });
-      test.runnerStoreConstructor(LocalStore);
     });
-    test.runnerStoreMethods(LocalStore);
+    test.heading('Store tests are applied', function () {
+      test.runnerStoreMethods(LocalStore,true);
+    });
   });
 };
 ;
@@ -5757,14 +6008,18 @@ test.runnerLocalStore = function () {
  */
 test.runnerRedisStore = function () {
   test.heading('Redis Store', function () {
-    test.paragraph('The RedisStore is a simple volatile store.');
+    test.paragraph('The RedisStore is a store using Redis.');
     test.heading('CONSTRUCTOR', function () {
+      test.heading('Store Constructor tests are applied', function () {
+        test.runnerStoreConstructor(RedisStore,true);
+      });
       test.example('objects created should be an instance of RedisStore', true, function () {
         return new RedisStore() instanceof RedisStore;
       });
-      test.runnerStoreConstructor(RedisStore);
     });
-    test.runnerStoreMethods(RedisStore);
+    test.heading('Store tests are applied', function () {
+      test.runnerStoreMethods(RedisStore,true);
+    });
   });
 };
 ;
@@ -5773,7 +6028,11 @@ test.runnerRedisStore = function () {
  * bootstrap3-panels-test.js
  */
 test.runnerBootstrap3Interface = function () {
-  test.heading('Bootstrap3Interface', function () {
+  test.heading('Bootstrap3PanelInterface', function () {
+    test.paragraph('Bootstrap3PanelInterface Interface is a single column panel oriented interface for cell / tablet / desktop.');
+    test.heading('Interface tests are applied.', function () {
+      test.runnerInterfaceMethodsTest(Bootstrap3PanelInterface,true);
+    });
   });
 };
 ;
@@ -5783,9 +6042,7 @@ test.runnerBootstrap3Interface = function () {
  */
 test.runnerCommandLineInterface = function () {
   test.heading('CommandLineInterface', function () {
-
   });
-
 };
 ;
 /**
@@ -5794,9 +6051,11 @@ test.runnerCommandLineInterface = function () {
  */
 test.runnerMockInterface = function () {
   test.heading('MockInterface', function () {
-
+    test.paragraph('Mock Interface provides a headless interface with full mocking capability.');
+    test.heading('Interface tests are applied.', function () {
+      test.runnerInterfaceMethodsTest(MockInterface,true);
+    });
   });
-
 };
 ;
 /**
@@ -5846,16 +6105,18 @@ test.runnerListIntegration = function () {
 
         // Build List
         for (var i in actorsInfo) {
-          if (actorsInfo[i][2]) { // for some populate model then add to list
-            actor.set('name', actorsInfo[i][0]);
-            actor.set('born', actorsInfo[i][1]);
-            actor.set('isMale', actorsInfo[i][2]);
-            actors.addItem(actor);
-          } else {
-            actors.addItem(); // add blank then set attribs
-            actors.set('name', actorsInfo[i][0]);
-            actors.set('born', actorsInfo[i][1]);
-            actors.set('isMale', actorsInfo[i][2]);
+          if (actorsInfo.hasOwnProperty(i)) {
+            if (actorsInfo[i][2]) { // for some populate model then add to list
+              actor.set('name', actorsInfo[i][0]);
+              actor.set('born', actorsInfo[i][1]);
+              actor.set('isMale', actorsInfo[i][2]);
+              actors.addItem(actor);
+            } else {
+              actors.addItem(); // add blank then set attribs
+              actors.set('name', actorsInfo[i][0]);
+              actors.set('born', actorsInfo[i][1]);
+              actors.set('isMale', actorsInfo[i][2]);
+            }
           }
         }
 
@@ -5866,8 +6127,10 @@ test.runnerListIntegration = function () {
           actors.previousItem();  // can't go past top
         });
         actors.nextItem();
+        test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Meryl Streep');
         actors.lastItem();
+        test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Renée Zellweger');
 
         // Sort the list
@@ -6084,6 +6347,32 @@ test.runnerListIntegration = function () {
   });
 };
 ;
+/**
+ * tequila
+ * test-interface-integration
+ */
+test.runnerInterfaceIntegration = function () {
+  test.heading('Interface Integration', function () {
+    test.example('Test command execution mocking', test.asyncResponse(true), function (testNode, returnResponse) {
+      // Send 4 mocks and make sure we get 4 callback calls
+      var self = this;
+      self.callbackCount = 0;
+      testInterface = new Interface();
+      testInterface.start(new Application(), new Presentation(), function (request) {
+        if (request.name == 'mock count')
+          self.callbackCount++;
+        if (self.callbackCount > 3)
+          returnResponse(testNode, true);
+      });
+      var cmds = [];
+      var i;
+      for (i = 0; i < 4; i++) {
+        cmds.push(new Command({name: 'mock count'}));
+      }
+      testInterface.mockRequest(cmds);
+    });
+  });
+};;
 /**
  * tequila
  * test-store-integration
@@ -6585,6 +6874,7 @@ test.heading('Classes', function () {
   test.runnerMessage();
   test.runnerModel(Model,false);
   test.runnerProcedure();
+  test.runnerRequest();
   test.runnerStore();
   test.runnerTransport();
 });
@@ -6613,10 +6903,11 @@ test.heading('Stores', function () {
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
     'If any assertion fails the test is failed.');
-  test.runnerListIntegration();
-  test.runnerStoreIntegration();
-  test.runnerProcedureIntegration();
   test.runnerCommandIntegration();
+  test.runnerInterfaceIntegration();
+  test.runnerListIntegration();
+  test.runnerProcedureIntegration();
+  test.runnerStoreIntegration();
 });
 test.stop();
 ;
