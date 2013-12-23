@@ -2449,6 +2449,8 @@ Application.prototype = T.inheritPrototype(Model.prototype);
  */
 Application.prototype.start = function () {
   if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
+  var pres = new Presentation(); // Todo ?
+  this.primaryInterface.start(this,pres);
 };
 Application.prototype.setInterface = function (primaryInterface) {
   if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');

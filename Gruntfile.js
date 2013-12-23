@@ -80,6 +80,7 @@ module.exports = function (grunt) {
           'test-spec/integration/test-store-integration.js',
           'test-spec/integration/test-command-integration.js',
           'test-spec/integration/test-procedure-integration.js',
+          'test-spec/integration/test-application-integration.js.js',
           'test-spec/tequila-spec.js',
           'test-spec/node-test-tail.js'
         ],
@@ -124,7 +125,7 @@ module.exports = function (grunt) {
 
   // tasks are ...
   grunt.log.write('Grunt ...\n');
-  grunt.log.muted = true; // to spammy
+  grunt.log.muted = true; // too spammy
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.registerTask('cover', ['coverme']);

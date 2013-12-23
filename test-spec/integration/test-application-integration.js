@@ -1,15 +1,20 @@
 /**
  * tequila
- * test-interface-integration
+ * test-application-integration
  */
-test.runnerInterfaceIntegration = function () {
-  test.heading('Interface Integration', function () {
-    test.example('Test command execution mocking', test.asyncResponse(true), function (testNode, returnResponse) {
+test.runnerApplicationIntegration = function () {
+  test.heading('Application Integration', function () {
+    test.example('little app with command execution mocking', test.asyncResponse(true), function (testNode, returnResponse) {
+
       // Send 4 mocks and make sure we get 4 callback calls
       var self = this;
       self.callbackCount = 0;
-      testInterface = new MockInterface();
-      testInterface.start(new Application(), new Presentation(), function (request) {
+
+      var app = new Application();
+      var testInterface = new Interface();
+
+      app.setInterface(testInterface);
+      app.start(function (request) {
         if (request.name == 'mock count')
           self.callbackCount++;
         if (self.callbackCount > 3)
