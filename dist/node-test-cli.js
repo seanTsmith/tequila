@@ -2447,16 +2447,24 @@ Application.prototype = T.inheritPrototype(Model.prototype);
 /*
  * Methods
  */
-Application.prototype.start = function () {
+Application.prototype.start = function (callBack) {
   if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
+  if (typeof callBack != 'function') throw new Error('callback required');
+  var self = this;
+  this.startCallback = callBack;
   var pres = new Presentation(); // Todo ?
-  this.primaryInterface.start(this,pres);
+  this.primaryInterface.start(self, pres, function (request) {
+    console.log('this.primaryInterface.start');
+    if (self.startCallback) {
+      self.startCallback(request);
+    }
+  });
 };
 Application.prototype.setInterface = function (primaryInterface) {
   if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');
   this.primaryInterface = primaryInterface;
 };
-Application.prototype.getInterface = function () {
+Application.prototype.getInterface = function (pl) {
   return this.primaryInterface;
 };
 ;
@@ -5754,6 +5762,13 @@ test.runnerApplicationModel = function () {
         test.example('must set interface before starting', Error('error starting application: interface not set'), function () {
           new Application().start();
         });
+        test.example('callback parameter required', Error('callback required'), function () {
+          var i = new Interface();
+          var a = new Application();
+          a.setInterface(i);
+          a.start();
+        });
+
       });
     });
   });
@@ -6359,7 +6374,7 @@ test.runnerInterfaceIntegration = function () {
       // Send 4 mocks and make sure we get 4 callback calls
       var self = this;
       self.callbackCount = 0;
-      testInterface = new Interface();
+      testInterface = new MockInterface();
       testInterface.start(new Application(), new Presentation(), function (request) {
         if (request.name == 'mock count')
           self.callbackCount++;
@@ -6860,6 +6875,38 @@ test.runnerProcedureIntegration = function () {
 ;
 /**
  * tequila
+ * test-application-integration
+ */
+test.runnerApplicationIntegration = function () {
+  test.heading('Application Integration', function () {
+    test.example('little app with command execution mocking', test.asyncResponse(true), function (testNode, returnResponse) {
+
+      // Send 4 mocks and make sure we get 4 callback calls
+      var self = this;
+      self.callbackCount = 0;
+
+      var app = new Application();
+      var testInterface = new Interface();
+
+      app.setInterface(testInterface);
+      app.start(function (request) {
+        if (request.name == 'mock count')
+          self.callbackCount++;
+        if (self.callbackCount > 3)
+          returnResponse(testNode, true);
+      });
+      var cmds = [];
+      var i;
+      for (i = 0; i < 4; i++) {
+        cmds.push(new Command({name: 'mock count'}));
+      }
+      testInterface.mockRequest(cmds);
+    });
+  });
+};
+;
+/**
+ * tequila
  * tequila-spec
  */
 test.start();
@@ -6905,6 +6952,7 @@ test.heading('Stores', function () {
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
     'If any assertion fails the test is failed.');
+  test.runnerApplicationIntegration();
   test.runnerCommandIntegration();
   test.runnerInterfaceIntegration();
   test.runnerListIntegration();

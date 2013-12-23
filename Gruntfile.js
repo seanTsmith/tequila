@@ -80,7 +80,7 @@ module.exports = function (grunt) {
           'test-spec/integration/test-store-integration.js',
           'test-spec/integration/test-command-integration.js',
           'test-spec/integration/test-procedure-integration.js',
-          'test-spec/integration/test-application-integration.js.js',
+          'test-spec/integration/test-application-integration.js',
           'test-spec/tequila-spec.js',
           'test-spec/node-test-tail.js'
         ],
