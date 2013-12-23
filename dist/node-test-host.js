@@ -1762,9 +1762,15 @@ function Bootstrap3PanelInterface(args) {
 }
 Bootstrap3PanelInterface.prototype = T.inheritPrototype(Interface.prototype);
 /*
- * Methods
- */
-;
+* Methods
+*/
+// See bootstrap3-panels-interface-client... stub for server here
+Bootstrap3PanelInterface.prototype.start = function (application, presentation, callBack) {
+  if (!(application instanceof Application)) throw new Error('Application required');
+  if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
+  if (typeof callBack != 'function') throw new Error('callback required');
+  throw new Error('Bootstrap3PanelInterface unavailable in server');
+};;
 /**
  * tequila
  * command-line-interface
