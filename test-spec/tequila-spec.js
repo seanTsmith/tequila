@@ -45,9 +45,9 @@ test.heading('Stores', function () {
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
     'If any assertion fails the test is failed.');
-  test.runnerApplicationIntegration();
   test.runnerCommandIntegration();
   test.runnerInterfaceIntegration();
+  test.runnerApplicationIntegration();
   test.runnerListIntegration();
   test.runnerProcedureIntegration();
   test.runnerStoreIntegration();
