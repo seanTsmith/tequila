@@ -2463,11 +2463,11 @@ Application.prototype = T.inheritPrototype(Model.prototype);
  */
 Application.prototype.start = function (callBack) {
   if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
+  if (false === (this.primaryPresentation instanceof Presentation)) throw new Error('error starting application: presentation not set');
   if (typeof callBack != 'function') throw new Error('callback required');
   var self = this;
   this.startCallback = callBack;
-  var pres = new Presentation(); // Todo ?
-  this.primaryInterface.start(self, pres, function (request) {
+  this.primaryInterface.start(self, this.primaryPresentation, function (request) {
     console.log('this.primaryInterface.start');
     if (self.startCallback) {
       self.startCallback(request);
@@ -2478,8 +2478,15 @@ Application.prototype.setInterface = function (primaryInterface) {
   if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');
   this.primaryInterface = primaryInterface;
 };
-Application.prototype.getInterface = function (pl) {
+Application.prototype.getInterface = function () {
   return this.primaryInterface;
+};
+Application.prototype.setPresentation = function (primaryPresentation) {
+  if (false === (primaryPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
+  this.primaryPresentation = primaryPresentation;
+};
+Application.prototype.getPresentation = function () {
+  return this.primaryPresentation;
 };
 ;
 /**
@@ -5772,6 +5779,7 @@ test.runnerApplicationModel = function () {
     });
 
     test.heading('METHODS', function () {
+
       test.heading('setInterface(interface)', function () {
         test.paragraph('Setting the interface for the application determines the primary method of user interaction.');
         test.example('must supply Interface object', Error('instance of Interface a required parameter'), function () {
@@ -5789,17 +5797,44 @@ test.runnerApplicationModel = function () {
           myApplication.setInterface(myInterface);
           return (myApplication.getInterface() === myInterface);
         });
-
       });
+
+      test.heading('setPresentation(presentation)', function () {
+        test.paragraph('Setting the presentation for the application determines the primary commands available to the user.');
+        test.example('must supply Presentation object', Error('instance of Presentation a required parameter'), function () {
+          new Application().setPresentation();
+        });
+      });
+      test.heading('getPresentation()', function () {
+        test.paragraph('returns primary user presentation for application');
+        test.example('default is undefined', true, function () {
+          return new Application().getPresentation() == undefined;
+        });
+        test.example('returns value set by set Presentation', true, function () {
+          var myPresentation = new Presentation();
+          var myApplication = new Application();
+          myApplication.setPresentation(myPresentation);
+          return (myApplication.getPresentation() === myPresentation);
+        });
+      });
+
       test.heading('start()', function () {
         test.paragraph('The start method executes the application.');
         test.example('must set interface before starting', Error('error starting application: interface not set'), function () {
           new Application().start();
         });
-        test.example('callback parameter required', Error('callback required'), function () {
+        test.example('must set presentation before starting', Error('error starting application: presentation not set'), function () {
           var i = new Interface();
           var a = new Application();
           a.setInterface(i);
+          a.start();
+        });
+        test.example('callback parameter required', Error('callback required'), function () {
+          var i = new Interface();
+          var p = new Presentation();
+          var a = new Application();
+          a.setInterface(i);
+          a.setPresentation(p);
           a.start();
         });
       });
@@ -6920,8 +6955,11 @@ test.runnerApplicationIntegration = function () {
 
       var app = new Application();
       var testInterface = new Interface();
+      var testPresentation = new Presentation();
 
       app.setInterface(testInterface);
+      app.setPresentation(testPresentation);
+
       app.start(function (request) {
         if (request.type == 'mock count')
           self.callbackCount++;

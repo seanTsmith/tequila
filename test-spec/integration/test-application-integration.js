@@ -12,8 +12,11 @@ test.runnerApplicationIntegration = function () {
 
       var app = new Application();
       var testInterface = new Interface();
+      var testPresentation = new Presentation();
 
       app.setInterface(testInterface);
+      app.setPresentation(testPresentation);
+
       app.start(function (request) {
         if (request.type == 'mock count')
           self.callbackCount++;
