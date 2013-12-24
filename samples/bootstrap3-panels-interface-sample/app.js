@@ -8,6 +8,8 @@ app.set('brand', 'Sample App');
 
 var b3p = new Bootstrap3PanelInterface();
 
+
+app.setPresentation(new Presentation());
 app.setInterface(b3p);
 
 $(document).ready(function () {
