@@ -1966,11 +1966,11 @@ Interface.prototype.doMock = function () {
   }, 0);
 };
 Interface.prototype.mockRequest = function (args) {
-  if (!(args instanceof Array || args instanceof Command)) throw new Error('missing command parameter');
+  if (!(args instanceof Array || args instanceof Request)) throw new Error('missing request parameter');
   if (!(args instanceof Array)) args = [args]; // coerce to array
   var i;
   for (i = 0; i < args.length; i++) {
-    if (false === (args[i] instanceof Command)) throw new Error('invalid command parameter');
+    if (false === (args[i] instanceof Request)) throw new Error('invalid request parameter');
   }
   // All good stack them
   for (i = 0; i < args.length; i++) {
@@ -2289,17 +2289,23 @@ function Request(args) {
   args = args || {};
   this.type = args.type || null;
   if (!this.type || typeof this.type != 'string') throw new Error('Request type required');
+  switch (this.type) {
+    case 'Command':
+      this.command = args.command || null;
+      if (false === (this.command instanceof Command)) throw new Error('command object required');
+      break;
+  }
 }
 /*
  * Methods
  */
 Request.prototype.toString = function () {
   switch (this.type) {
-    case 'Null':
-      return this.type + ' Request';
+    case 'Command':
+      return this.type + ' Request: ' + this.command;
       break;
     default:
-      return this.type + ' Request: ' + this.contents;
+      return this.type + ' Request';
       break;
   }
 };
@@ -3215,9 +3221,6 @@ MockInterface.prototype = T.inheritPrototype(Interface.prototype);
  */
 MockInterface.prototype.canMock = function () {
   return true;
-};
-MockInterface.prototype.mockRequest = function (args) {
-  Interface.prototype.mockRequest.call(this, args);
 };
 ;
 /**
@@ -4925,17 +4928,17 @@ test.runnerInterfaceMethodsTest = function (SurrogateInterface, inheritanceTest)
         });
       });
       test.heading('mockRequest()', function () {
-        test.example('parameter must be command or array of commands', undefined, function () {
+        test.example('parameter must be request or array of requests', undefined, function () {
           var ui = new SurrogateInterface();
-          test.shouldThrow('Error: missing command parameter', function () {
+          test.shouldThrow('Error: missing request parameter', function () {
             ui.mockRequest();
           });
           // Empty Stub Commands are ignored in mocks
-          ui.mockRequest(new Command()); // Send single command
-          ui.mockRequest([new Command(), new Command()]); // Send array of commands
+          ui.mockRequest(new Request(new Command())); // Send single command
+          ui.mockRequest([new Request(new Command()), new Request(new Command())]); // Send array of commands
           // Test when one of array elements is bad
-          test.shouldThrow('Error: invalid command parameter', function () {
-            ui.mockRequest([new Command(), 'wtf']);
+          test.shouldThrow('Error: invalid request parameter', function () {
+            ui.mockRequest([new Request(new Command()), 'wtf']);
           });
         });
       });
@@ -5329,6 +5332,12 @@ test.runnerRequest = function () {
       });
       test.example('type can be specified when object passed', 'example', function () {
         return new Request({type: 'example'}).type;
+      });
+      test.example('Command type requests expect contents to contain a command object', Error('command object required'), function () {
+        return new Request({type: 'Command'});
+      });
+      test.example('correct version', 'Command Request: Stub Command: (unnamed)', function () {
+        return new Request({type: 'Command', command: new Command()});
       });
     });
     test.heading('METHODS', function () {
@@ -6400,7 +6409,7 @@ test.runnerInterfaceIntegration = function () {
       self.callbackCount = 0;
       testInterface = new MockInterface();
       testInterface.start(new Application(), new Presentation(), function (request) {
-        if (request.name == 'mock count')
+        if (request.type == 'mock count')
           self.callbackCount++;
         if (self.callbackCount > 3)
           returnResponse(testNode, true);
@@ -6408,7 +6417,7 @@ test.runnerInterfaceIntegration = function () {
       var cmds = [];
       var i;
       for (i = 0; i < 4; i++) {
-        cmds.push(new Command({name: 'mock count'}));
+        cmds.push(new Request('mock count'));
       }
       testInterface.mockRequest(cmds);
     });
@@ -6914,7 +6923,7 @@ test.runnerApplicationIntegration = function () {
 
       app.setInterface(testInterface);
       app.start(function (request) {
-        if (request.name == 'mock count')
+        if (request.type == 'mock count')
           self.callbackCount++;
         if (self.callbackCount > 3)
           returnResponse(testNode, true);
@@ -6922,7 +6931,7 @@ test.runnerApplicationIntegration = function () {
       var cmds = [];
       var i;
       for (i = 0; i < 4; i++) {
-        cmds.push(new Command({name: 'mock count'}));
+        cmds.push(new Request('mock count'));
       }
       testInterface.mockRequest(cmds);
     });
@@ -6976,9 +6985,9 @@ test.heading('Stores', function () {
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
     'If any assertion fails the test is failed.');
-  test.runnerApplicationIntegration();
   test.runnerCommandIntegration();
   test.runnerInterfaceIntegration();
+  test.runnerApplicationIntegration();
   test.runnerListIntegration();
   test.runnerProcedureIntegration();
   test.runnerStoreIntegration();
