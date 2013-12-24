@@ -15,7 +15,7 @@ test.runnerApplicationIntegration = function () {
 
       app.setInterface(testInterface);
       app.start(function (request) {
-        if (request.name == 'mock count')
+        if (request.type == 'mock count')
           self.callbackCount++;
         if (self.callbackCount > 3)
           returnResponse(testNode, true);
@@ -23,7 +23,7 @@ test.runnerApplicationIntegration = function () {
       var cmds = [];
       var i;
       for (i = 0; i < 4; i++) {
-        cmds.push(new Command({name: 'mock count'}));
+        cmds.push(new Request('mock count'));
       }
       testInterface.mockRequest(cmds);
     });
