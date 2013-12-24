@@ -1067,7 +1067,6 @@ Application.prototype.start = function (callBack) {
   var self = this;
   this.startCallback = callBack;
   this.primaryInterface.start(self, this.primaryPresentation, function (request) {
-    console.log('this.primaryInterface.start');
     if (self.startCallback) {
       self.startCallback(request);
     }
