@@ -1039,8 +1039,16 @@ Transport.prototype.close = function () {
 // Model Constructor
 var Application = function (args) {
   if (false === (this instanceof Application)) throw new Error('new operator required');
+  args = args || {};
+  if (!args.attributes) {
+    args.attributes = [];
+  }
+  args.attributes.push(new Attribute({name: 'name', type: 'String(20)'}));
+  args.attributes.push(new Attribute({name: 'brand', type: 'String'}));
   Model.call(this, args);
   this.modelType = "Application";
+  this.set('name','newApp');
+  this.set('brand','NEW APP');
 };
 Application.prototype = T.inheritPrototype(Model.prototype);
 /*

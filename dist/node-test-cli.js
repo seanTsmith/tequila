@@ -2440,8 +2440,16 @@ Transport.prototype.close = function () {
 // Model Constructor
 var Application = function (args) {
   if (false === (this instanceof Application)) throw new Error('new operator required');
+  args = args || {};
+  if (!args.attributes) {
+    args.attributes = [];
+  }
+  args.attributes.push(new Attribute({name: 'name', type: 'String(20)'}));
+  args.attributes.push(new Attribute({name: 'brand', type: 'String'}));
   Model.call(this, args);
   this.modelType = "Application";
+  this.set('name','newApp');
+  this.set('brand','NEW APP');
 };
 Application.prototype = T.inheritPrototype(Model.prototype);
 /*
@@ -5743,6 +5751,17 @@ test.runnerApplicationModel = function () {
         test.runnerModel(Application, true);
       });
     });
+    test.heading('ATTRIBUTES', function () {
+      test.paragraph('Application extends model and inherits the attributes property.  All Presentation objects ' +
+        'have the following attributes:');
+      test.example('following attributes are defined:', undefined, function () {
+        var presentation = new Application(); // default attributes and values
+        test.assertion(presentation.get('name') === 'newApp');
+        test.assertion(presentation.get('brand') === 'NEW APP');
+      });
+
+    });
+
     test.heading('METHODS', function () {
       test.heading('setInterface(interface)', function () {
         test.paragraph('Setting the interface for the application determines the primary method of user interaction.');
@@ -5774,7 +5793,6 @@ test.runnerApplicationModel = function () {
           a.setInterface(i);
           a.start();
         });
-
       });
     });
   });
