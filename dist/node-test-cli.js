@@ -1990,6 +1990,10 @@ Interface.prototype.start = function (application, presentation, callBack) {
 Interface.prototype.stop = function (callBack) {
   if (typeof callBack != 'function') throw new Error('callback required');
 };
+Interface.prototype.dispatch = function (request, response) {
+  if (false === (request instanceof Request)) throw new Error('Request required');
+  if (response && typeof response != 'function') throw new Error('response callback is not a function');
+};
 Interface.prototype.notify = function (request) {
   if (false === (request instanceof Request)) throw new Error('Request required');
 };
@@ -2473,6 +2477,10 @@ Application.prototype.start = function (callBack) {
       self.startCallback(request);
     }
   });
+};
+Application.prototype.dispatch = function (request, response) {
+  if (false === (request instanceof Request)) throw new Error('Request required');
+  if (response && typeof response != 'function') throw new Error('response callback is not a function');
 };
 Application.prototype.setInterface = function (primaryInterface) {
   if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');
@@ -4905,7 +4913,7 @@ test.runnerInterfaceMethodsTest = function (SurrogateInterface, inheritanceTest)
            myInterface.notify(...);
            });
            */
-          new SurrogateInterface().start(new Application(),new Presentation());
+          new SurrogateInterface().start(new Application(), new Presentation());
         });
       });
       test.heading('stop()', function () {
@@ -4914,6 +4922,19 @@ test.runnerInterfaceMethodsTest = function (SurrogateInterface, inheritanceTest)
           new SurrogateInterface().stop();
         });
       });
+      test.heading('dispatch()', function () {
+        test.paragraph('The dispatch method will accept a request and act on it or pass it to the app.');
+        test.example('must pass a Request object', Error('Request required'), function () {
+          new SurrogateInterface().dispatch();
+        });
+        test.example('send command without callback when no response needed', undefined, function () {
+          new SurrogateInterface().dispatch(new Request({type: 'Command', command: new Command()}));
+        });
+        test.example('optional second parameter is the response callback', Error('response callback is not a function'), function () {
+          new SurrogateInterface().dispatch(new Request({type: 'Command', command: new Command()}), true);
+        });
+      });
+
       test.heading('notify()', function () {
         test.paragraph('The notify method sends a Request to the Interface.  This can be the result of a request sent from the start() callback.');
         test.example('must pass a Request object', Error('Request required'), function () {
@@ -5777,9 +5798,7 @@ test.runnerApplicationModel = function () {
       });
 
     });
-
     test.heading('METHODS', function () {
-
       test.heading('setInterface(interface)', function () {
         test.paragraph('Setting the interface for the application determines the primary method of user interaction.');
         test.example('must supply Interface object', Error('instance of Interface a required parameter'), function () {
@@ -5798,7 +5817,6 @@ test.runnerApplicationModel = function () {
           return (myApplication.getInterface() === myInterface);
         });
       });
-
       test.heading('setPresentation(presentation)', function () {
         test.paragraph('Setting the presentation for the application determines the primary commands available to the user.');
         test.example('must supply Presentation object', Error('instance of Presentation a required parameter'), function () {
@@ -5817,7 +5835,6 @@ test.runnerApplicationModel = function () {
           return (myApplication.getPresentation() === myPresentation);
         });
       });
-
       test.heading('start()', function () {
         test.paragraph('The start method executes the application.');
         test.example('must set interface before starting', Error('error starting application: interface not set'), function () {
@@ -5836,6 +5853,18 @@ test.runnerApplicationModel = function () {
           a.setInterface(i);
           a.setPresentation(p);
           a.start();
+        });
+      });
+      test.heading('dispatch()', function () {
+        test.paragraph('The dispatch method will accept a request and act on it or pass it to the app.');
+        test.example('must pass a Request object', Error('Request required'), function () {
+          new Application().dispatch();
+        });
+        test.example('send command without callback when no response needed', undefined, function () {
+          new Application().dispatch(new Request({type: 'Command', command: new Command()}));
+        });
+        test.example('optional second parameter is the response callback', Error('response callback is not a function'), function () {
+          new Application().dispatch(new Request({type: 'Command', command: new Command()}), true);
         });
       });
     });
@@ -6975,6 +7004,11 @@ test.runnerApplicationIntegration = function () {
     });
   });
 };
+;
+/**
+ * tequila
+ * test-request-dispatch-integration
+ */
 ;
 /**
  * tequila

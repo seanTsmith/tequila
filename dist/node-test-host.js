@@ -589,6 +589,10 @@ Interface.prototype.start = function (application, presentation, callBack) {
 Interface.prototype.stop = function (callBack) {
   if (typeof callBack != 'function') throw new Error('callback required');
 };
+Interface.prototype.dispatch = function (request, response) {
+  if (false === (request instanceof Request)) throw new Error('Request required');
+  if (response && typeof response != 'function') throw new Error('response callback is not a function');
+};
 Interface.prototype.notify = function (request) {
   if (false === (request instanceof Request)) throw new Error('Request required');
 };
@@ -1072,6 +1076,10 @@ Application.prototype.start = function (callBack) {
       self.startCallback(request);
     }
   });
+};
+Application.prototype.dispatch = function (request, response) {
+  if (false === (request instanceof Request)) throw new Error('Request required');
+  if (response && typeof response != 'function') throw new Error('response callback is not a function');
 };
 Application.prototype.setInterface = function (primaryInterface) {
   if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');

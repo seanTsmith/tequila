@@ -27,7 +27,7 @@ app.setPresentation(menu);
 
 $(document).ready(function () {
   app.start(function (stuff) {
-    console.log(JSON.stringify(stuff));
+    console.log('app got stuff: ' + JSON.stringify(stuff));
   });
   b3p.mockRequest(new Request('dude'));
 });

@@ -2,6 +2,7 @@
 Tequila es bueno!
 
 ## TODO
+- Command class functions should not need to call this.complete() ... should be automatic
 - Attribute image type
 - Attribute visible property
 - implement /lib/stores/local-test.js & /lib/stores/local-store.js
