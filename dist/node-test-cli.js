@@ -1788,6 +1788,7 @@ Command.prototype.execute = function () {
   if (!this.type) throw new Error('command not implemented');
   if (!T.contains(['Function', 'Procedure'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
   var self = this;
+  var args = arguments;
   this.emitEvent('BeforeExecute');
   try {
     switch (this.type) {
@@ -1810,7 +1811,7 @@ Command.prototype.execute = function () {
   this.emitEvent('AfterExecute');
   function callFunc() {
     try {
-      self.contents.call(self, {}); // give function this context to command object (self)
+      self.contents.apply(self, args); // give function this context to command object (self)
     } catch (e) {
       self.error = e;
       self.emitEvent('Error');
@@ -1955,9 +1956,7 @@ Interface.prototype.doMock = function () {
     return;
   // Get oldest ele and pass to callback if it is set
   var thisMock = this.mocks.shift();
-  if (this.startCallback) {
-    this.startCallback(thisMock);
-  }
+  this.dispatch(thisMock);
   // Invoke for next element (delayed execution)
   this.mockPending = true;
   var self = this;
@@ -1985,6 +1984,8 @@ Interface.prototype.start = function (application, presentation, callBack) {
   if (!(application instanceof Application)) throw new Error('Application required');
   if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
   if (typeof callBack != 'function') throw new Error('callback required');
+  this.application = application;
+  this.presentation = presentation;
   this.startCallback = callBack;
 };
 Interface.prototype.stop = function (callBack) {
@@ -1993,6 +1994,11 @@ Interface.prototype.stop = function (callBack) {
 Interface.prototype.dispatch = function (request, response) {
   if (false === (request instanceof Request)) throw new Error('Request required');
   if (response && typeof response != 'function') throw new Error('response callback is not a function');
+  if (!this.application || !this.application.dispatch(request)) {
+    if (this.startCallback) {
+      this.startCallback(request);
+    }
+  }
 };
 Interface.prototype.notify = function (request) {
   if (false === (request instanceof Request)) throw new Error('Request required');
@@ -2472,7 +2478,6 @@ Application.prototype.start = function (callBack) {
   var self = this;
   this.startCallback = callBack;
   this.primaryInterface.start(self, this.primaryPresentation, function (request) {
-    console.log('this.primaryInterface.start');
     if (self.startCallback) {
       self.startCallback(request);
     }
@@ -2481,6 +2486,11 @@ Application.prototype.start = function (callBack) {
 Application.prototype.dispatch = function (request, response) {
   if (false === (request instanceof Request)) throw new Error('Request required');
   if (response && typeof response != 'function') throw new Error('response callback is not a function');
+  if (this.startCallback) {
+    this.startCallback(request);
+    return true;
+  }
+  return false;
 };
 Application.prototype.setInterface = function (primaryInterface) {
   if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');
@@ -7009,6 +7019,70 @@ test.runnerApplicationIntegration = function () {
  * tequila
  * test-request-dispatch-integration
  */
+test.runnerRequestDispatchIntegration = function () {
+  test.heading('Request Dispatch Integration', function () {
+    test.paragraph('Requests are first handled by the interface and may be passed to the application' +
+      ' if the interface does not handle the request it is passed to the app.start() callback.');
+    test.xexample('do it', test.asyncResponse('abc123!'), function (testNode, returnResponse) {
+
+      // This test may be FUBAR
+
+      // Test strings to modify
+      var iString = 'iString';
+      var aString = 'aString';
+      var period = '.';
+
+      // Create 3 commands that alter test strings
+      var iCommand = new Command({
+        name: 'iCommand',
+        type: 'Function',
+        contents: function (stuff) {
+          iString = stuff;
+        }
+      });
+      var aCommand = new Command({
+        name: 'aCommand',
+        type: 'Function',
+        contents: function (stuff) {
+          aString = stuff;
+        }
+      });
+      var pCommand = new Command({
+        name: 'pCommand',
+        type: 'Function',
+        contents: function (stuff) {
+          aString = stuff;
+        }
+      });
+
+      // Now make out test app
+      var app = new Application();
+      var mock = new MockInterface();
+      var menu = new Presentation();
+      app.setInterface(mock);
+      app.setPresentation(menu);
+      app.start(function (request) {
+        console.log(JSON.stringify(request));
+      });
+
+
+      setTimeout(function () {
+        mock.mockRequest(new Request({type: 'Command', command: pCommand}));
+        mock.mockRequest(new Request({type: 'Command', command: aCommand}));
+        mock.mockRequest(new Request({type: 'Command', command: iCommand}));
+      }, 50); // Shitty way to get results but it's just a test
+
+//      iCommand.execute("abc");
+//      aCommand.execute("123");
+
+      setTimeout(function () {
+        returnResponse(testNode, iString + aString + period);
+      }, 250); // Shitty way to get results but it's just a test
+
+
+    });
+  });
+};
 ;
 /**
  * tequila
@@ -7063,6 +7137,7 @@ test.heading('Integration Tests', function () {
   test.runnerListIntegration();
   test.runnerProcedureIntegration();
   test.runnerStoreIntegration();
+  test.runnerRequestDispatchIntegration();
 });
 test.stop();
 ;

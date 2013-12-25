@@ -387,6 +387,7 @@ Command.prototype.execute = function () {
   if (!this.type) throw new Error('command not implemented');
   if (!T.contains(['Function', 'Procedure'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
   var self = this;
+  var args = arguments;
   this.emitEvent('BeforeExecute');
   try {
     switch (this.type) {
@@ -409,7 +410,7 @@ Command.prototype.execute = function () {
   this.emitEvent('AfterExecute');
   function callFunc() {
     try {
-      self.contents.call(self, {}); // give function this context to command object (self)
+      self.contents.apply(self, args); // give function this context to command object (self)
     } catch (e) {
       self.error = e;
       self.emitEvent('Error');
@@ -554,9 +555,7 @@ Interface.prototype.doMock = function () {
     return;
   // Get oldest ele and pass to callback if it is set
   var thisMock = this.mocks.shift();
-  if (this.startCallback) {
-    this.startCallback(thisMock);
-  }
+  this.dispatch(thisMock);
   // Invoke for next element (delayed execution)
   this.mockPending = true;
   var self = this;
@@ -584,6 +583,8 @@ Interface.prototype.start = function (application, presentation, callBack) {
   if (!(application instanceof Application)) throw new Error('Application required');
   if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
   if (typeof callBack != 'function') throw new Error('callback required');
+  this.application = application;
+  this.presentation = presentation;
   this.startCallback = callBack;
 };
 Interface.prototype.stop = function (callBack) {
@@ -592,6 +593,11 @@ Interface.prototype.stop = function (callBack) {
 Interface.prototype.dispatch = function (request, response) {
   if (false === (request instanceof Request)) throw new Error('Request required');
   if (response && typeof response != 'function') throw new Error('response callback is not a function');
+  if (!this.application || !this.application.dispatch(request)) {
+    if (this.startCallback) {
+      this.startCallback(request);
+    }
+  }
 };
 Interface.prototype.notify = function (request) {
   if (false === (request instanceof Request)) throw new Error('Request required');
@@ -1071,7 +1077,6 @@ Application.prototype.start = function (callBack) {
   var self = this;
   this.startCallback = callBack;
   this.primaryInterface.start(self, this.primaryPresentation, function (request) {
-    console.log('this.primaryInterface.start');
     if (self.startCallback) {
       self.startCallback(request);
     }
@@ -1080,6 +1085,11 @@ Application.prototype.start = function (callBack) {
 Application.prototype.dispatch = function (request, response) {
   if (false === (request instanceof Request)) throw new Error('Request required');
   if (response && typeof response != 'function') throw new Error('response callback is not a function');
+  if (this.startCallback) {
+    this.startCallback(request);
+    return true;
+  }
+  return false;
 };
 Application.prototype.setInterface = function (primaryInterface) {
   if (false === (primaryInterface instanceof Interface)) throw new Error('instance of Interface a required parameter');
