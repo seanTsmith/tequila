@@ -1,4 +1,4 @@
 HISTORY
 ===
 
-Model changes and additions are listed hereS
+Model changes and additions are listed here.

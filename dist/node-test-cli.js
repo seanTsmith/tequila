@@ -6147,6 +6147,9 @@ test.runnerRedisStore = function () {
     });
     test.heading('Store tests are applied', function () {
       test.runnerStoreMethods(RedisStore,true);
+      test.xexample('placeholder....', undefined, function () {
+      });
+
     });
   });
 };

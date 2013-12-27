@@ -4,7 +4,7 @@
  */
 test.runnerProcedureIntegration = function () {
   test.heading('Procedure Integration', function () {
-    test.example('synchronous sequential tasks are the default when tasks has no', test.asyncResponse('abc123'), function (testNode, returnResponse) {
+    test.example('synchronous sequential tasks are the default when tasks has no requires property', test.asyncResponse('abc123'), function (testNode, returnResponse) {
       var cmd = new Command({name: 'cmdProcedure', type: 'Procedure', contents: new Procedure({tasks: [
         {
           command: new Command({
