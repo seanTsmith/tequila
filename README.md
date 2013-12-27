@@ -30,3 +30,7 @@ Tequila es bueno!
 + **/bin** tequila command line interface
 + **/lib** tequila library source code
 + [**/test-spec**](test-spec/README.md) Tequila Specifications, Documentation, Unit Tests, Integration Tests & Regression Tests
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dremoor/tequila/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
