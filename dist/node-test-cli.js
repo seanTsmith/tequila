@@ -1822,7 +1822,7 @@ Command.prototype.execute = function () {
 
   function ProcedureExecute() {
     self.status = 0;
-    var tasks = self.contents.tasks;
+    var tasks = self.contents.tasks || [];
     for (var t = 0; t < tasks.length; t++) {
       // shorthand for function command gets coerced into longhand
       if (typeof tasks[t] == 'function') {
@@ -2478,8 +2478,12 @@ Application.prototype.start = function (callBack) {
   var self = this;
   this.startCallback = callBack;
   this.primaryInterface.start(self, this.primaryPresentation, function (request) {
-    if (self.startCallback) {
-      self.startCallback(request);
+    if (request.type=='Command') {
+      request.command.execute();
+    } else {
+      if (self.startCallback) {
+        self.startCallback(request);
+      }
     }
   });
 };

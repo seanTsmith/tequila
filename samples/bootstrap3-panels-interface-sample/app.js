@@ -20,8 +20,16 @@ menu.set('contents', [
     new Command({name: 'Larry'}),
     new Command({name: 'Curly'})
   ]}),
-  new Command({name: 'More'}),
-  new Command({name: 'Chiken'})
+  new Command({name: 'Commands', type: 'Menu', contents: [
+    'Command Types',
+    '-',
+    new Command({name: 'Stub', type: 'Stub'}),
+    new Command({name: 'Presentation', type: 'Presentation', contents: new Presentation()}),
+    new Command({name: 'Function', type: 'Function', contents: function(){
+      alert("Hello! I am an alert box!!");
+    }}),
+    new Command({name: 'Procedure', type: 'Procedure', contents: new Procedure()})
+  ]})
 ]);
 app.setPresentation(menu);
 
