@@ -30,14 +30,14 @@ test.runnerCommandIntegration = function () {
     });
 
     // Presentation
-    test.example('Presentation', Error('command type Presentation not implemented'), function () {
+    test.example('Presentation', undefined, function () {
       var cmd = new Command({
         name: 'presentationCommand',
         description: 'presentation command test',
         type: 'Presentation',
         contents: new Presentation()
       });
-      test.show(cmd);
+//      test.show(cmd);
       cmd.execute();
     });
 

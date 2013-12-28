@@ -1786,7 +1786,7 @@ Command.prototype.emitEvent = function (event) {
 };
 Command.prototype.execute = function () {
   if (!this.type) throw new Error('command not implemented');
-  if (!T.contains(['Function', 'Procedure'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
+  if (!T.contains(['Function', 'Procedure', 'Presentation'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
   var self = this;
   var args = arguments;
   this.emitEvent('BeforeExecute');
@@ -6860,7 +6860,7 @@ test.runnerCommandIntegration = function () {
  */
 test.runnerProcedureIntegration = function () {
   test.heading('Procedure Integration', function () {
-    test.example('synchronous sequential tasks are the default when tasks has no', test.asyncResponse('abc123'), function (testNode, returnResponse) {
+    test.example('synchronous sequential tasks are the default when tasks has no requires property', test.asyncResponse('abc123'), function (testNode, returnResponse) {
       var cmd = new Command({name: 'cmdProcedure', type: 'Procedure', contents: new Procedure({tasks: [
         {
           command: new Command({

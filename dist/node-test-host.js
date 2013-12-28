@@ -385,7 +385,7 @@ Command.prototype.emitEvent = function (event) {
 };
 Command.prototype.execute = function () {
   if (!this.type) throw new Error('command not implemented');
-  if (!T.contains(['Function', 'Procedure'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
+  if (!T.contains(['Function', 'Procedure', 'Presentation'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
   var self = this;
   var args = arguments;
   this.emitEvent('BeforeExecute');

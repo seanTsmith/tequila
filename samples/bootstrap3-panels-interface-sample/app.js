@@ -4,7 +4,7 @@
  */
 
 var app = new Application();
-app.set('brand', 'tgiCloud');
+app.set('brand', 'tequila sample app');
 
 var b3p = new Bootstrap3PanelInterface();
 app.setInterface(b3p);

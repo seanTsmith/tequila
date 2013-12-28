@@ -6,4 +6,5 @@ For now it is used as a todo for this sample...
 
 TODO
 ---
-  * Fixed drag and drop on panels
+  * Presentation!!!
+  * Fix drag and drop on panels
