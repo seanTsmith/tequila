@@ -1409,7 +1409,7 @@ var Tequila = (function () {
 
   function init() {
     // Private methods and variables
-    var version = '0.1.2';
+    var version = '0.1.5';
     var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table', 'Object'];
     var messageTypes = ['Null', 'Connected', 'Error', 'Sent', 'Ping', 'PutModel', 'PutModelAck', 'GetModel', 'GetModelAck', 'DeleteModel', 'DeleteModelAck', 'GetList', 'GetListAck'];
     var commandTypes = ['Stub', 'Menu', 'Presentation', 'Function', 'Procedure'];
@@ -6771,14 +6771,14 @@ test.runnerCommandIntegration = function () {
     });
 
     // Presentation
-    test.example('Presentation', Error('command type Presentation not implemented'), function () {
+    test.example('Presentation', undefined, function () {
       var cmd = new Command({
         name: 'presentationCommand',
         description: 'presentation command test',
         type: 'Presentation',
         contents: new Presentation()
       });
-      test.show(cmd);
+//      test.show(cmd);
       cmd.execute();
     });
 

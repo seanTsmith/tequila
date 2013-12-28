@@ -95,6 +95,16 @@ module.exports = function (grunt) {
         ],
         dest: 'dist/node-test-host.js'
       }
+    },
+    uglify:{
+      options: {
+        mangle: false
+      },
+      my_target: {
+        files: {
+          'dist/tequila.min.js': ['dist/tequila.js']
+        }
+      }
     }
   });
 
@@ -128,9 +138,10 @@ module.exports = function (grunt) {
   grunt.log.write('Grunt ...\n');
   grunt.log.muted = true; // too spammy
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.registerTask('cover', ['coverme']);
   grunt.registerTask('help', ['helpme']);
-  grunt.registerTask('default', ['concat', 'test']);
-  grunt.registerTask('make', ['concat', 'test']);
+  grunt.registerTask('default', ['concat', 'uglify', 'test']);
+  grunt.registerTask('make', ['concat', 'uglify', 'test']);
 };

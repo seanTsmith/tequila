@@ -1,6 +1,6 @@
 {
   "name": "tequila",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Sean Smith <dremoor@gmail.com>",
   "description": "tequila es muy bueno",
   "contributors": [
@@ -19,8 +19,9 @@
   },
   "devDependencies": {
     "colors": "*",
-    "grunt": "~0.4.1",
+    "grunt": "*",
     "grunt-contrib-concat": "*",
+    "grunt-contrib-uglify": "*",
     "grunt-contrib-watch": "*"
   },
   "repository": {
