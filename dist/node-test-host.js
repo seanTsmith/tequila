@@ -386,6 +386,19 @@ Command.prototype.emitEvent = function (event) {
 Command.prototype.execute = function () {
   if (!this.type) throw new Error('command not implemented');
   if (!T.contains(['Function', 'Procedure', 'Presentation'], this.type)) throw new Error('command type ' + this.type + ' not implemented');
+  var errors;
+  switch (this.type) {
+    case 'Presentation':
+      if (!(this.contents instanceof Presentation)) throw new Error('contents must be a Presentation');
+      errors = this.contents.getValidationErrors();
+      if (errors.length) {
+        if (errors.length > 1)
+          throw new Error('error executing Presentation: multiple errors');
+        else
+          throw new Error('error executing Presentation: ' + errors[0]);
+      }
+      break;
+  }
   var self = this;
   var args = arguments;
   this.emitEvent('BeforeExecute');
@@ -398,8 +411,6 @@ Command.prototype.execute = function () {
       case 'Procedure':
         setTimeout(ProcedureExecute, 0);
         break;
-      default:
-        throw new Error('command not implemented');
     }
   } catch (e) {
     this.error = e;
@@ -426,7 +437,7 @@ Command.prototype.execute = function () {
       // shorthand for function command gets coerced into longhand
       if (typeof tasks[t] == 'function') {
         var theFunc = tasks[t];
-        tasks[t] = {requires:[-1], command: new Command({type: 'Function', contents: theFunc})};
+        tasks[t] = {requires: [-1], command: new Command({type: 'Function', contents: theFunc})};
       }
       // Initialize if not done
       if (!tasks[t].command._parentProcedure) {
@@ -449,7 +460,7 @@ Command.prototype.execute = function () {
           if (typeof tasks[t].requires[r] == 'number') {
             if (tasks[t].requires[r] == -1) { // previous task needed to complete?
               if (t != '0') { // first one always runs
-                if (!tasks[t-1].command.status || tasks[t - 1].command.status <= 0) {
+                if (!tasks[t - 1].command.status || tasks[t - 1].command.status <= 0) {
                   canExecute = false;
                 }
               }
@@ -467,6 +478,7 @@ Command.prototype.execute = function () {
       }
     }
   }
+
   function ProcedureEvents(event) {
     var tasks = self.contents.tasks;
     var allTasksDone = true; // until proved wrong ...

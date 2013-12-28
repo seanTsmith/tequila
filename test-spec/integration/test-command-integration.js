@@ -37,8 +37,15 @@ test.runnerCommandIntegration = function () {
         type: 'Presentation',
         contents: new Presentation()
       });
-//      test.show(cmd);
-      cmd.execute();
+      test.shouldThrow(Error('contents must be a Presentation'), function () {
+        cmd.contents = 123;
+        cmd.execute();
+      });
+      test.shouldThrow(Error('error executing Presentation: contents elements must be Command or Attribute'), function () {
+        cmd.contents = new Presentation();
+        cmd.contents.set('contents', [new Command(), new Attribute({name: 'meh'}), true]);
+        cmd.execute();
+      });
     });
 
     // Function
