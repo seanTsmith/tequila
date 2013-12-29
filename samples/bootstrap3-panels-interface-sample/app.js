@@ -4,7 +4,7 @@
  */
 
 var app = new Application();
-app.set('brand', 'tequila sample app');
+app.set('brand', 'tequila');
 
 var b3p = new Bootstrap3PanelInterface();
 app.setInterface(b3p);
@@ -21,7 +21,8 @@ procCommand = new Command({name: 'Procedure', type: 'Procedure', contents: new P
 var pres = new Presentation();
 pres.set('contents', [
   new Attribute({name: 'firstName'}),
-  new Attribute({name: 'lastName'})
+  new Attribute({name: 'lastName'}),
+  funcCommand
 ]);
 var presCommand = new Command({name: 'Presentation', type: 'Presentation', contents: pres});
 
