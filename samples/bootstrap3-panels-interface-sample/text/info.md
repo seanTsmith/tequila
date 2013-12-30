@@ -6,5 +6,6 @@ For now it is used as a todo for this sample...
 
 TODO
 ---
-  * Give buttons margin with css instead of space so cell phone wraps have gap also
-  *
+  * Colored buttons
+  * button glyphs
+  * placeholders for attribute
