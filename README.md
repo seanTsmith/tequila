@@ -1,5 +1,7 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila) 
-Tequila es bueno!
+Tequila is a application framework for single page web apps and cell phone apps via phonegap.
+
+Demo: http://dremoor.github.io/tequila/samples/bootstrap3-panels-interface-sample/
 
 ## TODO
 - Add placeholder to Attribute and implement in sample
