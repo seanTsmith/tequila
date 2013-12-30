@@ -2,7 +2,7 @@
 Tequila es bueno!
 
 ## TODO
-- figure out how to get Webstorm to do git push so gh-pages updated when commit/push done
+- Add placeholder to Attribute and implement in sample
 - Command class functions should not need to call this.complete() ... should be automatic
 - Attribute image type
 - Attribute visible property
