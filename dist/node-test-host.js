@@ -126,21 +126,24 @@ function Attribute(args, arg2) {
       this.value = args.value || null;
       break;
     case 'String':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value', 'size']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeholder', 'value', 'size']);
       this.size = splitTypes[1] ? splitTypes[1] : typeof args.size == 'number' ? args.size : args.size || 50;
       this.value = args.value || null;
+      this.placeholder = args.placeholder || null;
       break;
     case 'Date':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeholder', 'value']);
       this.value = args.value || null;
+      this.placeholder = args.placeholder || null;
       break;
     case 'Boolean':
       unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       break;
     case 'Number':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeholder', 'value']);
       this.value = args.value || null;
+      this.placeholder = args.placeholder || null;
       break;
     case 'Model':
       unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
@@ -307,7 +310,8 @@ function Command(/* does this matter */ args) {
   }
   args = args || {};
   var i;
-  var unusedProperties = T.getInvalidProperties(args, ['name', 'description', 'type', 'contents', 'scope', 'timeout', 'bucket']);
+  var unusedProperties = T.getInvalidProperties(args,
+    ['name', 'description', 'type', 'contents', 'scope', 'timeout', 'theme', 'icon', 'bucket']);
   var badJooJoo = [];
   for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
   if (badJooJoo.length > 1) throw new Error('error creating Command: multiple errors');
@@ -345,6 +349,19 @@ function Command(/* does this matter */ args) {
       throw new Error('optional scope property must be Model or List');
   if ('undefined' != typeof this.timeout)
     if (typeof this.timeout != 'Number') throw new Error('timeout must be a Number');
+  if ('undefined' != typeof this.timeout)
+    if (typeof this.timeout != 'Number') throw new Error('timeout must be a Number');
+  if ('undefined' != typeof this.theme) {
+    if ('string' != typeof this.theme) throw new Error('invalid theme');
+    if (!T.contains(['default', 'primary', 'success', 'info', 'warning', 'danger', 'link'], this.theme))
+      throw new Error('invalid theme');
+  }
+  if ('undefined' != typeof this.icon) {
+    if ('string' != typeof this.icon) throw new Error('invalid icon');
+    if (!T.contains(['fa', 'glyphicon'], this.icon.split('-')[0]) || !this.icon.split('-')[1])
+      throw new Error('invalid icon');
+  }
+
   // Validations done
   this._eventListeners = [];
 }

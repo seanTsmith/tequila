@@ -9,6 +9,11 @@ app.set('brand', 'tequila');
 var b3p = new Bootstrap3PanelInterface();
 app.setInterface(b3p);
 
+// Stub commands
+var stubMoe = new Command({name: 'Moe', description: 'Moses Horwitz', theme: 'primary', icon: 'fa-coffee'});
+var stubLarry = new Command({name: 'Larry', description: 'Louis Fienberg', theme: 'info', icon: 'fa-beer'});
+var stubCurly = new Command({name: 'Curly', description: 'Jerome Lester Horwitz', theme: 'warning', icon: 'fa-glass'});
+
 // Create a function command
 var funcCommand = new Command({name: 'Function', type: 'Function', contents: function () {
   alert("Hello! I am an alert box!!");
@@ -28,9 +33,9 @@ pres.set('contents', [
   new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)'}),
   funcCommand,
   procCommand,
-  new Command({name: 'Moe'}),
-  new Command({name: 'Larry'}),
-  new Command({name: 'Curly'})
+  stubMoe,
+  stubLarry,
+  stubCurly
 
 ]);
 var presCommand = new Command({name: 'Presentation', type: 'Presentation', contents: pres});
@@ -42,9 +47,9 @@ menu.set('contents', [
   new Command({name: 'Stooges', type: 'Menu', contents: [
     'The Three Stooges',
     '-',
-    new Command({name: 'Moe'}),
-    new Command({name: 'Larry'}),
-    new Command({name: 'Curly'})
+    stubMoe,
+    stubLarry,
+    stubCurly
   ]}),
   new Command({name: 'Commands', type: 'Menu', contents: [
     'Command Types',
