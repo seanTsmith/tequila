@@ -1569,10 +1569,10 @@ function Attribute(args, arg2) {
     default:
       break;
   }
-  var badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Attribute: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Attribute: ' + badJooJoo[0]);
+  var errorList = this.getValidationErrors(); // before leaving make sure valid Attribute
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Attribute: multiple errors');
+  if (errorList.length) throw new Error('error creating Attribute: ' + errorList[0]);
 }
 /*
  * Additional Constructors
@@ -1713,10 +1713,10 @@ function Command(/* does this matter */ args) {
   var i;
   var unusedProperties = T.getInvalidProperties(args,
     ['name', 'description', 'type', 'contents', 'scope', 'timeout', 'theme', 'icon', 'bucket']);
-  var badJooJoo = [];
-  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Command: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Command: ' + badJooJoo[0]);
+  var errorList = [];
+  for (i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Command: multiple errors');
+  if (errorList.length) throw new Error('error creating Command: ' + errorList[0]);
   for (i in args) this[i] = args[i];
   this.name = this.name || "(unnamed)"; // name is optional
   if ('string' != typeof this.name) throw new Error('name must be string');
@@ -1956,11 +1956,11 @@ function Interface(args) {
   args.description = args.description || 'a Interface';
   var i;
   var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
-  var badJooJoo = [];
-  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1)
+  var errorList = [];
+  for (i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1)
     throw new Error('error creating Procedure: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  if (errorList.length) throw new Error('error creating Procedure: ' + errorList[0]);
   // default state
   this.startCallback = null;
   this.stopCallback = null;
@@ -2186,10 +2186,10 @@ var Model = function (args) {
     }
   }
   var unusedProperties = T.getInvalidProperties(args, ['attributes']);
-  var badJooJoo = this.getValidationErrors(); // before leaving make sure valid Model
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Attribute: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Attribute: ' + badJooJoo[0]);
+  var errorList = this.getValidationErrors(); // before leaving make sure valid Model
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Attribute: multiple errors');
+  if (errorList.length) throw new Error('error creating Attribute: ' + errorList[0]);
 };
 // Methods
 Model.prototype.toString = function () {
@@ -2253,35 +2253,35 @@ var Procedure = function (args) {
   args = args || {};
   var i;
   var unusedProperties = T.getInvalidProperties(args, ['tasks', 'tasksNeeded', 'tasksCompleted']);
-  var badJooJoo = [];
-  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1)
+  var errorList = [];
+  for (i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1)
     throw new Error('error creating Procedure: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  if (errorList.length) throw new Error('error creating Procedure: ' + errorList[0]);
   // args ok, now copy to object and check for errors
   for (i in args)
     if (args.hasOwnProperty(i))
       this[i] = args[i];
-  badJooJoo = this.getValidationErrors(); // before leaving make sure valid Attribute
-  if (badJooJoo) {
-    if (badJooJoo.length > 1) throw new Error('error creating Procedure: multiple errors');
-    if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  errorList = this.getValidationErrors(); // before leaving make sure valid Attribute
+  if (errorList) {
+    if (errorList.length > 1) throw new Error('error creating Procedure: multiple errors');
+    if (errorList.length) throw new Error('error creating Procedure: ' + errorList[0]);
   }
 };
 Procedure.prototype.getValidationErrors = function () {
   var i, j, k;
   var unusedProperties;
   if (this.tasks && !(this.tasks instanceof Array)) return ['tasks is not an array'];
-  var badJooJoo = [];
+  var errorList = [];
   for (i in this.tasks) {
     if (this.tasks.hasOwnProperty(i)) {
       var task = this.tasks[i];
       unusedProperties = T.getInvalidProperties(task, ['label', 'command', 'requires', 'timeout']);
-      for (j = 0; j < unusedProperties.length; j++) badJooJoo.push('invalid task[' + i + '] property: ' + unusedProperties[j]);
+      for (j = 0; j < unusedProperties.length; j++) errorList.push('invalid task[' + i + '] property: ' + unusedProperties[j]);
       if (typeof task.label != 'undefined' && typeof task.label != 'string')
-        badJooJoo.push('task[' + i + '].label must be string');
+        errorList.push('task[' + i + '].label must be string');
       if (typeof task.command != 'undefined' && !(task.command instanceof Command))
-        badJooJoo.push('task[' + i + '].command must be a Command object');
+        errorList.push('task[' + i + '].command must be a Command object');
       // make sure requires valid if specified
       if (typeof task.requires == 'undefined')
         task.requires = -1; // default to
@@ -2308,7 +2308,7 @@ Procedure.prototype.getValidationErrors = function () {
       }
     }
   }
-  return badJooJoo.length ? badJooJoo : null;
+  return errorList.length ? errorList : null;
 };
 ;
 /**
@@ -2368,10 +2368,10 @@ var Store = function (args) {
     canGetList: false
   };
   var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
-  var badJooJoo = [];
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+  var errorList = [];
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
+  if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
 // Methods
 Store.prototype.toString = function () {
@@ -2695,10 +2695,10 @@ var MemoryStore = function (args) {
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
   var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
-  var badJooJoo = [];
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+  var errorList = [];
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
+  if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
 MemoryStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
@@ -2880,10 +2880,10 @@ var MongoStore = function (args) {
     canGetList: T.isServer()
   };
   var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
-  var badJooJoo = [];
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+  var errorList = [];
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
+  if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
 MongoStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
@@ -2913,10 +2913,10 @@ var RemoteStore = function (args) {
     canGetList: true
   };
   var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
-  var badJooJoo = [];
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+  var errorList = [];
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
+  if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
 RemoteStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
@@ -3173,10 +3173,10 @@ var LocalStore = function (args) {
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
   var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
-  var badJooJoo = [];
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+  var errorList = [];
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
+  if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
 LocalStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
@@ -3201,10 +3201,10 @@ var RedisStore = function (args) {
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
   var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
-  var badJooJoo = [];
-  for (var i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1) throw new Error('error creating Store: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Store: ' + badJooJoo[0]);
+  var errorList = [];
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
+  if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
 RedisStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
@@ -3220,11 +3220,11 @@ function Bootstrap3PanelInterface(args) {
   args.description = args.description || 'a Interface';
   var i;
   var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
-  var badJooJoo = [];
-  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1)
+  var errorList = [];
+  for (i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1)
     throw new Error('error creating Procedure: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  if (errorList.length) throw new Error('error creating Procedure: ' + errorList[0]);
   // default state
   this.startCallback = null;
   this.stopCallback = null;
@@ -3260,11 +3260,11 @@ function MockInterface(args) {
   args.description = args.description || 'a Interface';
   var i;
   var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
-  var badJooJoo = [];
-  for (i = 0; i < unusedProperties.length; i++) badJooJoo.push('invalid property: ' + unusedProperties[i]);
-  if (badJooJoo.length > 1)
+  var errorList = [];
+  for (i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1)
     throw new Error('error creating Procedure: multiple errors');
-  if (badJooJoo.length) throw new Error('error creating Procedure: ' + badJooJoo[0]);
+  if (errorList.length) throw new Error('error creating Procedure: ' + errorList[0]);
   // default state
   this.startCallback = null;
   this.stopCallback = null;
