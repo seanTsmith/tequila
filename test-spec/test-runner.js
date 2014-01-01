@@ -35,6 +35,10 @@ test.runner = function (isBrowser) {
         test.integrationStore = test.hostStore;
       } else if (test.mongoStoreAvailable) {
         test.integrationStore = test.mongoStore;
+      } else if(typeof(Storage)!=="undefined") {
+        localStorage.removeItem('tequilaData'); // TODO names need to bet set as with mongodb
+        localStorage.removeItem('tequilaIDCounter'); // TODO ... otherwise tests will wipe real data
+        test.integrationStore = new LocalStore({name: 'Integration Test Store'});
       } else {
         test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
       }

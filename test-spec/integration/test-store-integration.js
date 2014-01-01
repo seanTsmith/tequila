@@ -57,9 +57,6 @@ test.runnerStoreIntegration = function () {
               for (var i = 0; i < list._items.length; i++) {
                 self.killhim.set('id', list._items[i][0]);
                 test.integrationStore.deleteModel(self.killhim, function (model, error) {
-                  if (typeof error != 'undefined') {
-                    console.log('error deleting: ' + JSON.stringify(error));
-                  }
                   if (++self.oldStoogesKilled >= self.oldStoogesFound) {
                     storeStooges();
                   }

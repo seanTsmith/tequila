@@ -3163,15 +3163,22 @@ var LocalStore = function (args) {
   args = args || {};
   this.storeType = args.storeType || "LocalStore";
   this.name = args.name || 'a ' + this.storeType;
+  var gotStore = typeof(Storage) !== "undefined";
   this.storeProperty = {
-    isReady: false,
-    canGetModel: false,
-    canPutModel: false,
-    canDeleteModel: false,
-    canGetList: false
+    isReady: gotStore,
+    canGetModel: gotStore,
+    canPutModel: gotStore,
+    canDeleteModel: gotStore,
+    canGetList: gotStore
   };
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
+  if (gotStore) {
+    localStorage.tequilaData = localStorage.tequilaData || [];
+    localStorage.tequilaIDCounter = localStorage.tequilaIDCounter  || 0;
+    if (localStorage.tequilaData) this.data = JSON.parse(localStorage.tequilaData);
+    if (localStorage.tequilaIDCounter) this.idCounter = localStorage.tequilaIDCounter;
+  }
   var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
   var errorList = [];
   for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
@@ -3490,9 +3497,6 @@ MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
   var store = this;
   list.clear();
 
-  console.log('getList (list): ' + JSON.stringify(list));
-  console.log('getList (filter): ' + JSON.stringify(filter));
-
   // Convert list filter to mongo flavor
   var mongoFilter = {};
   for (var prop in filter) {
@@ -3596,6 +3600,10 @@ test.runner = function (isBrowser) {
         test.integrationStore = test.hostStore;
       } else if (test.mongoStoreAvailable) {
         test.integrationStore = test.mongoStore;
+      } else if(typeof(Storage)!=="undefined") {
+        localStorage.removeItem('tequilaData'); // TODO names need to bet set as with mongodb
+        localStorage.removeItem('tequilaIDCounter'); // TODO ... otherwise tests will wipe real data
+        test.integrationStore = new LocalStore({name: 'Integration Test Store'});
       } else {
         test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
       }
@@ -5644,7 +5652,8 @@ test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
         if (services['isReady']) {
           test.example('returns error when model not found', test.asyncResponse(Error('model not found in store')), function (testNode, returnResponse) {
             var m = new Model();
-            m.attributes[0].value = 1;
+            m.modelType = 'PeopleAreString!';
+            m.attributes[0].value = 90210;
             new SurrogateStore().deleteModel(m, function (mod, err) {
               if (err) {
                 returnResponse(testNode, err);
@@ -6414,9 +6423,6 @@ test.runnerListIntegration = function () {
               for (var i = 0; i < list._items.length; i++) {
                 self.killhim.set('id', list._items[i][0]);
                 test.integrationStore.deleteModel(self.killhim, function (model, error) {
-                  if (typeof error != 'undefined') {
-                    console.log('error deleting: ' + JSON.stringify(error));
-                  }
                   if (++self.oldActorsKilled >= self.oldActorsFound) {
                     storeActors();
                   }
@@ -6642,9 +6648,6 @@ test.runnerStoreIntegration = function () {
               for (var i = 0; i < list._items.length; i++) {
                 self.killhim.set('id', list._items[i][0]);
                 test.integrationStore.deleteModel(self.killhim, function (model, error) {
-                  if (typeof error != 'undefined') {
-                    console.log('error deleting: ' + JSON.stringify(error));
-                  }
                   if (++self.oldStoogesKilled >= self.oldStoogesFound) {
                     storeStooges();
                   }
@@ -7155,7 +7158,7 @@ test.runnerRequestDispatchIntegration = function () {
       app.setInterface(mock);
       app.setPresentation(menu);
       app.start(function (request) {
-        console.log(JSON.stringify(request));
+//        console.log(JSON.stringify(request));
       });
 
 
