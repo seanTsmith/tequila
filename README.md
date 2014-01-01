@@ -1,15 +1,15 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila) 
-Tequila is a javascript application framework.  It runs on node server and html5 clients.
+Tequila is an javascript application framework.  It runs on node server and html5 browsers.
 
-## Raison d'être
+##### Project Goals:
 
-* Hide complexities of data transport, persistence and user interface.
-* Provide abtractions to to do the heavy lifting parts of an app so you can concentrate on the application logic
-* Don't reinvent the wheel but build a better mousetrap
+* Provide high level abstractions to simplify application development
+* Facilitate design pattern practices
+* Adherence to test driven design and development
+* Utilize 3rd party libraries but provide facades and adapters to keep the app simple, flexible and extensible
 
 Demo: http://dremoor.github.io/tequila/samples/bootstrap3-panels-interface-sample/
-
-Specs/Docs/Tests: http://dremoor.github.io/tequila/test-spec/test-runner
+Spec: http://dremoor.github.io/tequila/test-spec/test-runner
 
 ## TODO
 - create local-store
