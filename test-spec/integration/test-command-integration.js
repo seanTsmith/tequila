@@ -41,7 +41,7 @@ test.runnerCommandIntegration = function () {
         cmd.contents = 123;
         cmd.execute();
       });
-      test.shouldThrow(Error('error executing Presentation: contents elements must be Command or Attribute'), function () {
+      test.shouldThrow(Error('error executing Presentation: contents elements must be Command, Attribute or string'), function () {
         cmd.contents = new Presentation();
         cmd.contents.set('contents', [new Command(), new Attribute({name: 'meh'}), true]);
         cmd.execute();

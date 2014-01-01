@@ -2615,11 +2615,11 @@ Presentation.prototype.getValidationErrors = function (modelCheckOnly) {
     var gotError = false;
     if (contents instanceof Array) {
       for (i=0; i<contents.length; i++) {
-        if (!(contents[i] instanceof Command || contents[i] instanceof Attribute))
+        if (!(contents[i] instanceof Command || contents[i] instanceof Attribute || typeof contents[i] == 'string'))
           gotError = true;
       }
       if (gotError)
-        errors.push('contents elements must be Command or Attribute');
+        errors.push('contents elements must be Command, Attribute or string');
     } else {
       errors.push('contents must be Array');
     }
@@ -6053,9 +6053,10 @@ test.runnerPresentation = function () {
         pres.set('contents', true);
         return pres.getValidationErrors();
       });
-      test.example('array elements must be Command and Attribute objects', 'contents elements must be Command or Attribute', function () {
+      test.example('array elements must be Command , Attribute or String', 'contents elements must be Command, Attribute or string', function () {
         var pres = new Presentation();
-        pres.set('contents', [new Command(), new Attribute({name: 'meh'})]);
+        // strings with prefix # are heading, a dash - by itself is for a visual seperator
+        pres.set('contents', ['#heading', new Command(), new Attribute({name: 'meh'})]);
         test.assertion(pres.getValidationErrors().length == 0);
         pres.set('contents', [new Command(), new Attribute({name: 'meh'}), true]);
         return pres.getValidationErrors();
@@ -6860,7 +6861,7 @@ test.runnerCommandIntegration = function () {
         cmd.contents = 123;
         cmd.execute();
       });
-      test.shouldThrow(Error('error executing Presentation: contents elements must be Command or Attribute'), function () {
+      test.shouldThrow(Error('error executing Presentation: contents elements must be Command, Attribute or string'), function () {
         cmd.contents = new Presentation();
         cmd.contents.set('contents', [new Command(), new Attribute({name: 'meh'}), true]);
         cmd.execute();

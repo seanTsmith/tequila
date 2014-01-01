@@ -12,6 +12,11 @@ body {
     /*background-position: center;*/
 }
 
+hr {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
 .blue-badge {
     background-color: #428bca;
 }

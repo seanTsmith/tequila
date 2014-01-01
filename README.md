@@ -3,15 +3,15 @@ Tequila is a application framework for single page web apps and cell phone apps 
 
 Demo: http://dremoor.github.io/tequila/samples/bootstrap3-panels-interface-sample/
 
+Specs/Docs/Tests: http://dremoor.github.io/tequila/test-spec/test-runner
+
 ## TODO
-- Add placeholder to Attribute and implement in sample
+- create local-store
+- implement /lib/stores/local-test.js & /lib/stores/local-store.js
+
 - Command class functions should not need to call this.complete() ... should be automatic
 - Attribute image type
 - Attribute visible property
-- implement /lib/stores/local-test.js & /lib/stores/local-store.js
-- install http://redis.io/ on tgiCloud Server
-- implement /lib/stores/redis-test.js & /lib/stores/redis-store.js .. make it look for tgicloud.com redis
-- test with /test-spec/integration/test-store-integration.js
 - make remote command type or flag as remote
 - getlist needs next item to detect end ? or need hasMoreItems ?
 - make a prettyprint function for model
@@ -21,9 +21,7 @@ Demo: http://dremoor.github.io/tequila/samples/bootstrap3-panels-interface-sampl
 - make validation for types
 - have stores validate before saving
 - create redis-store
-- create local-store
 - create json-file-store
-- create cookie-store
 - create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 - tequilaStore needs to be set not hard coded
 - fix Test variations on getList method test for remote stores

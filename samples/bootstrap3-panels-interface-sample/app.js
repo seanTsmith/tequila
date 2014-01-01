@@ -25,12 +25,16 @@ procCommand = new Command({name: 'Procedure', type: 'Procedure', contents: new P
 // Create sample presentation
 var pres = new Presentation();
 pres.set('contents', [
+  '####INSTRUCTIONS\n\n' +
+    'Enter some stuff then push some buttons.',
+  '-',
   new Attribute({name: 'firstName', label: 'First Name', type: 'String(20)', value: 'John'}),
   new Attribute({name: 'lastName', label: 'Last Name', type: 'String(25)', value: 'Doe'}),
   new Attribute({name: 'address', label: 'Address', type: 'String(50)'}),
   new Attribute({name: 'city', label: 'City', type: 'String(35)'}),
   new Attribute({name: 'state', label: 'State', type: 'String(2)'}),
-  new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)'}),
+  new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)', placeholder:'#####-####'}),
+  '-',
   funcCommand,
   procCommand,
   stubMoe,

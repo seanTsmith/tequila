@@ -1214,11 +1214,11 @@ Presentation.prototype.getValidationErrors = function (modelCheckOnly) {
     var gotError = false;
     if (contents instanceof Array) {
       for (i=0; i<contents.length; i++) {
-        if (!(contents[i] instanceof Command || contents[i] instanceof Attribute))
+        if (!(contents[i] instanceof Command || contents[i] instanceof Attribute || typeof contents[i] == 'string'))
           gotError = true;
       }
       if (gotError)
-        errors.push('contents elements must be Command or Attribute');
+        errors.push('contents elements must be Command, Attribute or string');
     } else {
       errors.push('contents must be Array');
     }
