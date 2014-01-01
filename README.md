@@ -1,5 +1,5 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila) 
-Tequila is an javascript application framework.  It runs on node server and html5 browsers.
+Tequila is a javascript application framework.  It runs on node server and html5 browsers.
 
 ## Project Goals:
 
@@ -11,7 +11,7 @@ Tequila is an javascript application framework.  It runs on node server and html
 ####Sample app
 http://dremoor.github.io/tequila/samples/bootstrap3-panels-interface-sample/
 
-####Tequila Specifications, Documentation, Unit Tests, Integration Tests & Regression Tests
+####Specs, Docs, & Tests
 http://dremoor.github.io/tequila/test-spec/test-runner
 
 ## Install
@@ -39,10 +39,5 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 - fix Test variations on getList method test for remote stores
 - Use confess / phantomJS to make cache manifest
-
-## Project Root
-+ **/bin** tequila command line interface
-+ **/lib** tequila library source code
-+ [**/test-spec**](test-spec/README.md) 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dremoor/tequila/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
