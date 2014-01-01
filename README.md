@@ -1,5 +1,5 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila) 
-Tequila is a javascript application framework.  It runs on node server and html5 browsers.
+Tequila is a javascript application framework.  It runs on node server,  modern browsers and as phonegap apps.
 
 ## Project Goals:
 
