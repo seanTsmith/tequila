@@ -32,6 +32,7 @@ test.heading('Models', function () {
   test.runnerLogModel();
   test.runnerPresentation();
   test.runnerUserModel();
+  test.runnerSessionModel();
   test.runnerWorkspace();
 });
 test.heading('Stores', function () {
@@ -52,5 +53,6 @@ test.heading('Integration Tests', function () {
   test.runnerProcedureIntegration();
   test.runnerStoreIntegration();
   test.runnerRequestDispatchIntegration();
+  test.runnerSessionIntegration();
 });
 test.stop();

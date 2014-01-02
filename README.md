@@ -25,9 +25,9 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - model.set({name:value}) should be like model.set('name',value})
 - make validation for types
 - have stores validate before saving
-- Session Model
 
 #### To do later
+- Don't store nulls in stores just do by inference (have get populate on return and put remove before inserting)
 - tequilaStore needs to be set not hard coded
 - Attribute image type
 - Attribute visible property

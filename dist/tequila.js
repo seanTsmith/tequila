@@ -611,13 +611,13 @@ Interface.prototype.mockRequest = function (args) {
 Interface.prototype.start = function (application, presentation, callBack) {
   if (!(application instanceof Application)) throw new Error('Application required');
   if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
-  if (typeof callBack != 'function') throw new Error('callback required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
   this.application = application;
   this.presentation = presentation;
   this.startCallback = callBack;
 };
 Interface.prototype.stop = function (callBack) {
-  if (typeof callBack != 'function') throw new Error('callback required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
 };
 Interface.prototype.dispatch = function (request, response) {
   if (false === (request instanceof Request)) throw new Error('Request required');
@@ -1102,7 +1102,7 @@ Application.prototype = T.inheritPrototype(Model.prototype);
 Application.prototype.start = function (callBack) {
   if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
   if (false === (this.primaryPresentation instanceof Presentation)) throw new Error('error starting application: presentation not set');
-  if (typeof callBack != 'function') throw new Error('callback required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
   var self = this;
   this.startCallback = callBack;
   this.primaryInterface.start(self, this.primaryPresentation, function (request) {
@@ -1305,7 +1305,7 @@ MemoryStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (!model.attributes[0].value) throw new Error('ID not set');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
   for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
@@ -1332,7 +1332,7 @@ MemoryStore.prototype.getModel = function (model, callBack) {
 MemoryStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   var id = model.get('ID');
   if (id) {
     // Find model in memorystore, error out if can't find
@@ -1385,7 +1385,7 @@ MemoryStore.prototype.putModel = function (model, callBack) {
 MemoryStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
   for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == model.modelType) modelIndex = i;
@@ -1422,7 +1422,7 @@ MemoryStore.prototype.getList = function (list, filter, arg3, arg4) {
   }
   if (!(list instanceof List)) throw new Error('argument must be a List');
   if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   // Find model in memorystore, error out if can't find
   var modelIndex = -1;
   for (var i = 0; i < this.data.length; i++) if (this.data[i][0] == list.model.modelType) modelIndex = i;
@@ -1436,7 +1436,6 @@ MemoryStore.prototype.getList = function (list, filter, arg3, arg4) {
     var doIt = true;
     for (var prop in filter) {
       if (filter.hasOwnProperty(prop)) {
-        console.log(storedPair[i][1][prop]);
         if (filter[prop] instanceof RegExp) {
           if (!filter[prop].test(storedPair[i][1][prop])) doIt = false;
         } else {
@@ -1547,7 +1546,7 @@ RemoteStore.prototype.onConnect = function (location, callBack) {
 RemoteStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   this.transport.send(new Message('PutModel', model), function (msg) {
     if (false && msg == 'Ack') { // todo wtf is this
       callBack(model);
@@ -1574,7 +1573,7 @@ RemoteStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
   if (!model.attributes[0].value) throw new Error('ID not set');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   this.transport.send(new Message('GetModel', model), function (msg) {
     if (false && msg == 'Ack') { // todo wtf is this
       callBack(model);
@@ -1600,7 +1599,7 @@ RemoteStore.prototype.getModel = function (model, callBack) {
 RemoteStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getValidationErrors().length) throw new Error('model has validation errors');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   this.transport.send(new Message('DeleteModel', model), function (msg) {
     if (false && msg == 'Ack') { // todo wtf is this
       callBack(model);
@@ -1633,7 +1632,7 @@ RemoteStore.prototype.getList = function (list, filter, arg3, arg4) {
   }
   if (!(list instanceof List)) throw new Error('argument must be a List');
   if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
-  if (typeof callBack != "function") throw new Error('callback required');
+  if (typeof callBack != "function") throw new Error('callBack required');
   this.transport.send(new Message('GetList', {list: list, filter: filter, order: order}), function (msg) {
     if (false && msg == 'Ack') { // todo wtf is this
       callBack(list);
@@ -1847,7 +1846,7 @@ Bootstrap3PanelInterface.prototype = T.inheritPrototype(Interface.prototype);
 Bootstrap3PanelInterface.prototype.start = function (application, presentation, callBack) {
   if (!(application instanceof Application)) throw new Error('Application required');
   if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
-  if (typeof callBack != 'function') throw new Error('callback required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
   throw new Error('Bootstrap3PanelInterface unavailable in server');
 };;
 /**

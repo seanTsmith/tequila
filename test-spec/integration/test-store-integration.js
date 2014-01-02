@@ -68,7 +68,6 @@ test.runnerStoreIntegration = function () {
             returnResponse(testNode, err);
           }
         } else {
-          // TODO May have to delete manually or expire for redis ?
           storeStooges();
         }
 
