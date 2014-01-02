@@ -20,11 +20,14 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it
 
 #### To do now
-- Command class functions should not need to call this.complete() ... should be automatic
+- Make session method endSession and add to integration test
+- Command class functions should not need to call this.complete() ... should be automatic?
+- Make easier way to retrieve single model findModel()
 - getlist needs next item to detect end ? or need hasMoreItems ?
 - model.set({name:value}) should be like model.set('name',value})
 - make validation for types
 - have stores validate before saving
+- fix Test variations on getList method test for remote stores
 
 #### To do later
 - Don't store nulls in stores just do by inference (have get populate on return and put remove before inserting)
@@ -37,7 +40,6 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - create redis-store
 - create json-file-store
 - create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
-- fix Test variations on getList method test for remote stores
 - Use confess / phantomJS to make cache manifest
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dremoor/tequila/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

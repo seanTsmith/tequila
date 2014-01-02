@@ -19,6 +19,7 @@ test.runnerSessionIntegration = function () {
       user2.set('name', name2);
       user2.set('password', pass2);
       user2.set('active', true);
+      session1 = new Session();
       session2 = new Session();
 
       // start with empty store and add some users
@@ -44,21 +45,36 @@ test.runnerSessionIntegration = function () {
       }
 
       // callback after session started called
-
       function usersStarted(err, session) {
         if (err)
           self.badCount++;
         else
           self.goodCount++;
 
-        if (self.badCount==2 && self.goodCount==2) {
+        if (self.badCount == 2 && self.goodCount == 2) {
+          // Resume session1 correctly, session2 with wrong passcode
+          self.passCode1 = session1.get('passCode');
+          self.passCode2 = session2.get('passCode');
+          self.goodCount = 0;
+          self.badCount = 0;
+          session1 = new Session(); // Don't reuse objects in test ...
+          session2 = new Session();
+          session1.resumeSession(store, ip1, self.passCode1, sessionResumed_Test1);
+          session2.resumeSession(store, ip1, 'no more secrets', sessionResumed_Test1);
+        }
+      }
+
+      function sessionResumed_Test1(err, session) {
+        if (err)
+          self.badCount++;
+        else
+          self.goodCount++;
+        if (self.badCount == 1 && self.goodCount == 1) {
           console.log(JSON.stringify(session1));
           console.log(JSON.stringify(session2));
           returnResponse(testNode, true);
         }
-
       }
-
 
     });
   });
