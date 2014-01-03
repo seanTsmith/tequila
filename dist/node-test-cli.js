@@ -2651,6 +2651,99 @@ var User = function (args) {
 User.prototype = T.inheritPrototype(Model.prototype);;
 /**
  * tequila
+ * session-model
+ */
+// Model Constructor
+var Session = function (args) {
+  if (false === (this instanceof Session)) throw new Error('new operator required');
+  args = args || {};
+  if (!args.attributes) {
+    args.attributes = [];
+  }
+  var userModelID = new Attribute.ModelID(new User());
+  args.attributes.push(new Attribute({name: 'userID', type: 'Model', value: userModelID}));
+  args.attributes.push(new Attribute({name: 'dateStarted', type: 'Date', value: new Date()}));
+  args.attributes.push(new Attribute({name: 'passCode', type: 'String(20)'}));
+  args.attributes.push(new Attribute({name: 'active', type: 'Boolean'}));
+  args.attributes.push(new Attribute({name: 'ipAddress', type: 'String'}));
+
+  Model.call(this, args);
+  this.modelType = "Session";
+  this.set('active', false);
+};
+Session.prototype = T.inheritPrototype(Model.prototype);
+/*
+ * Methods
+ */
+Session.prototype.startSession = function (store, userName, password, ip, callBack) {
+  if (false === (store instanceof Store)) throw new Error('store required');
+  if (typeof userName !== 'string') throw new Error('userName required');
+  if (typeof password !== 'string') throw new Error('password required');
+  if (typeof ip !== 'string') throw new Error('ip required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
+
+  // Find user in store
+  var self = this;
+  var userModel = new User();
+  store.getList(new List(userModel), {name: userName, password: password}, function (list, error) {
+    if (error) {
+      callBack(error);
+      return;
+    }
+    if (list.length() != 1) {
+      callBack(new Error('login not found'));
+      return;
+    }
+
+    // Make random passCode
+    var passCode = "";
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 20; i++)
+      passCode += chars.charAt(Math.floor(Math.random() * chars.length));
+
+    // Got user create new session
+    list.firstItem();
+    self.set('userID', list.get('id'));
+    self.set('active', true);
+    self.set('passCode', passCode);
+    self.set('ipAddress', ip);
+    store.putModel(self, function (model, error) {
+      callBack(error, model);
+    });
+  });
+};
+Session.prototype.resumeSession = function (store, ip, passCode, callBack) {
+  if (false === (store instanceof Store)) throw new Error('store required');
+  if (typeof ip !== 'string') throw new Error('ip required');
+  if (typeof passCode !== 'string') throw new Error('passCode required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
+
+  // Find the session in store
+  var self = this;
+  store.getList(new List(self), {ipAddress:ip, passCode:passCode}, function (list, error) {
+    if (error) {
+      callBack(error);
+      return;
+    }
+    if (list.length() != 1) {
+      callBack(new Error('invalid or expired session'));
+      return;
+    }
+
+    // Get model for session as shitty as this is (TODO a better way)
+    list.firstItem();
+    self.set('id', list.get('id'));
+    self.set('userID', list.get('userID'));
+    self.set('dateStarted', list.get('dateStarted'));
+    self.set('passCode', list.get('passCode'));
+    self.set('active', list.get('active'));
+    self.set('ipAddress', list.get('ipAddress'));
+    callBack(error, self);
+  });
+
+};;
+/**
+ * tequila
  * workspace-class
  */
 function Workspace(args) {
@@ -5582,7 +5675,7 @@ test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
           test.paragraph('skipping tests since store is not ready');
         }
       } else {
-        test.example('getModel() is not implemented', Error(new SurrogateStore().storeType + ' does not provide getModel'), function () {
+        test.example('getModel() is not implemented for virtual class', Error(new SurrogateStore().storeType + ' does not provide getModel'), function () {
           new SurrogateStore().getModel();
         });
       }
@@ -5628,7 +5721,7 @@ test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
           test.paragraph('skipping tests since store is not ready');
         }
       } else {
-        test.example('putModel() is not implemented', Error('Store does not provide putModel'), function () {
+        test.example('putModel() is not implemented for virtual class', Error('Store does not provide putModel'), function () {
           new SurrogateStore().putModel();
         });
       }
@@ -5665,7 +5758,7 @@ test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
           test.paragraph('skipping tests since store is not ready');
         }
       } else {
-        test.example('deleteModel() is not implemented', Error('Store does not provide deleteModel'), function () {
+        test.example('deleteModel() is not implemented for virtual class', Error('Store does not provide deleteModel'), function () {
           new SurrogateStore().deleteModel();
         });
       }
@@ -6100,6 +6193,76 @@ test.runnerUserModel = function () {
         test.assertion(user.get('firstName') === null);
         test.assertion(user.get('lastName') === null);
         test.assertion(user.get('email') === null);
+      });
+    });
+  });
+};
+;
+/**
+ * tequila
+ * session-test
+ */
+test.runnerSessionModel = function () {
+  test.heading('Session Model', function () {
+    test.paragraph('The Session Model represents the Session logged into the system. The library uses this for system' +
+      ' access, logging and other functions.');
+    test.heading('CONSTRUCTOR', function () {
+      test.example('objects created should be an instance of Session', true, function () {
+        return new Session() instanceof Session;
+      });
+      test.heading('Model tests are applied', function () {
+        test.runnerModel(Session, true);
+      });
+    });
+    test.heading('ATTRIBUTES', function () {
+      test.example('following attributes are defined:', undefined, function () {
+        var session = new Session(); // default attributes and values
+        test.assertion(session.get('id') === null);
+        test.assertion(session.get('userID') instanceof Attribute.ModelID);
+        test.assertion(session.get('userID').modelType == 'User');
+        test.assertion(session.get('dateStarted') instanceof Date);
+        test.assertion(session.get('passCode') === null);
+        test.assertion(session.get('ipAddress') === null);
+        test.assertion(session.get('active') === false);
+      });
+    });
+    test.heading('METHODS', function () {
+      test.heading('startSession()', function () {
+        test.paragraph('This method will create a new session record for a user.');
+        test.example('parameters are store, user, password, IP and callback', undefined, function () {
+          test.shouldThrow(Error('store required'), function () {
+            new Session().startSession();
+          });
+          test.shouldThrow(Error('userName required'), function () {
+            new Session().startSession(new Store());
+          });
+          test.shouldThrow(Error('password required'), function () {
+            new Session().startSession(new Store(), 'blow');
+          });
+          test.shouldThrow(Error('ip required'), function () {
+            new Session().startSession(new Store(), 'blow', 'me');
+          });
+          test.shouldThrow(Error('callBack required'), function () {
+            new Session().startSession(new Store(), 'blow', 'me', 'ipman');
+          });
+        });
+      });
+      test.heading('resumeSession()', function () {
+        test.paragraph('This method will resume an existing session.');
+        test.example('parameters are store, IP, passcode and callback', undefined, function () {
+          test.shouldThrow(Error('store required'), function () {
+            new Session().resumeSession();
+          });
+          test.shouldThrow(Error('ip required'), function () {
+            new Session().resumeSession(new Store());
+          });
+          test.shouldThrow(Error('passCode required'), function () {
+            new Session().resumeSession(new Store(), 'ipman');
+          });
+          test.shouldThrow(Error('callBack required'), function () {
+            new Session().resumeSession(new Store(), 'ipman', '123');
+          });
+        });
       });
     });
   });
@@ -6566,6 +6729,7 @@ test.runnerListIntegration = function () {
  * tequila
  * test-session-integration
  */
+console.log('shizz');
 test.runnerSessionIntegration = function () {
   test.heading('Session Integration', function () {
     test.example('simulate logging in etc', test.asyncResponse(true), function (testNode, returnResponse) {
@@ -6583,6 +6747,7 @@ test.runnerSessionIntegration = function () {
       user2.set('name', name2);
       user2.set('password', pass2);
       user2.set('active', true);
+      session1 = new Session();
       session2 = new Session();
 
       // start with empty store and add some users
@@ -6608,21 +6773,36 @@ test.runnerSessionIntegration = function () {
       }
 
       // callback after session started called
-
       function usersStarted(err, session) {
         if (err)
           self.badCount++;
         else
           self.goodCount++;
 
-        if (self.badCount==2 && self.goodCount==2) {
+        if (self.badCount == 2 && self.goodCount == 2) {
+          // Resume session1 correctly, session2 with wrong passcode
+          self.passCode1 = session1.get('passCode');
+          self.passCode2 = session2.get('passCode');
+          self.goodCount = 0;
+          self.badCount = 0;
+          session1 = new Session(); // Don't reuse objects in test ...
+          session2 = new Session();
+          session1.resumeSession(store, ip1, self.passCode1, sessionResumed_Test1);
+          session2.resumeSession(store, ip1, 'no more secrets', sessionResumed_Test1);
+        }
+      }
+
+      function sessionResumed_Test1(err, session) {
+        if (err)
+          self.badCount++;
+        else
+          self.goodCount++;
+        if (self.badCount == 1 && self.goodCount == 1) {
           console.log(JSON.stringify(session1));
           console.log(JSON.stringify(session2));
           returnResponse(testNode, true);
         }
-
       }
-
 
     });
   });

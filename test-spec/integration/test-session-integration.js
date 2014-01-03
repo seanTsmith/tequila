@@ -2,6 +2,7 @@
  * tequila
  * test-session-integration
  */
+console.log('shizz');
 test.runnerSessionIntegration = function () {
   test.heading('Session Integration', function () {
     test.example('simulate logging in etc', test.asyncResponse(true), function (testNode, returnResponse) {

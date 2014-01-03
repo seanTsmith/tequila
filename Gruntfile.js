@@ -25,6 +25,7 @@ module.exports = function (grunt) {
           'lib/models/log-model.js',
           'lib/models/presentation-model.js',
           'lib/models/user-model.js',
+          'lib/models/session-model.js',
           'lib/models/workspace-model.js',
 
           'lib/stores/memory-store.js',
@@ -64,6 +65,7 @@ module.exports = function (grunt) {
           'lib/models/log-test.js',
           'lib/models/presentation-test.js',
           'lib/models/user-test.js',
+          'lib/models/session-test.js',
           'lib/models/workspace-test.js',
 
           'lib/stores/memory-test.js',
