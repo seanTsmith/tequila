@@ -2926,6 +2926,7 @@ MemoryStore.prototype.getList = function (list, filter, arg3, arg4) {
   }
   list.clear();
   var storedPair = this.data[modelIndex][1];
+//  console.log('// storedPair\n' + JSON.stringify(storedPair,null,2));
   for (var i = 0; i < storedPair.length; i++) {
     var doIt = true;
     for (var prop in filter) {
@@ -2949,6 +2950,7 @@ MemoryStore.prototype.getList = function (list, filter, arg3, arg4) {
   if (order) {
     list.sort(order);
   }
+//  console.log(JSON.stringify(list,null,2));
   callBack(list);
 };
 ;
@@ -3004,7 +3006,7 @@ var JSONFileStore = function (args) {
     canGetModel: T.isServer(),
     canPutModel: T.isServer(),
     canDeleteModel: T.isServer(),
-    canGetList: false // T.isServer()
+    canGetList: T.isServer()
   };
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;
@@ -3798,6 +3800,93 @@ JSONFileStore.prototype.getList = function (list, filter, arg3, arg4) {
   if (!(list instanceof List)) throw new Error('argument must be a List');
   if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
   if (typeof callBack != "function") throw new Error('callBack required');
+  var pathName = 'json-file-store/' + list.model.modelType + '/';
+  list.clear();
+  fs.readdir(pathName, function (err, files) {
+    if (err) {
+      list.clear();
+      callBack(list);
+      return;
+    }
+    // console.log('// list\n' + JSON.stringify(list,null,2));
+    // Prepare for getting async file reads
+    var storedPair = [];
+    for (var f in files) {
+      if (files.hasOwnProperty(f)) {
+        var file = files[f];
+        var id = file.split('.')[0];
+        var fileName = pathName + '/' + id + '.JSON';
+        var ele = [id, {}, fileName];
+        storedPair.push(ele);
+      }
+    }
+
+    // Count files read / launch first
+    var filesRead = 0;
+    _ReadEle(filesRead);
+
+    // function reads file and invokes self for next one
+    function _ReadEle(ele) {
+      fs.readFile(storedPair[ele][2], function (err, data) {
+        filesRead++;
+        if (err) {
+          console.log('error read ' + err);
+          callBack(list);
+        } else {
+          try {
+            var dataJSON = JSON.parse(data);
+            for (var name in dataJSON) {
+              if (dataJSON.hasOwnProperty(name)) {
+                var value = dataJSON[name];
+                storedPair[ele][1][name] = value;
+              }
+            }
+            //storedPair[ele][1] = data;
+            storedPair[ele].pop(); // file name was temp not part of list structure
+            if (filesRead < storedPair.length) {
+              _ReadEle(filesRead);
+            } else {
+              _Cleanup();
+            }
+          } catch (err) {
+            console.log('error catch ' + err);
+            callBack(list);
+          }
+        }
+      });
+    }
+
+    // When last file processed ...
+    function _Cleanup() {
+//  console.log('// storedPair\n' + JSON.stringify(storedPair,null,2));
+      for (var i = 0; i < storedPair.length; i++) {
+        var doIt = true;
+        for (var prop in filter) {
+          if (filter.hasOwnProperty(prop)) {
+            if (filter[prop] instanceof RegExp) {
+              if (!filter[prop].test(storedPair[i][1][prop])) doIt = false;
+            } else {
+              if (filter[prop] != storedPair[i][1][prop]) doIt = false;
+            }
+          }
+        }
+        if (doIt) {
+          var dataPart = [];
+          for (var j in storedPair[i][1]) {
+            dataPart.push(storedPair[i][1][j]);
+          }
+          list._items.push(dataPart);
+        }
+      }
+      list._itemIndex = list._items.length - 1;
+      if (order) {
+        list.sort(order);
+      }
+//  console.log(JSON.stringify(list,null,2));
+      callBack(list);
+    }
+
+  });
 };
 ;
 /***********************************************************************************************************************
@@ -4428,7 +4517,7 @@ test.asyncCallback = function (node, test_Results) {
       process.stdout.write(colors.green('✓'));
     } else {
       test.countFail++;
-      var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+      var ref = node.levelText + node.exampleNumber + ' ';
       var indent = '';
       for (j = 0; j < ref.length; j++)
         indent += ' ';
@@ -5870,7 +5959,8 @@ test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
               }
             });
           });
-          test.example('creates new model when ID is not set', test.asyncResponse(true), function (testNode, returnResponse) {
+          test.xexample('creates new model when ID is not set', test.asyncResponse(true), function (testNode, returnResponse) {
+            // This works but pollutes store with crap
             var m = new Model();
             new SurrogateStore().putModel(m, function (mod, err) {
               if (err) {
@@ -6508,7 +6598,10 @@ test.runnerMongoStore = function () {
 
 test.runnerJSONFileStore = function () {
   test.heading('JSONFileStore', function () {
-    test.paragraph('The JSONFileStore handles data storage in simple JSON files.');
+    test.paragraph('The JSONFileStore handles data storage in simple JSON files.' +
+      ' It should NOT be used in concurrency read / write situations.' +
+      ' It is mainly for static read situations.  It can be written to for authoring or testing' +
+      ' purposes as long as limitations of files vs a database are understood.');
     test.heading('CONSTRUCTOR', function () {
       test.heading('Store Constructor tests are applied', function () {
         test.runnerStoreConstructor(JSONFileStore,true);
@@ -7036,7 +7129,7 @@ test.runnerStoreIntegration = function () {
         // setup stooge class
         self.Stooge = function (args) {
           Model.call(this, args);
-          this.modelType = "Stooge";
+          this.modelType = "_tempTest_Stooge";
           this.attributes.push(new Attribute('name'));
         };
         self.Stooge.prototype = T.inheritPrototype(Model.prototype);

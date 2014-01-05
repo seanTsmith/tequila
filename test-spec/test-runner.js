@@ -612,7 +612,7 @@ test.asyncCallback = function (node, test_Results) {
       process.stdout.write(colors.green('✓'));
     } else {
       test.countFail++;
-      var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
+      var ref = node.levelText + node.exampleNumber + ' ';
       var indent = '';
       for (j = 0; j < ref.length; j++)
         indent += ' ';

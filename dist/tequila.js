@@ -1525,6 +1525,7 @@ MemoryStore.prototype.getList = function (list, filter, arg3, arg4) {
   }
   list.clear();
   var storedPair = this.data[modelIndex][1];
+//  console.log('// storedPair\n' + JSON.stringify(storedPair,null,2));
   for (var i = 0; i < storedPair.length; i++) {
     var doIt = true;
     for (var prop in filter) {
@@ -1548,6 +1549,7 @@ MemoryStore.prototype.getList = function (list, filter, arg3, arg4) {
   if (order) {
     list.sort(order);
   }
+//  console.log(JSON.stringify(list,null,2));
   callBack(list);
 };
 ;
@@ -1603,7 +1605,7 @@ var JSONFileStore = function (args) {
     canGetModel: T.isServer(),
     canPutModel: T.isServer(),
     canDeleteModel: T.isServer(),
-    canGetList: false // T.isServer()
+    canGetList: T.isServer()
   };
   this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
   this.idCounter = 0;

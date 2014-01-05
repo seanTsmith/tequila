@@ -19,7 +19,7 @@ test.runnerStoreIntegration = function () {
         // setup stooge class
         self.Stooge = function (args) {
           Model.call(this, args);
-          this.modelType = "Stooge";
+          this.modelType = "_tempTest_Stooge";
           this.attributes.push(new Attribute('name'));
         };
         self.Stooge.prototype = T.inheritPrototype(Model.prototype);
