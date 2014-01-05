@@ -20,6 +20,8 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it
 
 #### To do now
+- create json-file-store
+
 - Make session method endSession and add to integration test
 - Command class functions should not need to call this.complete() ... should be automatic?
 - Make easier way to retrieve single model findModel()
@@ -38,7 +40,6 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 
 #### To do even later
 - create redis-store
-- create json-file-store
 - create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 - Use confess / phantomJS to make cache manifest
 

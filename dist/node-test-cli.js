@@ -2989,6 +2989,36 @@ MongoStore.prototype.onConnect = function (location, callBack) {
 ;
 /**
  * tequila
+ * json-file-store
+ */
+
+// Constructor
+var JSONFileStore = function (args) {
+  if (false === (this instanceof JSONFileStore)) throw new Error('new operator required');
+  args = args || {};
+  this.storeType = args.storeType || "JSONFileStore";
+  this.name = args.name || 'a ' + this.storeType;
+
+  this.storeProperty = {
+    isReady: T.isServer(),
+    canGetModel: T.isServer(),
+    canPutModel: T.isServer(),
+    canDeleteModel: T.isServer(),
+    canGetList: false // T.isServer()
+  };
+  this.data = [];// Each ele is an array of model types and contents (which is an array of IDs and Model Value Store)
+  this.idCounter = 0;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'storeType']);
+  var errorList = [];
+  for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
+  if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
+};
+JSONFileStore.prototype = T.inheritPrototype(Store.prototype);
+// Methods
+;
+/**
+ * tequila
  * remote-store
  */
 // Constructor
@@ -3642,6 +3672,127 @@ MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
   });
 };
 ;
+/**
+ * tequila
+ * json-file-server
+ */
+JSONFileStore.prototype.onConnect = function (location, callBack) {
+  if (typeof location != 'string') throw new Error('argument must a url string');
+  if (typeof callBack != 'function') throw new Error('argument must a callback');
+  callBack(this, undefined);
+};
+JSONFileStore.prototype.getModel = function (model, callBack) {
+  if (!(model instanceof Model)) throw new Error('argument must be a Model');
+  if (model.getValidationErrors().length) throw new Error('model has validation errors');
+  if (!model.attributes[0].value) throw new Error('ID not set');
+  if (typeof callBack != "function") throw new Error('callBack required');
+  var id = model.get('ID');
+  var pathName = 'json-file-store/' + model.modelType;
+  var fileName = pathName + '/' + id + '.JSON';
+  fs.readFile(fileName, function (err, data) {
+    if (err) {
+      callBack(model, new Error('model not found in store'));
+    } else {
+      try {
+        var dataJSON = JSON.parse(data);
+        for (var i = 0; i < dataJSON.attributes.length; i++) {
+          var name = dataJSON.attributes[i].name;
+          var value = dataJSON.attributes[i].value;
+          model.set(name, value);
+        }
+        callBack(model);
+      } catch (err) {
+        callBack(model, new Error('JSON.parse ' + err));
+      }
+    }
+  });
+};
+JSONFileStore.prototype.putModel = function (model, callBack) {
+  if (!(model instanceof Model)) throw new Error('argument must be a Model');
+  if (model.getValidationErrors().length) throw new Error('model has validation errors');
+  if (typeof callBack != "function") throw new Error('callBack required');
+  var id = model.get('ID');
+  var pathName = 'json-file-store/' + model.modelType;
+  var fileName = pathName + '/' + id + '.JSON';
+  var firstTry = true;
+  // If no id then make one
+  if (!id) {
+    id = "";
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 20; i++)
+      id += chars.charAt(Math.floor(Math.random() * chars.length));
+    model.set('ID', id);
+    fileName = pathName + '/' + id + '.JSON';
+    _WriteFile();
+  } else {
+    // if id given make sure exists already
+    fs.exists(fileName, function (exists) {
+      if (exists)
+        _WriteFile();
+      else
+        callBack(model, new Error('model not found in store'));
+    });
+  }
+  function _WriteFile() {
+    fs.writeFile(fileName, JSON.stringify(model, null, 2), function (err) {
+      if (err) {
+        // Try making model folder if it failed
+        if (firstTry) {
+          firstTry = false;
+          fs.mkdir(pathName, undefined, function (err) {
+            if (err) {
+              if (err.code == 'EEXIST')
+                _WriteFile(); // Race condition means it got created so we good
+              else
+                callBack(model, err);
+            } else {
+              _WriteFile();
+            }
+          });
+        } else {
+          callBack(model, err);
+        }
+      } else {
+        callBack(model);
+      }
+    });
+  }
+};
+JSONFileStore.prototype.deleteModel = function (model, callBack) {
+  if (!(model instanceof Model)) throw new Error('argument must be a Model');
+  if (model.getValidationErrors().length) throw new Error('model has validation errors');
+  if (typeof callBack != "function") throw new Error('callBack required');
+  var id = model.get('ID');
+  var pathName = 'json-file-store/' + model.modelType;
+  var fileName = pathName + '/' + id + '.JSON';
+  fs.exists(fileName, function (exists) {
+    if (exists) {
+      fs.unlink(fileName, function (err) {
+        if (err) {
+          callBack(model, err);
+        } else {
+          model.set('id', undefined);
+          callBack(model, undefined);
+        }
+      });
+    } else
+      callBack(model, new Error('model not found in store'));
+  });
+
+};
+JSONFileStore.prototype.getList = function (list, filter, arg3, arg4) {
+  var callBack, order;
+  if (typeof(arg4) == 'function') {
+    callBack = arg4;
+    order = arg3;
+  } else {
+    callBack = arg3;
+  }
+  if (!(list instanceof List)) throw new Error('argument must be a List');
+  if (!(filter instanceof Object)) throw new Error('filter argument must be Object');
+  if (typeof callBack != "function") throw new Error('callBack required');
+};
+;
 /***********************************************************************************************************************
  * tequila
  * node-test-header
@@ -3654,6 +3805,7 @@ Object.prototype.badActor = function() {
 
 var colors = require('colors');
 var mongo = require('mongodb');
+var fs = require('fs');
 ;
 /**
  * tequila
@@ -3692,12 +3844,16 @@ test.runner = function (isBrowser) {
         test.integrationStore = test.hostStore;
       } else if (test.mongoStoreAvailable) {
         test.integrationStore = test.mongoStore;
-      } else if(typeof(Storage)!=="undefined") {
+      } else if (typeof(Storage) !== "undefined") {
         localStorage.removeItem('tequilaData'); // TODO names need to bet set as with mongodb
         localStorage.removeItem('tequilaIDCounter'); // TODO ... otherwise tests will wipe real data
         test.integrationStore = new LocalStore({name: 'Integration Test Store'});
       } else {
-        test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
+        var jStore = new JSONFileStore({name: 'Integration Test Store'});
+        if (jStore.getServices().isReady)
+          test.integrationStore = jStore;
+        else
+          test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
       }
       console.log(test.integrationStore.name + ' is a ' + test.integrationStore.storeType);
       test.renderHead(isBrowser);
@@ -3720,7 +3876,7 @@ test.runner = function (isBrowser) {
 
   // try to create a hostStore
   test.hostStore = new RemoteStore({name: 'Integration Test Store'});
-  test.hostStore.onConnect('http://localhost', function (store, err) { // DOUG CHANGE HERE
+  test.hostStore.onConnect('http://localhost', function (store, err) { // TODO localhost ...
     if (err) {
       test.hostStoreAvailable = false;
       console.warn('hostStore unavailable (' + err + ')');
@@ -4172,7 +4328,7 @@ test.show = function (value) {
       return;
     }
     if (value !== undefined) {
-      test.showWork.push(JSON.stringify(value,null,' '));
+      test.showWork.push(JSON.stringify(value, null, ' '));
       return;
     }
     test.showWork.push(value);
@@ -6340,6 +6496,28 @@ test.runnerMongoStore = function () {
 ;
 /**
  * tequila
+ * json-file-test
+ */
+
+test.runnerJSONFileStore = function () {
+  test.heading('JSONFileStore', function () {
+    test.paragraph('The JSONFileStore handles data storage in simple JSON files.');
+    test.heading('CONSTRUCTOR', function () {
+      test.heading('Store Constructor tests are applied', function () {
+        test.runnerStoreConstructor(JSONFileStore,true);
+      });
+      test.example('objects created should be an instance of JSONFileStore', true, function () {
+        return new JSONFileStore() instanceof JSONFileStore;
+      });
+    });
+    test.heading('Store tests are applied', function () {
+      test.runnerStoreMethods(JSONFileStore,true);
+    });
+  });
+};
+;
+/**
+ * tequila
  * remote-test
  */
 test.runnerRemoteStore = function () {
@@ -6729,7 +6907,6 @@ test.runnerListIntegration = function () {
  * tequila
  * test-session-integration
  */
-console.log('shizz');
 test.runnerSessionIntegration = function () {
   test.heading('Session Integration', function () {
     test.example('simulate logging in etc', test.asyncResponse(true), function (testNode, returnResponse) {
@@ -6798,8 +6975,6 @@ test.runnerSessionIntegration = function () {
         else
           self.goodCount++;
         if (self.badCount == 1 && self.goodCount == 1) {
-          console.log(JSON.stringify(session1));
-          console.log(JSON.stringify(session2));
           returnResponse(testNode, true);
         }
       }
@@ -7022,7 +7197,7 @@ test.runnerStoreIntegration = function () {
         // callback after lookup of dead stooge
         function hesDeadJim(model, error) {
           if (typeof error != 'undefined') {
-            if (error != 'Error: id not found in store') {
+            if ((error != 'Error: id not found in store') && (error != 'Error: model not found in store')) {
               returnResponse(testNode, error);
               return;
             }
@@ -7464,6 +7639,7 @@ test.heading('Stores', function () {
   test.paragraph('These core stores are included in the library.');
   test.runnerMemoryStore();
   test.runnerMongoStore();
+  test.runnerJSONFileStore();
   test.runnerRemoteStore();
   test.runnerLocalStore();
   test.runnerRedisStore();

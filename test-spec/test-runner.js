@@ -35,12 +35,16 @@ test.runner = function (isBrowser) {
         test.integrationStore = test.hostStore;
       } else if (test.mongoStoreAvailable) {
         test.integrationStore = test.mongoStore;
-      } else if(typeof(Storage)!=="undefined") {
+      } else if (typeof(Storage) !== "undefined") {
         localStorage.removeItem('tequilaData'); // TODO names need to bet set as with mongodb
         localStorage.removeItem('tequilaIDCounter'); // TODO ... otherwise tests will wipe real data
         test.integrationStore = new LocalStore({name: 'Integration Test Store'});
       } else {
-        test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
+        var jStore = new JSONFileStore({name: 'Integration Test Store'});
+        if (jStore.getServices().isReady)
+          test.integrationStore = jStore;
+        else
+          test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
       }
       console.log(test.integrationStore.name + ' is a ' + test.integrationStore.storeType);
       test.renderHead(isBrowser);
@@ -63,7 +67,7 @@ test.runner = function (isBrowser) {
 
   // try to create a hostStore
   test.hostStore = new RemoteStore({name: 'Integration Test Store'});
-  test.hostStore.onConnect('http://localhost', function (store, err) { // DOUG CHANGE HERE
+  test.hostStore.onConnect('http://localhost', function (store, err) { // TODO localhost ...
     if (err) {
       test.hostStoreAvailable = false;
       console.warn('hostStore unavailable (' + err + ')');
@@ -515,7 +519,7 @@ test.show = function (value) {
       return;
     }
     if (value !== undefined) {
-      test.showWork.push(JSON.stringify(value,null,' '));
+      test.showWork.push(JSON.stringify(value, null, ' '));
       return;
     }
     test.showWork.push(value);

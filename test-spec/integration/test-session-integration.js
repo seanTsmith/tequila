@@ -2,7 +2,6 @@
  * tequila
  * test-session-integration
  */
-console.log('shizz');
 test.runnerSessionIntegration = function () {
   test.heading('Session Integration', function () {
     test.example('simulate logging in etc', test.asyncResponse(true), function (testNode, returnResponse) {
@@ -71,8 +70,6 @@ test.runnerSessionIntegration = function () {
         else
           self.goodCount++;
         if (self.badCount == 1 && self.goodCount == 1) {
-          console.log(JSON.stringify(session1));
-          console.log(JSON.stringify(session2));
           returnResponse(testNode, true);
         }
       }

@@ -39,6 +39,7 @@ test.heading('Stores', function () {
   test.paragraph('These core stores are included in the library.');
   test.runnerMemoryStore();
   test.runnerMongoStore();
+  test.runnerJSONFileStore();
   test.runnerRemoteStore();
   test.runnerLocalStore();
   test.runnerRedisStore();

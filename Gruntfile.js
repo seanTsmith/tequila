@@ -30,6 +30,7 @@ module.exports = function (grunt) {
 
           'lib/stores/memory-store.js',
           'lib/stores/mongo-store.js',
+          'lib/stores/json-file-store.js',
           'lib/stores/remote-store.js',
           'lib/stores/local-store.js',
           'lib/stores/redis-store.js',
@@ -45,6 +46,7 @@ module.exports = function (grunt) {
           'test-spec/Markdown.Converter.js',
           'dist/tequila.js',
           'lib/stores/mongo-store-server.js',
+          'lib/stores/json-file-server.js',
           'test-spec/node-test-header.js',
           'test-spec/test-runner.js',
 
@@ -70,6 +72,7 @@ module.exports = function (grunt) {
 
           'lib/stores/memory-test.js',
           'lib/stores/mongo-test.js',
+          'lib/stores/json-file-test.js',
           'lib/stores/remote-test.js',
           'lib/stores/local-test.js',
           'lib/stores/redis-test.js',
@@ -94,6 +97,7 @@ module.exports = function (grunt) {
         src: [
           'dist/tequila.js',
           'lib/stores/mongo-store-server.js',
+          'lib/stores/json-file-store-server.js',
           'test-spec/test-runner-node-server.js'
         ],
         dest: 'dist/node-test-host.js'

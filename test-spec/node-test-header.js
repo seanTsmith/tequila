@@ -10,3 +10,4 @@ Object.prototype.badActor = function() {
 
 var colors = require('colors');
 var mongo = require('mongodb');
+var fs = require('fs');

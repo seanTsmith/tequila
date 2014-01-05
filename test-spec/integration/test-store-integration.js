@@ -187,7 +187,7 @@ test.runnerStoreIntegration = function () {
         // callback after lookup of dead stooge
         function hesDeadJim(model, error) {
           if (typeof error != 'undefined') {
-            if (error != 'Error: id not found in store') {
+            if ((error != 'Error: id not found in store') && (error != 'Error: model not found in store')) {
               returnResponse(testNode, error);
               return;
             }
