@@ -9,7 +9,8 @@ test.runnerListIntegration = function () {
         // Create actor class
         var Actor = function (args) {
           Model.call(this, args);
-          this.modelType = "_tempTest_Actor";
+          this.modelType = "Actor";
+
           this.attributes.push(new Attribute('name'));
           this.attributes.push(new Attribute('born', 'Number'));
           this.attributes.push(new Attribute('isMale', 'Boolean'));
@@ -113,7 +114,7 @@ test.runnerListIntegration = function () {
         // Create actor class
         self.Actor = function (args) {
           Model.call(this, args);
-          this.modelType = "_tempTest_Actor";
+          this.modelType = "Actor";
           this.attributes.push(new Attribute('name'));
           this.attributes.push(new Attribute('born', 'Date'));
           this.attributes.push(new Attribute('isMale', 'Boolean'));
@@ -186,7 +187,7 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              test.assertion(list._items.length == 20);
+              test.assertion(list._items.length == 20,'20');
               getTomHanks();
             });
           }
@@ -204,7 +205,7 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              test.assertion(list._items.length == 1);
+              test.assertion(list._items.length == 1,'1');
               getD();
             });
           }
@@ -223,7 +224,7 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              test.assertion(list._items.length == 3);
+              test.assertion(list._items.length == 3,'3');
               getRZ();
             });
           }
@@ -242,8 +243,8 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              test.assertion(list._items.length == 1);
-              list._items.length && test.assertion(list.get('name') == 'Renée Zellweger');
+              test.assertion(list._items.length == 1,'1');
+              list._items.length && test.assertion(list.get('name') == 'Renée Zellweger','rz');
               getAlphabetical();
             });
           }
@@ -263,12 +264,12 @@ test.runnerListIntegration = function () {
                 return;
               }
               // Verify each move returns true when move succeeds
-              test.assertion(list.moveFirst());
-              test.assertion(!list.movePrevious());
-              test.assertion(list.get('name') == 'Al Pacino');
-              test.assertion(list.moveLast());
-              test.assertion(!list.moveNext());
-              test.assertion(list.get('name') == 'Tom Hanks');
+              test.assertion(list.moveFirst(),'moveFirst');
+              test.assertion(!list.movePrevious(),'movePrevious');
+              test.assertion(list.get('name') == 'Al Pacino','AP');
+              test.assertion(list.moveLast(),'moveLast');
+              test.assertion(!list.moveNext(),'moveNext');
+              test.assertion(list.get('name') == 'Tom Hanks','TH');
               returnResponse(testNode, true);
             });
           }
