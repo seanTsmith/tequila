@@ -6842,8 +6842,6 @@ test.runnerListIntegration = function () {
         actors.moveFirst();
         test.assertion(actors.get('name') == 'Marlon Brando');
       });
-
-
       test.example('Test variations on getList method.', test.asyncResponse(true), function (testNode, returnResponse) {
         var self = this;
         var storeBeingTested = test.integrationStore.name + ' ' + test.integrationStore.storeType;
@@ -6968,7 +6966,7 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              test.assertion(list._items.length == 1,'1');
+              test.assertion(list._items.length == 1,('1 not ' + list._items.length));
               getD();
             });
           }
@@ -6987,7 +6985,7 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              test.assertion(list._items.length == 3,'3');
+              test.assertion(list._items.length == 3,('3 not ' + list._items.length));
               getRZ();
             });
           }
@@ -7006,7 +7004,7 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              test.assertion(list._items.length == 1,'1');
+              test.assertion(list._items.length == 1,('1 not ' + list._items.length));
               list._items.length && test.assertion(list.get('name') == 'Renée Zellweger','rz');
               getAlphabetical();
             });
