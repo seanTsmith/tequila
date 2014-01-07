@@ -258,7 +258,6 @@ test.runnerListIntegration = function () {
         function getAlphabetical() {
           try {
             test.integrationStore.getList(self.list, {}, { name: 1 }, function (list, error) {
-              console.log('adasdasdsad');
               if (typeof error != 'undefined') {
                 returnResponse(testNode, error);
                 return;

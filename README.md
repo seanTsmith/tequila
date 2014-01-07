@@ -24,7 +24,6 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 
 #### To do later
 - Make validation rules for attributes.  Built in and code.  Also model can have one.  // rulsfor types and other
-- Make session method endSession and add to integration test
 - Attribute image type
 - Attribute visible property
 
@@ -33,6 +32,7 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - create redis-store
 - create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 - Use confess / phantomJS to make cache manifest
+- Review callback for consistancy.  err, xxx like node?
 
 #### Uncertain
 - make remote command type or flag as remote ? or just do it automatically if not handled locally ?

@@ -1321,13 +1321,13 @@ Session.prototype.resumeSession = function (store, ip, passCode, callBack) {
 
   // Find the session in store
   var self = this;
-  store.getList(new List(self), {ipAddress:ip, passCode:passCode}, function (list, error) {
+  store.getList(new List(self), {ipAddress: ip, passCode: passCode}, function (list, error) {
     if (error) {
       callBack(error);
       return;
     }
     if (list.length() != 1) {
-      callBack(new Error('invalid or expired session'));
+      callBack(new Error('session not resumed'));
       return;
     }
 
@@ -1342,7 +1342,21 @@ Session.prototype.resumeSession = function (store, ip, passCode, callBack) {
     callBack(error, self);
   });
 
-};;
+};
+Session.prototype.endSession = function (store, callBack) {
+  if (false === (store instanceof Store)) throw new Error('store required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
+
+  // If no session ID (never persisted) or is not active then silently return
+  if (!this.get('active') || !this.get('id')) {
+    callBack(this);
+  }
+  // Mark inactive and save to store
+  this.set('active', false);
+  store.putModel(this, function (model, err) {
+    callBack(err, model);
+  });
+};
 /**
  * tequila
  * workspace-class

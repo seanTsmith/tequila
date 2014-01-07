@@ -55,6 +55,5 @@ test.heading('Integration Tests', function () {
   test.runnerProcedureIntegration();
   test.runnerStoreIntegration();
   test.runnerRequestDispatchIntegration();
-  test.runnerSessionIntegration();
 });
 test.stop();

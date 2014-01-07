@@ -3,24 +3,23 @@
  * test-session-integration
  */
 test.runnerSessionIntegration = function () {
-  test.heading('Session Integration', function () {
+  test.heading('INTEGRATION TEST', function () {
     test.example('simulate logging in etc', test.asyncResponse(true), function (testNode, returnResponse) {
 
       var self = this;
       var store = new MemoryStore();
+      var session1 = new Session();
+      var session2 = new Session();
 
       var user1 = new User(), name1 = 'jack', pass1 = 'wack', ip1 = '123';
       user1.set('name', name1);
       user1.set('password', pass1);
       user1.set('active', true);
-      session1 = new Session();
 
       var user2 = new User(), name2 = 'jill', pass2 = 'pill', ip2 = '456';
       user2.set('name', name2);
       user2.set('password', pass2);
       user2.set('active', true);
-      session1 = new Session();
-      session2 = new Session();
 
       // start with empty store and add some users
       store.putModel(user1, userStored);
@@ -52,28 +51,43 @@ test.runnerSessionIntegration = function () {
           self.goodCount++;
 
         if (self.badCount == 2 && self.goodCount == 2) {
-          // Resume session1 correctly, session2 with wrong passcode
-          self.passCode1 = session1.get('passCode');
-          self.passCode2 = session2.get('passCode');
-          self.goodCount = 0;
-          self.badCount = 0;
-          session1 = new Session(); // Don't reuse objects in test ...
-          session2 = new Session();
-          session1.resumeSession(store, ip1, self.passCode1, sessionResumed_Test1);
-          session2.resumeSession(store, ip1, 'no more secrets', sessionResumed_Test1);
+          // Resume session1 correctly
+          new Session().resumeSession(store, ip1, session1.get('passCode'), sessionResumed_Test1);
         }
       }
-
       function sessionResumed_Test1(err, session) {
         if (err)
-          self.badCount++;
+          returnResponse(testNode, Error('sessionResumed_Test1 failed'));
         else
-          self.goodCount++;
-        if (self.badCount == 1 && self.goodCount == 1) {
-          returnResponse(testNode, true);
-        }
+        // Resume session2 with wrong passcode
+          new Session().resumeSession(store, ip2, 'no more secrets', sessionResumed_Test2);
       }
-
+      function sessionResumed_Test2(err, session) {
+        if (err)
+        // Resume session2 correctly now after failing
+          new Session().resumeSession(store, ip2, session2.get('passCode'), sessionResumed_Test3);
+        else
+          returnResponse(testNode, Error('sessionResumed_Test2 failed'));
+      }
+      function sessionResumed_Test3(err, session) {
+        if (err)
+          returnResponse(testNode, Error('sessionResumed_Test3 failed:  ' + err));
+        else
+        // Now we end this session
+          session.endSession(store, function (err, session) {
+            if (err)
+              returnResponse(testNode, Error('session.endSession failed: '+err));
+            else
+            // Now try restoring again and it should fail
+              new Session().resumeSession(store, ip2, session2.get('passCode'), sessionResumed_Test4);
+          });
+      }
+      function sessionResumed_Test4(err, session) {
+        if (err)
+          returnResponse(testNode, Error('sessionResumed_Test4 failed'));
+        else
+          returnResponse(testNode, true);
+      }
     });
   });
 };
