@@ -9,7 +9,7 @@ test.runnerListIntegration = function () {
         // Create actor class
         var Actor = function (args) {
           Model.call(this, args);
-          this.modelType = "Actor";
+          this.modelType = "_tempTest_Actor";
           this.attributes.push(new Attribute('name'));
           this.attributes.push(new Attribute('born', 'Number'));
           this.attributes.push(new Attribute('isMale', 'Boolean'));
@@ -113,7 +113,7 @@ test.runnerListIntegration = function () {
         // Create actor class
         self.Actor = function (args) {
           Model.call(this, args);
-          this.modelType = "Actor";
+          this.modelType = "_tempTest_Actor";
           this.attributes.push(new Attribute('name'));
           this.attributes.push(new Attribute('born', 'Date'));
           this.attributes.push(new Attribute('isMale', 'Boolean'));

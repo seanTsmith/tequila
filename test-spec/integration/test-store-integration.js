@@ -89,7 +89,7 @@ test.runnerStoreIntegration = function () {
           try {
             self.stoogeIDsStored.push(model.get('id'));
             if (self.stoogeIDsStored.length == 3) {
-              test.assertion(true); // Show we made it this far
+              test.assertion(true,'here');
               // Now that first 3 stooges are stored lets retrieve and verify
               var actors = [];
               for (var i = 0; i < 3; i++) {
@@ -112,10 +112,10 @@ test.runnerStoreIntegration = function () {
           }
           self.stoogesRetrieved.push(model);
           if (self.stoogesRetrieved.length == 3) {
-            test.assertion(true); // Show we made it this far
+            test.assertion(true,'here');
             // Now we have stored and retrieved (via IDs into new objects).  So verify the stooges made it
             test.assertion(self.stoogesRetrieved[0] !== self.moe && // Make sure not a reference but a copy
-              self.stoogesRetrieved[0] !== self.larry && self.stoogesRetrieved[0] !== self.shemp);
+              self.stoogesRetrieved[0] !== self.larry && self.stoogesRetrieved[0] !== self.shemp,'copy');
             var s = []; // get list of names to see if all stooges made it
             for (var i = 0; i < 3; i++) s.push(self.stoogesRetrieved[i].get('name'));
             test.show(s);
@@ -146,7 +146,7 @@ test.runnerStoreIntegration = function () {
             returnResponse(testNode, error);
             return;
           }
-          test.assertion(model.get('name') == 'Curly');
+          test.assertion(model.get('name') == 'Curly','Curly');
           var curly = new self.Stooge();
           curly.set('id', model.get('id'));
           try {
@@ -163,7 +163,7 @@ test.runnerStoreIntegration = function () {
             returnResponse(testNode, error);
             return;
           }
-          test.assertion(model.get('name') == 'Curly');
+          test.assertion(model.get('name') == 'Curly','Curly');
           // Now test delete
           self.deletedModelId = model.get('id'); // Remember this
           test.integrationStore.deleteModel(model, stoogeDeleted)
@@ -176,7 +176,7 @@ test.runnerStoreIntegration = function () {
             return;
           }
           // model parameter is what was deleted
-          test.assertion(model.get('id') == null); // ID is removed
+          test.assertion(model.get('id') == null,'no id'); // ID is removed
           test.assertion(model.get('name') == 'Curly'); // the rest remains
           // Is it really dead?
           var curly = new self.Stooge();
@@ -217,12 +217,15 @@ test.runnerStoreIntegration = function () {
             returnResponse(testNode, error);
             return;
           }
-          test.assertion(list instanceof List);
-          test.assertion(list.length() == 2);
+          test.assertion(list instanceof List,'is list');
+          test.assertion(list.length() == 2,'is 2');
           list.moveFirst();
-          test.assertion(list.get('name') == 'Larry');
+          test.assertion(list.get('name') == 'Larry','larry');
           list.moveNext();
-          test.assertion(list.get('name') == 'Moe');
+          test.assertion(list.get('name') == 'Moe','moe');
+          test.assertion(false,'eanie'); // temp
+          test.assertion(true,'meenie'); // temp
+          test.assertion(false,'fucker'); // temp
           returnResponse(testNode, true);
         }
       });

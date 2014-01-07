@@ -283,6 +283,7 @@ test.renderDetail = function (isBrowser) {
             }
             test.showWork = [];
             test.assertions = [];
+            test.assertionsDescription = [];
             var ref = test.nodes[i].levelText + test.nodes[i].exampleNumber + ' ';
             var indent = '';
             for (j = 0; j < ref.length; j++)
@@ -316,7 +317,7 @@ test.renderDetail = function (isBrowser) {
               if (test_Value !== expected_Value || gotFailedAssertions) {
                 test.countFail++; // TODO if console is white this is invisible ink...
                 if (gotFailedAssertions) {
-                  process.stdout.write('\n' + colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
+                  process.stdout.write('\n' + test.assertionInfo() + '\n' + ref + colors.white(
                     'ASSERTION(s) failed'));
                 } else {
                   process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
@@ -354,6 +355,7 @@ test.renderDetail = function (isBrowser) {
             }
             test.showWork = [];
             test.assertions = [];
+            test.assertionsDescription = [];
             var exampleCode = '';
             if (test.nodes[i].asyncTest) {
               exampleCode += test.formatCode(test.nodes[i].func, true);
@@ -509,8 +511,9 @@ test.xexample = function (text, expect, func) {
   this.exampleNumber++;
   this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
 };
-test.assertion = function (truDat) {
+test.assertion = function (truDat, description) {
   test.assertions.push(truDat);
+  test.assertionsDescription.push(description);
 };
 test.show = function (value) {
   try {
@@ -565,7 +568,7 @@ test.asyncCallback = function (node, test_Results) {
   // If test did not pass then remember to we don't get multiple errors
   node.errorThrown = !testPassed;
   // Check assertions
-  var gotFailedAssertions = false;
+  var gotFailedAssertions = false; // TODO flawed - need to track per testnode
   for (var j in test.assertions) {
     if (test.assertions.hasOwnProperty(j))
       if (!test.assertions[j])
@@ -620,7 +623,7 @@ test.asyncCallback = function (node, test_Results) {
         process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(' ERROR: idk'));
       } else {
         if (gotFailedAssertions) {
-          process.stdout.write(colors.red('✘') + JSON.stringify(test.assertions) + '\n' + ref + colors.white(
+          process.stdout.write(test.assertionInfo() + '\n' + ref + colors.white(
             'ASSERTION(s) failed'));
         } else {
           process.stdout.write(colors.red('✘') + '\n' + ref + colors.white(
@@ -633,6 +636,19 @@ test.asyncCallback = function (node, test_Results) {
     }
   }
 };
+
+test.assertionInfo = function () {
+  var text = '';
+  var space = '';
+  for (a = 0; a < test.assertions.length; a++) {
+    text += space;
+    text += ((test.assertions[a]) ? colors.green('✓') : colors.red('✘'));
+    text += (test.assertionsDescription[a] || ('#' + a));
+    space = ' ';
+  }
+  return text;
+};
+
 test.cliCloser = function () {
   // Wait for deferred tasks to finish
   if (test.countPending > 0) {

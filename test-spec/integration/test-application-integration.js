@@ -4,7 +4,7 @@
  */
 test.runnerApplicationIntegration = function () {
   test.heading('Application Integration', function () {
-    test.example('little app with command execution mocking', test.asyncResponse(true), function (testNode, returnResponse) {
+    test.xexample('little app with command execution mocking', test.asyncResponse(true), function (testNode, returnResponse) {
 
       // Send 4 mocks and make sure we get 4 callback calls
       var self = this;
