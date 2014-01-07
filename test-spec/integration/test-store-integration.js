@@ -212,16 +212,17 @@ test.runnerStoreIntegration = function () {
 
         // callback after list created from store
         function listReady(list, error) {
+          list.sort({name:1});
           if (typeof error != 'undefined') {
             returnResponse(testNode, error);
             return;
           }
           test.assertion(list instanceof List);
           test.assertion(list.length() == 2);
-          list.firstItem();
-          test.assertion(list.get('name') == 'Moe');
-          list.nextItem();
+          list.moveFirst();
           test.assertion(list.get('name') == 'Larry');
+          list.moveNext();
+          test.assertion(list.get('name') == 'Moe');
           returnResponse(testNode, true);
         }
       });

@@ -61,24 +61,24 @@ test.runnerListIntegration = function () {
         }
 
         // Test movement thru list
-        actors.firstItem();
+        actors.moveFirst();
         test.assertion(actors.get('name') == 'Jack Nicholson');
         test.shouldThrow(Error('item not found'), function () {
-          actors.previousItem();  // can't go past top
+          actors.movePrevious();  // can't go past top
         });
-        actors.nextItem();
+        actors.moveNext();
         test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Meryl Streep');
-        actors.lastItem();
+        actors.moveLast();
         test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Renée Zellweger');
 
         // Sort the list
         actors.sort({born: -1});  // Youngest actor
-        actors.firstItem();
+        actors.moveFirst();
         test.assertion(actors.get('name') == 'Kate Winslet' || actor.get('name') == 'Angelina Jolie');
         actors.sort({born: 1});  // Oldest actor
-        actors.firstItem();
+        actors.moveFirst();
         test.assertion(actors.get('name') == 'Marlon Brando');
       });
 
@@ -265,9 +265,9 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              list.firstItem();
+              list.moveFirst();
               test.assertion(list.get('name') == 'Al Pacino');
-              list.lastItem();
+              list.moveLast();
               test.assertion(list.get('name') == 'Tom Hanks');
               returnResponse(testNode, true);
             });

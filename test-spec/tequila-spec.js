@@ -36,7 +36,8 @@ test.heading('Models', function () {
   test.runnerWorkspace();
 });
 test.heading('Stores', function () {
-  test.paragraph('These core stores are included in the library.');
+  test.paragraph('These core stores are included in the library.  See MemoryStore for documentation.  ' +
+    'All stores run the same test but output is suppressed for all but MemoryStore.');
   test.runnerMemoryStore();
   test.runnerMongoStore();
   test.runnerJSONFileStore();

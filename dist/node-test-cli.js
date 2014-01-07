@@ -2100,19 +2100,19 @@ List.prototype.indexedItem = function (index) {
   if (index < 0) throw new Error('item not found');
   this._itemIndex = index;
 };
-List.prototype.nextItem = function () {
+List.prototype.moveNext = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(this._itemIndex + 1);
 };
-List.prototype.previousItem = function () {
+List.prototype.movePrevious = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(this._itemIndex - 1);
 };
-List.prototype.firstItem = function () {
+List.prototype.moveFirst = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(0);
 };
-List.prototype.lastItem = function () {
+List.prototype.moveLast = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(this._items.length - 1);
 };
@@ -2702,7 +2702,7 @@ Session.prototype.startSession = function (store, userName, password, ip, callBa
       passCode += chars.charAt(Math.floor(Math.random() * chars.length));
 
     // Got user create new session
-    list.firstItem();
+    list.moveFirst();
     self.set('userID', list.get('id'));
     self.set('active', true);
     self.set('passCode', passCode);
@@ -2731,7 +2731,7 @@ Session.prototype.resumeSession = function (store, ip, passCode, callBack) {
     }
 
     // Get model for session as shitty as this is (TODO a better way)
-    list.firstItem();
+    list.moveFirst();
     self.set('id', list.get('id'));
     self.set('userID', list.get('userID'));
     self.set('dateStarted', list.get('dateStarted'));
@@ -5482,24 +5482,24 @@ test.runnerList = function (SurrogateListClass, inheritanceTest) {
           return list.addItem(new Model).removeItem().length(); // returns ref for method chaining
         });
       });
-      test.heading('nextItem()', function () {
+      test.heading('moveNext()', function () {
         test.example('move to next item in list', Error('list is empty'), function () {
-          new List(new Model).nextItem(); // see integration tests
+          new List(new Model).moveNext(); // see integration tests
         });
       });
-      test.heading('previousItem()', function () {
+      test.heading('movePrevious()', function () {
         test.example('move to the previous item in list', Error('list is empty'), function () {
-          new List(new Model).previousItem(); // see integration tests
+          new List(new Model).movePrevious(); // see integration tests
         });
       });
-      test.heading('firstItem()', function () {
+      test.heading('moveFirst()', function () {
         test.example('move to the first item in list', Error('list is empty'), function () {
-          new List(new Model).firstItem(); // see integration tests
+          new List(new Model).moveFirst(); // see integration tests
         });
       });
-      test.heading('lastItem()', function () {
+      test.heading('moveLast()', function () {
         test.example('move to the last item in list', Error('list is empty'), function () {
-          new List(new Model).lastItem(); // see integration tests
+          new List(new Model).moveLast(); // see integration tests
         });
       });
       test.heading('sort(key)', function () {
@@ -6554,7 +6554,8 @@ test.runnerWorkspace = function () {
  */
 test.runnerMemoryStore = function () {
   test.heading('MemoryStore', function () {
-    test.paragraph('The MemoryStore is a simple volatile store.');
+    test.paragraph('The MemoryStore is a simple volatile store. ' +
+      'It is the first test standard to define the spec for all Stores to follow.');
     test.heading('CONSTRUCTOR', function () {
       test.heading('Store Constructor tests are applied', function () {
         test.runnerStoreConstructor(MemoryStore,true);
@@ -6564,7 +6565,7 @@ test.runnerMemoryStore = function () {
       });
     });
     test.heading('Store tests are applied', function () {
-      test.runnerStoreMethods(MemoryStore,true);
+      test.runnerStoreMethods(MemoryStore,false);
     });
   });
 };
@@ -6780,24 +6781,24 @@ test.runnerListIntegration = function () {
         }
 
         // Test movement thru list
-        actors.firstItem();
+        actors.moveFirst();
         test.assertion(actors.get('name') == 'Jack Nicholson');
         test.shouldThrow(Error('item not found'), function () {
-          actors.previousItem();  // can't go past top
+          actors.movePrevious();  // can't go past top
         });
-        actors.nextItem();
+        actors.moveNext();
         test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Meryl Streep');
-        actors.lastItem();
+        actors.moveLast();
         test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Renée Zellweger');
 
         // Sort the list
         actors.sort({born: -1});  // Youngest actor
-        actors.firstItem();
+        actors.moveFirst();
         test.assertion(actors.get('name') == 'Kate Winslet' || actor.get('name') == 'Angelina Jolie');
         actors.sort({born: 1});  // Oldest actor
-        actors.firstItem();
+        actors.moveFirst();
         test.assertion(actors.get('name') == 'Marlon Brando');
       });
 
@@ -6984,9 +6985,9 @@ test.runnerListIntegration = function () {
                 returnResponse(testNode, error);
                 return;
               }
-              list.firstItem();
+              list.moveFirst();
               test.assertion(list.get('name') == 'Al Pacino');
-              list.lastItem();
+              list.moveLast();
               test.assertion(list.get('name') == 'Tom Hanks');
               returnResponse(testNode, true);
             });
@@ -7322,16 +7323,17 @@ test.runnerStoreIntegration = function () {
 
         // callback after list created from store
         function listReady(list, error) {
+          list.sort({name:1});
           if (typeof error != 'undefined') {
             returnResponse(testNode, error);
             return;
           }
           test.assertion(list instanceof List);
           test.assertion(list.length() == 2);
-          list.firstItem();
-          test.assertion(list.get('name') == 'Moe');
-          list.nextItem();
+          list.moveFirst();
           test.assertion(list.get('name') == 'Larry');
+          list.moveNext();
+          test.assertion(list.get('name') == 'Moe');
           returnResponse(testNode, true);
         }
       });
@@ -7736,7 +7738,8 @@ test.heading('Models', function () {
   test.runnerWorkspace();
 });
 test.heading('Stores', function () {
-  test.paragraph('These core stores are included in the library.');
+  test.paragraph('These core stores are included in the library.  See MemoryStore for documentation.  ' +
+    'All stores run the same test but output is suppressed for all but MemoryStore.');
   test.runnerMemoryStore();
   test.runnerMongoStore();
   test.runnerJSONFileStore();

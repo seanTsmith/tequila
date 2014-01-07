@@ -699,19 +699,19 @@ List.prototype.indexedItem = function (index) {
   if (index < 0) throw new Error('item not found');
   this._itemIndex = index;
 };
-List.prototype.nextItem = function () {
+List.prototype.moveNext = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(this._itemIndex + 1);
 };
-List.prototype.previousItem = function () {
+List.prototype.movePrevious = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(this._itemIndex - 1);
 };
-List.prototype.firstItem = function () {
+List.prototype.moveFirst = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(0);
 };
-List.prototype.lastItem = function () {
+List.prototype.moveLast = function () {
   if (this._items.length < 1) throw new Error('list is empty');
   this.indexedItem(this._items.length - 1);
 };
@@ -1301,7 +1301,7 @@ Session.prototype.startSession = function (store, userName, password, ip, callBa
       passCode += chars.charAt(Math.floor(Math.random() * chars.length));
 
     // Got user create new session
-    list.firstItem();
+    list.moveFirst();
     self.set('userID', list.get('id'));
     self.set('active', true);
     self.set('passCode', passCode);
@@ -1330,7 +1330,7 @@ Session.prototype.resumeSession = function (store, ip, passCode, callBack) {
     }
 
     // Get model for session as shitty as this is (TODO a better way)
-    list.firstItem();
+    list.moveFirst();
     self.set('id', list.get('id'));
     self.set('userID', list.get('userID'));
     self.set('dateStarted', list.get('dateStarted'));
