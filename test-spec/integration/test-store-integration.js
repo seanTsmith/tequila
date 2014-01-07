@@ -202,7 +202,7 @@ test.runnerStoreIntegration = function () {
             // Now create a list from the stooge store
             var list = new List(new self.Stooge());
             try {
-              test.integrationStore.getList(list, [], listReady);
+              test.integrationStore.getList(list, {}, {name:1}, listReady);
             }
             catch (err) {
               returnResponse(testNode, err);
@@ -212,7 +212,7 @@ test.runnerStoreIntegration = function () {
 
         // callback after list created from store
         function listReady(list, error) {
-          list.sort({name:1});
+//          list.sort({name:1});
           if (typeof error != 'undefined') {
             returnResponse(testNode, error);
             return;

@@ -695,25 +695,27 @@ List.prototype.removeItem = function (item) {
   return this;
 };
 List.prototype.indexedItem = function (index) {
-  if (this._items.length < 1) throw new Error('list is empty');
-  if (index < 0) throw new Error('item not found');
+  if (this._items.length < 1) return false;
+  if (index < 0) return false;
+  if (index >= this._items.length) return false;
   this._itemIndex = index;
+  return true;
 };
 List.prototype.moveNext = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(this._itemIndex + 1);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(this._itemIndex + 1);
 };
 List.prototype.movePrevious = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(this._itemIndex - 1);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(this._itemIndex - 1);
 };
 List.prototype.moveFirst = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(0);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(0);
 };
 List.prototype.moveLast = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(this._items.length - 1);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(this._items.length - 1);
 };
 List.prototype.sort = function (key) {
   var i = 0;

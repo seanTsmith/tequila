@@ -2096,25 +2096,27 @@ List.prototype.removeItem = function (item) {
   return this;
 };
 List.prototype.indexedItem = function (index) {
-  if (this._items.length < 1) throw new Error('list is empty');
-  if (index < 0) throw new Error('item not found');
+  if (this._items.length < 1) return false;
+  if (index < 0) return false;
+  if (index >= this._items.length) return false;
   this._itemIndex = index;
+  return true;
 };
 List.prototype.moveNext = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(this._itemIndex + 1);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(this._itemIndex + 1);
 };
 List.prototype.movePrevious = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(this._itemIndex - 1);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(this._itemIndex - 1);
 };
 List.prototype.moveFirst = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(0);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(0);
 };
 List.prototype.moveLast = function () {
-  if (this._items.length < 1) throw new Error('list is empty');
-  this.indexedItem(this._items.length - 1);
+  if (this._items.length < 1) return false;
+  return this.indexedItem(this._items.length - 1);
 };
 List.prototype.sort = function (key) {
   var i = 0;
@@ -3808,7 +3810,6 @@ JSONFileStore.prototype.getList = function (list, filter, arg3, arg4) {
       callBack(list);
       return;
     }
-    // console.log('// list\n' + JSON.stringify(list,null,2));
     // Prepare for getting async file reads
     var storedPair = [];
     for (var f in files) {
@@ -3858,7 +3859,6 @@ JSONFileStore.prototype.getList = function (list, filter, arg3, arg4) {
 
     // When last file processed ...
     function _Cleanup() {
-//  console.log('// storedPair\n' + JSON.stringify(storedPair,null,2));
       for (var i = 0; i < storedPair.length; i++) {
         var doIt = true;
         for (var prop in filter) {
@@ -3882,7 +3882,6 @@ JSONFileStore.prototype.getList = function (list, filter, arg3, arg4) {
       if (order) {
         list.sort(order);
       }
-//  console.log(JSON.stringify(list,null,2));
       callBack(list);
     }
 
@@ -5483,23 +5482,23 @@ test.runnerList = function (SurrogateListClass, inheritanceTest) {
         });
       });
       test.heading('moveNext()', function () {
-        test.example('move to next item in list', Error('list is empty'), function () {
-          new List(new Model).moveNext(); // see integration tests
+        test.example('move to next item in list', false, function () {
+          return new List(new Model).moveNext(); // Returns true when move succeeds
         });
       });
       test.heading('movePrevious()', function () {
-        test.example('move to the previous item in list', Error('list is empty'), function () {
-          new List(new Model).movePrevious(); // see integration tests
+        test.example('move to the previous item in list', false, function () {
+          return new List(new Model).movePrevious(); // Returns true when move succeeds
         });
       });
       test.heading('moveFirst()', function () {
-        test.example('move to the first item in list', Error('list is empty'), function () {
-          new List(new Model).moveFirst(); // see integration tests
+        test.example('move to the first item in list', false, function () {
+          return new List(new Model).moveFirst(); // Returns true when move succeeds
         });
       });
       test.heading('moveLast()', function () {
-        test.example('move to the last item in list', Error('list is empty'), function () {
-          new List(new Model).moveLast(); // see integration tests
+        test.example('move to the last item in list', false, function () {
+          return new List(new Model).moveLast(); // Returns true when move succeeds
         });
       });
       test.heading('sort(key)', function () {
@@ -6783,9 +6782,6 @@ test.runnerListIntegration = function () {
         // Test movement thru list
         actors.moveFirst();
         test.assertion(actors.get('name') == 'Jack Nicholson');
-        test.shouldThrow(Error('item not found'), function () {
-          actors.movePrevious();  // can't go past top
-        });
         actors.moveNext();
         test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Meryl Streep');
@@ -6803,7 +6799,7 @@ test.runnerListIntegration = function () {
       });
 
 
-      test.xexample('Test variations on getList method.', test.asyncResponse(true), function (testNode, returnResponse) {
+      test.example('Test variations on getList method.', test.asyncResponse(true), function (testNode, returnResponse) {
         var self = this;
         var storeBeingTested = test.integrationStore.name + ' ' + test.integrationStore.storeType;
         test.show(storeBeingTested);
@@ -6881,7 +6877,7 @@ test.runnerListIntegration = function () {
         // now, build List and add to store
         function storeActors() {
           self.actorsStored = 0;
-          for (var i in self.actorsInfo) {
+          for (var i=0; i<self.actorsInfo.length; i++) {
             self.actor.set('ID', null);
             self.actor.set('name', self.actorsInfo[i][0]);
             self.actor.set('born', self.actorsInfo[i][1]);
@@ -6981,13 +6977,17 @@ test.runnerListIntegration = function () {
         function getAlphabetical() {
           try {
             test.integrationStore.getList(self.list, {}, { name: 1 }, function (list, error) {
+              console.log('adasdasdsad');
               if (typeof error != 'undefined') {
                 returnResponse(testNode, error);
                 return;
               }
-              list.moveFirst();
+              // Verify each move returns true when move succeeds
+              test.assertion(list.moveFirst());
+              test.assertion(!list.movePrevious());
               test.assertion(list.get('name') == 'Al Pacino');
-              list.moveLast();
+              test.assertion(list.moveLast());
+              test.assertion(!list.moveNext());
               test.assertion(list.get('name') == 'Tom Hanks');
               returnResponse(testNode, true);
             });
@@ -7313,7 +7313,7 @@ test.runnerStoreIntegration = function () {
             // Now create a list from the stooge store
             var list = new List(new self.Stooge());
             try {
-              test.integrationStore.getList(list, [], listReady);
+              test.integrationStore.getList(list, {}, {name:1}, listReady);
             }
             catch (err) {
               returnResponse(testNode, err);
@@ -7323,7 +7323,7 @@ test.runnerStoreIntegration = function () {
 
         // callback after list created from store
         function listReady(list, error) {
-          list.sort({name:1});
+//          list.sort({name:1});
           if (typeof error != 'undefined') {
             returnResponse(testNode, error);
             return;

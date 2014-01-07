@@ -63,9 +63,6 @@ test.runnerListIntegration = function () {
         // Test movement thru list
         actors.moveFirst();
         test.assertion(actors.get('name') == 'Jack Nicholson');
-        test.shouldThrow(Error('item not found'), function () {
-          actors.movePrevious();  // can't go past top
-        });
         actors.moveNext();
         test.show(actors.get('name'));
         test.assertion(actors.get('name') == 'Meryl Streep');
@@ -83,7 +80,7 @@ test.runnerListIntegration = function () {
       });
 
 
-      test.xexample('Test variations on getList method.', test.asyncResponse(true), function (testNode, returnResponse) {
+      test.example('Test variations on getList method.', test.asyncResponse(true), function (testNode, returnResponse) {
         var self = this;
         var storeBeingTested = test.integrationStore.name + ' ' + test.integrationStore.storeType;
         test.show(storeBeingTested);
@@ -161,7 +158,7 @@ test.runnerListIntegration = function () {
         // now, build List and add to store
         function storeActors() {
           self.actorsStored = 0;
-          for (var i in self.actorsInfo) {
+          for (var i=0; i<self.actorsInfo.length; i++) {
             self.actor.set('ID', null);
             self.actor.set('name', self.actorsInfo[i][0]);
             self.actor.set('born', self.actorsInfo[i][1]);
@@ -261,13 +258,17 @@ test.runnerListIntegration = function () {
         function getAlphabetical() {
           try {
             test.integrationStore.getList(self.list, {}, { name: 1 }, function (list, error) {
+              console.log('adasdasdsad');
               if (typeof error != 'undefined') {
                 returnResponse(testNode, error);
                 return;
               }
-              list.moveFirst();
+              // Verify each move returns true when move succeeds
+              test.assertion(list.moveFirst());
+              test.assertion(!list.movePrevious());
               test.assertion(list.get('name') == 'Al Pacino');
-              list.moveLast();
+              test.assertion(list.moveLast());
+              test.assertion(!list.moveNext());
               test.assertion(list.get('name') == 'Tom Hanks');
               returnResponse(testNode, true);
             });
