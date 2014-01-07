@@ -40,11 +40,11 @@ test.runner = function (isBrowser) {
         localStorage.removeItem('tequilaIDCounter'); // TODO ... otherwise tests will wipe real data
         test.integrationStore = new LocalStore({name: 'Integration Test Store'});
       } else {
-        var jStore = new JSONFileStore({name: 'Integration Test Store'});
-        if (jStore.getServices().isReady)
-          test.integrationStore = jStore;
-        else
-          test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
+//        var jStore = new JSONFileStore({name: 'Integration Test Store'});
+//        if (jStore.getServices().isReady)
+//          test.integrationStore = jStore;
+//        else
+        test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
       }
       console.log(test.integrationStore.name + ' is a ' + test.integrationStore.storeType);
       test.renderHead(isBrowser);

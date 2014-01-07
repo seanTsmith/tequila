@@ -5,7 +5,7 @@
 test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
-      test.xexample('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
+      test.example('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
         var self = this;
         var storeBeingTested = test.integrationStore.name + ' ' + test.integrationStore.storeType;
         test.show(storeBeingTested);
@@ -223,9 +223,9 @@ test.runnerStoreIntegration = function () {
           test.assertion(list.get('name') == 'Larry','larry');
           list.moveNext();
           test.assertion(list.get('name') == 'Moe','moe');
-          test.assertion(false,'WHAT'); // temp
-          test.assertion(true,'THE'); // temp
-          test.assertion(false,'FUCK'); // temp
+//          test.assertion(false,'WHAT'); // temp
+//          test.assertion(true,'THE'); // temp
+//          test.assertion(false,'FUCK'); // temp
           returnResponse(testNode, true);
         }
       });

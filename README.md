@@ -20,7 +20,7 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it
 
 #### To do now
-- go to bed
+- Why is Travis breaking JSONfilestore ?
 
 #### To do later
 - Make validation rules for attributes.  Built in and code.  Also model can have one.  // rulsfor types and other

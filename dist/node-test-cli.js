@@ -3958,11 +3958,11 @@ test.runner = function (isBrowser) {
         localStorage.removeItem('tequilaIDCounter'); // TODO ... otherwise tests will wipe real data
         test.integrationStore = new LocalStore({name: 'Integration Test Store'});
       } else {
-        var jStore = new JSONFileStore({name: 'Integration Test Store'});
-        if (jStore.getServices().isReady)
-          test.integrationStore = jStore;
-        else
-          test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
+//        var jStore = new JSONFileStore({name: 'Integration Test Store'});
+//        if (jStore.getServices().isReady)
+//          test.integrationStore = jStore;
+//        else
+        test.integrationStore = new MemoryStore({name: 'Integration Test Store'});
       }
       console.log(test.integrationStore.name + ' is a ' + test.integrationStore.storeType);
       test.renderHead(isBrowser);
@@ -7172,7 +7172,7 @@ test.runnerInterfaceIntegration = function () {
 test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
-      test.xexample('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
+      test.example('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
         var self = this;
         var storeBeingTested = test.integrationStore.name + ' ' + test.integrationStore.storeType;
         test.show(storeBeingTested);
@@ -7390,9 +7390,9 @@ test.runnerStoreIntegration = function () {
           test.assertion(list.get('name') == 'Larry','larry');
           list.moveNext();
           test.assertion(list.get('name') == 'Moe','moe');
-          test.assertion(false,'WHAT'); // temp
-          test.assertion(true,'THE'); // temp
-          test.assertion(false,'FUCK'); // temp
+//          test.assertion(false,'WHAT'); // temp
+//          test.assertion(true,'THE'); // temp
+//          test.assertion(false,'FUCK'); // temp
           returnResponse(testNode, true);
         }
       });
