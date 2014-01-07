@@ -4559,7 +4559,7 @@ test.assertionInfo = function () {
   var text = '';
   var space = '';
   for (a = 0; a < test.assertions.length; a++) {
-    text += space;
+    text += space; // wtf
     text += ((test.assertions[a]) ? colors.green('✓') : colors.red('✘'));
     text += (test.assertionsDescription[a] || ('#' + a));
     space = ' ';
@@ -7173,7 +7173,7 @@ test.runnerInterfaceIntegration = function () {
 test.runnerStoreIntegration = function () {
   test.heading('Store Integration', function () {
     test.heading('CRUD (Create Read Update Delete)', function () {
-      test.example('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
+      test.xexample('Exercise all store function for one store.', test.asyncResponse(true), function (testNode, returnResponse) {
         var self = this;
         var storeBeingTested = test.integrationStore.name + ' ' + test.integrationStore.storeType;
         test.show(storeBeingTested);
@@ -7391,9 +7391,9 @@ test.runnerStoreIntegration = function () {
           test.assertion(list.get('name') == 'Larry','larry');
           list.moveNext();
           test.assertion(list.get('name') == 'Moe','moe');
-          test.assertion(false,'eanie'); // temp
-          test.assertion(true,'meenie'); // temp
-          test.assertion(false,'fucker'); // temp
+          test.assertion(false,'WHAT'); // temp
+          test.assertion(true,'THE'); // temp
+          test.assertion(false,'FUCK'); // temp
           returnResponse(testNode, true);
         }
       });
