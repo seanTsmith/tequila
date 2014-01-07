@@ -223,9 +223,9 @@ test.runnerStoreIntegration = function () {
           test.assertion(list.get('name') == 'Larry','larry');
           list.moveNext();
           test.assertion(list.get('name') == 'Moe','moe');
-          test.assertion(false,'eanie'); // temp
-          test.assertion(true,'meenie'); // temp
-          test.assertion(false,'fucker'); // temp
+//          test.assertion(false,'eanie'); // temp
+//          test.assertion(true,'meenie'); // temp
+//          test.assertion(false,'fucker'); // temp
           returnResponse(testNode, true);
         }
       });
