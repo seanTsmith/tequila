@@ -20,19 +20,21 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it
 
 #### To do now
-- Why is Travis breaking JSONfilestore ?
+- Workspace Integration
 
 #### To do later
+- Review callback for consistancy.  err, xxx like node?
 - Make validation rules for attributes.  Built in and code.  Also model can have one.  // rulsfor types and other
 - Attribute image type
+- tequilaStore needs to be set not hard coded (mongo)
 - Attribute visible property
 
 #### To do even later
-- tequilaStore needs to be set not hard coded (mongo)
+- Why is Travis breaking JSONfilestore ?
+- Fix test rig async assertions getting intermixed need state per node instead of global
 - create redis-store
 - create package-store (sound, image, pdf, misc subclass resource-class make attribute type)
 - Use confess / phantomJS to make cache manifest
-- Review callback for consistancy.  err, xxx like node?
 
 #### Uncertain
 - make remote command type or flag as remote ? or just do it automatically if not handled locally ?
