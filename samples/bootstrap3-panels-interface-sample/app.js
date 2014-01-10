@@ -45,9 +45,9 @@ pres.set('contents', [
 var presCommand = new Command({name: 'Presentation', type: 'Presentation', contents: pres});
 
 // App menu
-var menu = new Presentation();
-menu.set('name', 'Main Menu');
-menu.set('contents', [
+var privateMenu = new Presentation();
+privateMenu.set('name', 'Private Menu');
+privateMenu.set('contents', [
   new Command({name: 'Stooges', type: 'Menu', contents: [
     'The Three Stooges',
     '-',
@@ -64,11 +64,21 @@ menu.set('contents', [
     procCommand
   ]})
 ]);
-app.setPresentation(menu);
+
+// Here is App when not logged in
+var publicMenu = new Presentation();
+publicMenu.set('name', 'Public Menu');
+publicMenu.set('contents', [
+    stubMoe,
+    stubLarry,
+    stubCurly
+]);
+
+app.setPresentation(publicMenu);
 
 $(document).ready(function () {
   app.start(function (stuff) {
     console.log('app got stuff: ' + JSON.stringify(stuff));
   });
-  b3p.mockRequest(new Request({type: 'Command', command: presCommand}));
+//  b3p.mockRequest(new Request({type: 'Command', command: presCommand}));
 });
