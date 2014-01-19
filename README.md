@@ -41,6 +41,3 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - Make easier way to retrieve single model findModel()
 - Command class functions should not need to call this.complete() ... should be automatic?
 - Don't store nulls in stores just do by inference (have get populate on return and put remove before inserting)
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dremoor/tequila/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
