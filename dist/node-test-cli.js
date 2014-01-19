@@ -2537,6 +2537,11 @@ Application.prototype.getInterface = function () {
 Application.prototype.setPresentation = function (primaryPresentation) {
   if (false === (primaryPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
   this.primaryPresentation = primaryPresentation;
+  if (this.startCallback) {
+    // Interface started so reload
+    console.log('sup');
+    this.primaryInterface.setPresentation(this.primaryPresentation);
+  }
 };
 Application.prototype.getPresentation = function () {
   return this.primaryPresentation;
@@ -5270,6 +5275,7 @@ test.runnerCommand = function () {
         });
       });
     });
+    test.runnerCommandIntegration();
   });
 };
 ;
@@ -5444,6 +5450,7 @@ test.runnerInterfaceMethodsTest = function (SurrogateInterface, inheritanceTest)
         });
       });
     });
+    test.runnerInterfaceIntegration();
   });
   T.inheritanceTest = inheritanceTestWas;
 };;
@@ -5537,6 +5544,7 @@ test.runnerList = function (SurrogateListClass, inheritanceTest) {
         });
       });
     });
+    test.runnerListIntegration();
   });
   T.inheritanceTest = inheritanceTestWas;
 };
@@ -5806,7 +5814,7 @@ test.runnerProcedure = function () {
         });
       });
     });
-
+    test.runnerProcedureIntegration();
   });
 };
 ;
@@ -5880,6 +5888,19 @@ test.runnerStoreConstructor = function (SurrogateStore, inheritanceTest) {
 test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
   var inheritanceTestWas = T.inheritanceTest;
   T.inheritanceTest = inheritanceTest;
+  test.heading('PROPERTIES', function () {
+    test.heading('name', function () {
+      test.example('name of store can be set in constructor', 'punchedCards', function () {
+        return new SurrogateStore({name: 'punchedCards'}).name;
+      });
+    });
+    test.heading('storeType', function () {
+      test.paragraph('storeType defaults to Store Class Name but can be set to suite the app architecture.');
+      test.example('storeType can be set in constructor', 'legacyStorage', function () {
+        return new SurrogateStore({storeType: 'legacyStorage'}).storeType;
+      });
+    });
+  });
   test.heading('METHODS', function () {
     var services = new SurrogateStore().getServices();  // TODO change to methods ASAP!!!
     test.example('getServices() returns an object with interface for the Store.', undefined, function () {
@@ -6076,19 +6097,7 @@ test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
       }
     });
   });
-  test.heading('PROPERTIES', function () {
-    test.heading('name', function () {
-      test.example('name of store can be set in constructor', 'punchedCards', function () {
-        return new SurrogateStore({name: 'punchedCards'}).name;
-      });
-    });
-    test.heading('storeType', function () {
-      test.paragraph('storeType defaults to Store Class Name but can be set to suite the app architecture.');
-      test.example('storeType can be set in constructor', 'legacyStorage', function () {
-        return new SurrogateStore({storeType: 'legacyStorage'}).storeType;
-      });
-    });
-  });
+  test.runnerStoreIntegration();
   T.inheritanceTest = inheritanceTestWas;
 };;
 /**
@@ -6343,6 +6352,7 @@ test.runnerApplicationModel = function () {
         });
       });
     });
+    test.runnerApplicationIntegration();
   });
 };
 ;
@@ -6589,6 +6599,17 @@ test.runnerWorkspace = function () {
         test.assertion(typeof user.get('deltas') == 'object');
       });
     });
+    test.heading('METHODS', function () {
+      test.paragraph('loadUserWorkspace(user, callBack)');
+      test.paragraph('sync');
+    });
+
+    test.heading('INTEGRATION', function () {
+      test.example('Workspace usage', undefined, function () {
+      });
+
+    });
+
   });
 };;
 /**
@@ -7809,12 +7830,6 @@ test.heading('Stores', function () {
 test.heading('Integration Tests', function () {
   test.paragraph('These set of tests run through a series of operations with multiple assertions inside each example.  ' +
     'If any assertion fails the test is failed.');
-  test.runnerCommandIntegration();
-  test.runnerInterfaceIntegration();
-  test.runnerApplicationIntegration();
-  test.runnerListIntegration();
-  test.runnerProcedureIntegration();
-  test.runnerStoreIntegration();
   test.runnerRequestDispatchIntegration();
 });
 test.stop();

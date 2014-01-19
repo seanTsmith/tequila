@@ -33,7 +33,7 @@ pres.set('contents', [
   new Attribute({name: 'address', label: 'Address', type: 'String(50)'}),
   new Attribute({name: 'city', label: 'City', type: 'String(35)'}),
   new Attribute({name: 'state', label: 'State', type: 'String(2)'}),
-  new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)', placeholder:'#####-####'}),
+  new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)', placeholder: '#####-####'}),
   '-',
   funcCommand,
   procCommand,
@@ -66,12 +66,34 @@ privateMenu.set('contents', [
 ]);
 
 // Here is App when not logged in
+var about = new Presentation();
+about.set('contents', [
+  '####ABOUT TEQUILA\n\n' +
+    'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
+    'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.'
+]);
+var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: about});
+
+var login = new Presentation();
+login.set('contents', [
+  'Please login to see the fun stuff.',
+  '-',
+  new Attribute({name: 'login', label: 'Login', type: 'String(20)', value: ''}),
+  new Attribute({name: 'password', label: 'Password', type: 'String(20)', value: ''}),
+  '-',
+  new Command({name: 'Login', type: 'Function', theme: 'info', icon: 'fa-sign-in', contents: function () {
+    $("#panel1").show(); // todo dont hard code ?
+    app.setPresentation(privateMenu);
+  }})
+
+]);
+
+var loginCommand = new Command({name: 'Login', type: 'Presentation', contents: login});
 var publicMenu = new Presentation();
 publicMenu.set('name', 'Public Menu');
 publicMenu.set('contents', [
-    stubMoe,
-    stubLarry,
-    stubCurly
+  aboutCommand,
+  loginCommand
 ]);
 
 app.setPresentation(publicMenu);

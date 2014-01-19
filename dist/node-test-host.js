@@ -1136,6 +1136,11 @@ Application.prototype.getInterface = function () {
 Application.prototype.setPresentation = function (primaryPresentation) {
   if (false === (primaryPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
   this.primaryPresentation = primaryPresentation;
+  if (this.startCallback) {
+    // Interface started so reload
+    console.log('sup');
+    this.primaryInterface.setPresentation(this.primaryPresentation);
+  }
 };
 Application.prototype.getPresentation = function () {
   return this.primaryPresentation;
