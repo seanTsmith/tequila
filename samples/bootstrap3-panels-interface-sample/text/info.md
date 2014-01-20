@@ -7,3 +7,4 @@ For now it is used as a todo for this sample...
   * Make saved/new/... real state variables
   * Make abstraction for presentation read from markup file
   * Commands should send errors to log - log should send to listeners
+  * Login needs to be singleton and close when login hit
