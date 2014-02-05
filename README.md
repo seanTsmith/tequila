@@ -23,11 +23,14 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - Workspace Integration
 
 #### To do later
-- Review callback for consistancy.  err, xxx like node?
-- Make validation rules for attributes.  Built in and code.  Also model can have one.  // rulsfor types and other
+- Review callback for consistency.  err, xxx like node?
+- Make validation rules for attributes.  Built in such as range, required, type specific, ..., finally js callback
+- Make validation for model in conjunction with attributes - extend current validation to code and rule based
 - Attribute image type
 - tequilaStore needs to be set not hard coded (mongo)
 - Attribute visible property
+- Improve Session to handle server side auth on store
+- Add authentication to Store via sessions
 
 #### To do even later
 - Why is Travis breaking JSONfilestore ?
