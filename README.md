@@ -20,9 +20,12 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it
 
 #### To do now
+- Finish Login in interface sample
 - Workspace Integration
 
 #### To do later
+- add get and put methods to Model
+- include google toolchain for chrome apps and bundles (cell,osx,...)
 - Review callback for consistency.  err, xxx like node?
 - Make validation rules for attributes.  Built in such as range, required, type specific, ..., finally js callback
 - Make validation for model in conjunction with attributes - extend current validation to code and rule based

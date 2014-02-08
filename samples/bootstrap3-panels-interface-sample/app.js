@@ -85,7 +85,6 @@ login.set('contents', [
     $("#panel1").show(); // todo dont hard code ?
     app.setPresentation(privateMenu);
   }})
-
 ]);
 
 var loginCommand = new Command({name: 'Login', type: 'Presentation', contents: login});
@@ -93,6 +92,7 @@ var publicMenu = new Presentation();
 publicMenu.set('name', 'Public Menu');
 publicMenu.set('contents', [
   aboutCommand,
+  '-', // separator right justifies remainder
   loginCommand
 ]);
 
