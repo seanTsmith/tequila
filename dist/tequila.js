@@ -126,30 +126,32 @@ function Attribute(args, arg2) {
       this.value = args.value || null;
       break;
     case 'String':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeholder', 'value', 'size']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeHolder', 'quickPick', 'value', 'size']);
       this.size = splitTypes[1] ? splitTypes[1] : typeof args.size == 'number' ? args.size : args.size || 50;
       this.value = args.value || null;
-      this.placeholder = args.placeholder || null;
+      if (args.quickPick)
+        this.quickPick = args.quickPick;
+      this.placeHolder = args.placeHolder || null;
       break;
     case 'Date':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeholder', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeHolder', 'value']);
       this.value = args.value || null;
-      this.placeholder = args.placeholder || null;
+      this.placeHolder = args.placeHolder || null;
       break;
     case 'Boolean':
       unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       break;
     case 'Number':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeholder', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeHolder', 'value']);
       this.value = args.value || null;
-      this.placeholder = args.placeholder || null;
+      this.placeHolder = args.placeHolder || null;
       break;
     case 'Model':
       unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
       this.value = args.value || null;
       if (this.value instanceof Attribute.ModelID)
-      this.modelType = this.value.modelType;
+        this.modelType = this.value.modelType;
       break;
     case 'Group':
       unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
@@ -1138,7 +1140,6 @@ Application.prototype.setPresentation = function (primaryPresentation) {
   this.primaryPresentation = primaryPresentation;
   if (this.startCallback) {
     // Interface started so reload
-    console.log('sup');
     this.primaryInterface.setPresentation(this.primaryPresentation);
   }
 };
@@ -1308,6 +1309,7 @@ Session.prototype.startSession = function (store, userName, password, ip, callBa
       passCode += chars.charAt(Math.floor(Math.random() * chars.length));
 
     // Got user create new session
+    // TODO: Make this server side tied to yet to be designed store integrated authentication
     list.moveFirst();
     self.set('userID', list.get('id'));
     self.set('active', true);

@@ -33,7 +33,7 @@ pres.set('contents', [
   new Attribute({name: 'address', label: 'Address', type: 'String(50)'}),
   new Attribute({name: 'city', label: 'City', type: 'String(35)'}),
   new Attribute({name: 'state', label: 'State', type: 'String(2)'}),
-  new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)', placeholder: '#####-####'}),
+  new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)', placeHolder: '#####-####'}),
   '-',
   funcCommand,
   procCommand,
@@ -74,13 +74,15 @@ about.set('contents', [
 ]);
 var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: about});
 
+var storePicks = ['MemoryStore', 'LocalStore', 'HostStore'];
+
 var login = new Presentation();
 login.set('contents', [
   'Please login to see the fun stuff.',
   '-',
   new Attribute({name: 'login', label: 'Login', type: 'String(20)', value: ''}),
   new Attribute({name: 'password', label: 'Password', type: 'String(20)', value: ''}),
-  new Attribute({name: 'store', label: 'Store', type: 'String', value: '(memory store)'}),
+  new Attribute({name: 'store', label: 'Store', type: 'String', quickPick: storePicks, value: '(memory store)'}),
   '-',
   new Command({name: 'Login', type: 'Function', theme: 'info', icon: 'fa-sign-in', contents: function () {
     $("#panel1").show(); // todo dont hard code ?
