@@ -80,6 +80,7 @@ login.set('contents', [
   '-',
   new Attribute({name: 'login', label: 'Login', type: 'String(20)', value: ''}),
   new Attribute({name: 'password', label: 'Password', type: 'String(20)', value: ''}),
+  new Attribute({name: 'store', label: 'Store', type: 'String', value: '(memory store)'}),
   '-',
   new Command({name: 'Login', type: 'Function', theme: 'info', icon: 'fa-sign-in', contents: function () {
     $("#panel1").show(); // todo dont hard code ?
@@ -102,5 +103,5 @@ $(document).ready(function () {
   app.start(function (stuff) {
     console.log('app got stuff: ' + JSON.stringify(stuff));
   });
-//  b3p.mockRequest(new Request({type: 'Command', command: presCommand}));
+  b3p.mockRequest(new Request({type: 'Command', command: aboutCommand}));
 });
