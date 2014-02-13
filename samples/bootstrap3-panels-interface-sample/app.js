@@ -3,8 +3,37 @@
  * app
  */
 
+var sample = {};
+
 var app = new Application();
 app.set('brand', 'tequila');
+
+sample.InitializeStore = function (store, callback) {
+  console.log('InitializeStore...');
+  var cmd = new Command({name: 'cmdInitializeStore', type: 'Procedure', contents: new Procedure({tasks: [
+    function () {
+      var self = this;
+      var user = new User();
+      user.set('name','admin');
+      user.set('password','tequila');
+      store.putModel(user, function (model, error) {
+        if (error) throw error;
+        self.complete();
+      });
+    } // add more to array here ...
+  ]})});
+  cmd.onEvent('*', function (event) {
+    if (event == 'Error') {
+      cmd.gotErrors = true;
+      callback(new Error('InitializeStore failed'));
+    }
+    if (event == 'Completed') {
+      if (!cmd.gotErrors)
+        callback();
+    }
+  });
+  cmd.execute();
+};
 
 var b3p = new Bootstrap3PanelInterface();
 app.setInterface(b3p);
@@ -102,8 +131,18 @@ publicMenu.set('contents', [
 app.setPresentation(publicMenu);
 
 $(document).ready(function () {
-  app.start(function (stuff) {
-    console.log('app got stuff: ' + JSON.stringify(stuff));
+  sample.memoryStore = new MemoryStore();
+  sample.InitializeStore(sample.memoryStore, function (err) {
+    if (err) {
+      var con = about.get('contents');
+      con.unshift('-');
+      con.unshift('####' + err)
+      con.unshift('#**ERROR**');
+      about.set('contents', con);
+    }
+    app.start(function (stuff) {
+      console.log('app got stuff: ' + JSON.stringify(stuff));
+    });
+    b3p.mockRequest(new Request({type: 'Command', command: aboutCommand}));
   });
-  b3p.mockRequest(new Request({type: 'Command', command: aboutCommand}));
 });
