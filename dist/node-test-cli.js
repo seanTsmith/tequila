@@ -1903,6 +1903,9 @@ Command.prototype.execute = function () {
     var tasks = self.contents.tasks;
     var allTasksDone = true; // until proved wrong ...
     switch (event) {
+      case 'Error':
+        self.emitEvent('Error');
+        break;
       case 'Completed':
         for (var t in tasks) {
           if (tasks.hasOwnProperty(t)) {
