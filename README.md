@@ -1,8 +1,7 @@
 # tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila) 
-Tequila is a javascript application framework.  It runs on node server,  modern browsers and as phonegap apps.
+Tequila is a javascript application framework.  It runs on node server and html5 capable interfaces.
 
 ## Project Goals:
-
 * Provide high level abstractions to simplify application development
 * Facilitate design pattern practices
 * Adherence to test driven design and development
@@ -20,20 +19,21 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it
 
 #### To do now
-- Finish Login in interface sample
-- Workspace Integration
+- Finish Login in interface sample can use the attribute exception handling now
+
 
 #### To do later
+- Workspace Integration
 - add get and put methods to Model
 - include google toolchain for chrome apps and bundles (cell,osx,...)
 - Review callback for consistency.  err, xxx like node?
-- Make validation rules for attributes.  Built in such as range, required, type specific, ..., finally js callback
-- Make validation for model in conjunction with attributes - extend current validation to code and rule based
-- Attribute image type
 - tequilaStore needs to be set not hard coded (mongo)
-- Attribute visible property
 - Improve Session to handle server side auth on store
 - Add authentication to Store via sessions
+- Make validation for model in conjunction with attributes - extend current validation to code and rule based
+- Attribute visible property
+- Attribute image type
+- has emitEvent bypassed the spec?
 
 #### To do even later
 - Why is Travis breaking JSONfilestore ?
