@@ -21,7 +21,6 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 #### To do now
 - Finish Login in interface sample can use the attribute exception handling now
 
-
 #### To do later
 - Workspace Integration
 - add get and put methods to Model
@@ -33,6 +32,7 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - Make validation for model in conjunction with attributes - extend current validation to code and rule based
 - Attribute visible property
 - Attribute image type
+- Attribute validation
 - has emitEvent bypassed the spec?
 
 #### To do even later

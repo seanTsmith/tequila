@@ -420,7 +420,7 @@ test.renderDetail = function (isBrowser) {
             }
           }
           var showExample = test.showExamples;
-          if (test.filterSection)
+          if (test.filterSection && (test.filterSection.split(".").length>2))
             showExample = 'Y';
           // filterSection
 
