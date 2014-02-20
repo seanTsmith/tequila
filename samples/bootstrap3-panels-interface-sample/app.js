@@ -8,7 +8,7 @@ var app = new Application();
 app.set('brand', 'tequila');
 
 sample.InitializeStore = function (store, callback) {
-  console.log('InitializeStore...');
+//  console.log('InitializeStore...');
   var cmd = new Command({name: 'cmdInitializeStore', type: 'Procedure', contents: new Procedure({tasks: [
     function () {
       var self = this;
@@ -108,19 +108,17 @@ var loginPresentation = new Presentation();
 loginPresentation.set('contents', [
   'Please login to see the fun stuff.',
   '-',
-  new Attribute({name: 'login', label: 'Login', type: 'String(20)', value: ''}),
-  new Attribute({name: 'password', label: 'Password', type: 'String(20)', value: ''}).onEvent('Validate', function () {
-    if (this.value != 'xxx')
-      this.validationErrors.push('Password must be xxx');
-  }),
-  new Attribute({name: 'store', label: 'Store', type: 'String', quickPick: storePicks, value: '(memory store)'}).onEvent('Validate', function () {
-    if (this.value != 'zzz')
-      this.validationErrors.push('Store must be zzz');
-  }),
+  new Attribute({name: 'login', label: 'Login', type: 'String(20)', hint: {required: true}, value: ''}),
+  new Attribute({name: 'password', label: 'Password', type: 'String(20)', hint: {password: true}, value: ''}),
+  new Attribute({name: 'store', label: 'Store', type: 'String', quickPick: storePicks, value: '(memory store)'}),
   '-',
   new Command({name: 'Login', type: 'Function', theme: 'info', icon: 'fa-sign-in', contents: function () {
-    $("#panel1").show(); // todo dont hard code ?
-    app.setPresentation(privateMenu);
+    loginPresentation.validate(function () {
+      if (!loginPresentation.validationMessage) {
+        $("#panel1").show(); // todo don't hard code ?
+        app.setPresentation(privateMenu);
+      }
+    });
   }})
 ]);
 

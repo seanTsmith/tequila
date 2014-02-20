@@ -1520,14 +1520,15 @@ function Attribute(args, arg2) {
     return tmpSplit;
   }(this.type);
   this.type = splitTypes[0];
+  this.hint = args.hint || {};
   var unusedProperties = [];
   switch (this.type) {
     case 'ID':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
       this.value = args.value || null;
       break;
     case 'String':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeHolder', 'quickPick', 'value', 'size']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'quickPick', 'value', 'size']);
       this.size = splitTypes[1] ? splitTypes[1] : typeof args.size == 'number' ? args.size : args.size || 50;
       this.value = args.value || null;
       if (args.quickPick)
@@ -1535,36 +1536,36 @@ function Attribute(args, arg2) {
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Date':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeHolder', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'value']);
       this.value = args.value || null;
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Boolean':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
       this.value = args.value || null;
       break;
     case 'Number':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'placeHolder', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'value']);
       this.value = args.value || null;
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Model':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
       this.value = args.value || null;
       if (this.value instanceof Attribute.ModelID)
         this.modelType = this.value.modelType;
       break;
     case 'Group':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
       this.value = args.value || null;
       break;
     case 'Table':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value', 'group']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value', 'group']);
       this.value = args.value || null;
       this.group = args.group || null;
       break;
     case 'Object':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'value']);
+      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
       this.value = args.value || null;
       break;
 
@@ -1629,8 +1630,6 @@ Attribute.prototype._emitEvent = function (event) {
       }
     }
   }
-  if (event == 'Completed') // if command complete release listeners
-    this._eventListeners = [];
 };
 Attribute.prototype.coerce = function (value) {
   var newValue = value;
@@ -1741,12 +1740,15 @@ Attribute.prototype.validate = function (callBack) {
   var e;
   for (e in this._errorConditions) {
     if (this._errorConditions.hasOwnProperty(e)) {
-      this.validationErrors.push(this._errorConditions[e])
+      this.validationErrors.push(this._errorConditions[e]);
     }
   }
+  if (this.hint.required && !this.value)
+    this.validationErrors.push(this.label + ' required');
+
   this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
   this._emitEvent('StateChange');
-  callBack();
+  callBack.call(this);
 };
 Attribute.prototype.setError = function (condition, description) {
   condition = condition || '';
@@ -2680,22 +2682,65 @@ Presentation.prototype = T.inheritPrototype(Model.prototype);
  */
 Presentation.prototype.getObjectStateErrors = function (modelCheckOnly) {
   var i;
-  var errors = Model.prototype.getObjectStateErrors.call(this);
-  if (!modelCheckOnly && errors.length == 0) { // Only check if model it valid
+  this.validationErrors = Model.prototype.getObjectStateErrors.call(this);
+  if (!modelCheckOnly && this.validationErrors.length == 0) { // Only check if model it valid
     var contents = this.get('contents');
     var gotError = false;
     if (contents instanceof Array) {
-      for (i=0; i<contents.length; i++) {
+      for (i = 0; i < contents.length; i++) {
         if (!(contents[i] instanceof Command || contents[i] instanceof Attribute || typeof contents[i] == 'string'))
           gotError = true;
       }
       if (gotError)
-        errors.push('contents elements must be Command, Attribute or string');
+        this.validationErrors.push('contents elements must be Command, Attribute or string');
     } else {
-      errors.push('contents must be Array');
+      this.validationErrors.push('contents must be Array');
     }
   }
-  return errors;
+  this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
+  return this.validationErrors;
+};
+Presentation.prototype.validate = function (callBack) {
+  var presentation = this;
+  if (typeof callBack != 'function') throw new Error('callback is required');
+  this.getObjectStateErrors();
+  var e;
+  for (e in this._errorConditions) {
+    if (this._errorConditions.hasOwnProperty(e)) {
+      this.validationErrors.push(this._errorConditions[e])
+    }
+  }
+  // validate each attribute in contents
+  var i;
+  var gotError = false;
+  var attributeCount = 0;
+  var checkCount = 0;
+  var contents = this.get('contents');
+  if (contents instanceof Array) {
+    // Count first
+    for (i = 0; i < contents.length; i++) {
+      if (contents[i] instanceof Attribute) {
+        attributeCount++;
+      }
+    }
+    // Launch validations
+    for (i = 0; i < contents.length; i++) {
+      if (contents[i] instanceof Attribute) {
+        contents[i].validate(checkAttrib);
+      }
+    }
+  }
+  function checkAttrib() {
+    checkCount++;
+    if (this.validationMessage)
+      gotError = true;
+    if (checkCount==checkCount) {
+      if (gotError)
+        presentation.validationErrors.push('contents has validation errors');
+      presentation.validationMessage = presentation.validationErrors.length > 0 ? presentation.validationErrors[0] : '';
+      callBack();
+    }
+  }
 };
 ;
 /**
@@ -4880,12 +4925,19 @@ test.runnerAttribute = function () {
         });
       });
       test.heading('placeHolder', function () {
-        test.example('pass thru to Interface used as visual cue to user for input', '###-##-####', function () {
+        test.example('pass through to Interface used as visual cue to user for input', '###-##-####', function () {
           return new Attribute({name: 'ssn', placeHolder: '###-##-####'}).placeHolder;
         });
       });
+      test.heading('hint', function () {
+        test.paragraph('hint properties give guidance in handling of the attribute');
+        test.example('initialized to empty object', 'object', function () {
+          return typeof new Attribute({name: 'name', label: 'Name'}).hint;
+        });
+
+      });
       test.heading('quickPick', function () {
-        test.example('list of values to pick from typicaly invoked from dropdown', 3, function () {
+        test.example('list of values to pick from typically invoked from dropdown', 3, function () {
           return new Attribute({name: 'stooge', quickPick: ['moe', 'larry', 'curly']}).quickPick.length;
         });
       });
@@ -5177,11 +5229,9 @@ test.runnerAttribute = function () {
     test.heading('INTEGRATION', function () {
       test.example('validation usage demonstrated', test.asyncResponse('got milk'), function (testNode, returnResponse) {
         var attribute = new Attribute({name: 'test'});
-        var testGoals = {};
 
         // Monitor state changes
         attribute.onEvent('StateChange', function () {
-//          console.log('validationMessage: ' + attribute.validationMessage);
           if (attribute.validationMessage == 'got milk')
             returnResponse(testNode, 'got milk');
         });
@@ -6267,13 +6317,13 @@ test.runnerStoreMethods = function (SurrogateStore, inheritanceTest) {
         test.example('returns a List populated from store', undefined, function () {
           test.shouldThrow(Error('argument must be a List'), function () {
             new SurrogateStore().getList();
-          })
+          });
           test.shouldThrow(Error('filter argument must be Object'), function () {
             new SurrogateStore().getList(new List(new Model()));
-          })
+          });
           test.shouldThrow(Error('callBack required'), function () {
             new SurrogateStore().getList(new List(new Model()), []);
-          })
+          });
           // See integration tests for examples of usage
         });
       } else {
@@ -6603,9 +6653,6 @@ test.runnerPresentation = function () {
       test.example('objects created should be an instance of Presentation', true, function () {
         return new Presentation() instanceof Presentation;
       });
-//      test.example('must create with model constructor', Error('must create with model constructor'), function () {
-//        new Presentation();
-//      });
       test.heading('Model tests are applied', function () {
         test.runnerModel(Presentation, true);
       });
@@ -6613,6 +6660,17 @@ test.runnerPresentation = function () {
     test.heading('PROPERTIES', function () {
       test.heading('model', function () {
         test.paragraph('This is a model instance for the presentation instance.');
+      });
+      test.heading('validationErrors', function () {
+        test.example('Array of errors', undefined, function () {
+          test.assertion(new Presentation().validationErrors instanceof Array);
+          test.assertion(new Presentation().validationErrors.length == 0);
+        });
+      });
+      test.heading('validationMessage', function () {
+        test.example('string description of error(s)', '', function () {
+          return new Presentation().validationMessage;
+        });
       });
     });
     test.heading('ATTRIBUTES', function () {
@@ -6629,6 +6687,14 @@ test.runnerPresentation = function () {
     test.heading('METHODS', function () {
       test.heading('modelConstructor', function () {
         test.paragraph('This is a reference to the constructor function to create a new model');
+        test.xexample('', undefined, function () {
+        });
+      });
+      test.heading('validate', function () {
+        test.paragraph('check valid object state then extend to presentation contents');
+        test.example('callback is required -- see integration', Error('callback is required'), function () {
+          new Presentation().validate();
+        });
       });
     });
     test.heading('CONTENTS', function () {
@@ -6640,13 +6706,25 @@ test.runnerPresentation = function () {
       });
       test.example('array elements must be Command , Attribute or String', 'contents elements must be Command, Attribute or string', function () {
         var pres = new Presentation();
-        // strings with prefix # are heading, a dash - by itself is for a visual seperator
+        // strings with prefix # are heading, a dash - by itself is for a visual separator
         pres.set('contents', ['#heading', new Command(), new Attribute({name: 'meh'})]);
         test.assertion(pres.getObjectStateErrors().length == 0);
         pres.set('contents', [new Command(), new Attribute({name: 'meh'}), true]);
         return pres.getObjectStateErrors();
       });
-
+    });
+    test.heading('INTEGRATION', function () {
+      test.example('validation usage demonstrated', test.asyncResponse('contents has validation errors'), function (testNode, returnResponse) {
+        var attribute = new Attribute({name:'test'});
+        var presentation = new Presentation(); // default attributes and values
+        presentation.set('contents',[
+          attribute
+        ]);
+        attribute.setError('test','test error');
+        presentation.validate(function() {
+          returnResponse(testNode, presentation.validationMessage);
+        });
+      });
     });
   });
 };
