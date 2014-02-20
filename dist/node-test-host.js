@@ -216,6 +216,7 @@ Attribute.prototype.onEvent = function (events, callback) {
   }
   // All good add to chain
   this._eventListeners.push({events: events, callback: callback});
+  return this;
 };
 Attribute.prototype._emitEvent = function (event) {
   var i;

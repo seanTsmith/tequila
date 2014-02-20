@@ -1617,6 +1617,7 @@ Attribute.prototype.onEvent = function (events, callback) {
   }
   // All good add to chain
   this._eventListeners.push({events: events, callback: callback});
+  return this;
 };
 Attribute.prototype._emitEvent = function (event) {
   var i;
@@ -4407,7 +4408,7 @@ test.renderDetail = function (isBrowser) {
             }
           }
           var showExample = test.showExamples;
-          if (test.filterSection)
+          if (test.filterSection && (test.filterSection.split(".").length>2))
             showExample = 'Y';
           // filterSection
 
@@ -5180,7 +5181,7 @@ test.runnerAttribute = function () {
 
         // Monitor state changes
         attribute.onEvent('StateChange', function () {
-          console.log('validationMessage: ' + attribute.validationMessage);
+//          console.log('validationMessage: ' + attribute.validationMessage);
           if (attribute.validationMessage == 'got milk')
             returnResponse(testNode, 'got milk');
         });

@@ -4,7 +4,6 @@
  */
 
 var sample = {};
-
 var app = new Application();
 app.set('brand', 'tequila');
 
@@ -14,8 +13,8 @@ sample.InitializeStore = function (store, callback) {
     function () {
       var self = this;
       var user = new User();
-      user.set('name','admin');
-      user.set('password','tequila');
+      user.set('name', 'admin');
+      user.set('password', 'tequila');
       store.putModel(user, function (model, error) {
         if (error) throw error;
         self.complete();
@@ -49,12 +48,12 @@ var funcCommand = new Command({name: 'Function', type: 'Function', contents: fun
 }});
 
 // Create a procedure command
-procCommand = new Command({name: 'Procedure', type: 'Procedure', contents: new Procedure()});
+var procCommand = new Command({name: 'Procedure', type: 'Procedure', contents: new Procedure()});
 
 // Create sample presentation
 var pres = new Presentation();
 pres.set('contents', [
-  '####INSTRUCTIONS\n\n' +
+    '####INSTRUCTIONS\n\n' +
     'Enter some stuff then push some buttons.',
   '-',
   new Attribute({name: 'firstName', label: 'First Name', type: 'String(20)', value: 'John'}),
@@ -95,23 +94,29 @@ privateMenu.set('contents', [
 ]);
 
 // Here is App when not logged in
-var about = new Presentation();
-about.set('contents', [
-  '####ABOUT TEQUILA\n\n' +
+var aboutPresentation = new Presentation();
+aboutPresentation.set('contents', [
+    '####ABOUT TEQUILA\n\n' +
     'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
     'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.'
 ]);
-var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: about});
+var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: aboutPresentation});
 
 var storePicks = ['MemoryStore', 'LocalStore', 'HostStore'];
 
-var login = new Presentation();
-login.set('contents', [
+var loginPresentation = new Presentation();
+loginPresentation.set('contents', [
   'Please login to see the fun stuff.',
   '-',
   new Attribute({name: 'login', label: 'Login', type: 'String(20)', value: ''}),
-  new Attribute({name: 'password', label: 'Password', type: 'String(20)', value: ''}),
-  new Attribute({name: 'store', label: 'Store', type: 'String', quickPick: storePicks, value: '(memory store)'}),
+  new Attribute({name: 'password', label: 'Password', type: 'String(20)', value: ''}).onEvent('Validate', function () {
+    if (this.value != 'xxx')
+      this.validationErrors.push('Password must be xxx');
+  }),
+  new Attribute({name: 'store', label: 'Store', type: 'String', quickPick: storePicks, value: '(memory store)'}).onEvent('Validate', function () {
+    if (this.value != 'zzz')
+      this.validationErrors.push('Store must be zzz');
+  }),
   '-',
   new Command({name: 'Login', type: 'Function', theme: 'info', icon: 'fa-sign-in', contents: function () {
     $("#panel1").show(); // todo dont hard code ?
@@ -119,7 +124,7 @@ login.set('contents', [
   }})
 ]);
 
-var loginCommand = new Command({name: 'Login', type: 'Presentation', contents: login});
+var loginCommand = new Command({name: 'Login', type: 'Presentation', contents: loginPresentation});
 var publicMenu = new Presentation();
 publicMenu.set('name', 'Public Menu');
 publicMenu.set('contents', [
@@ -134,11 +139,11 @@ $(document).ready(function () {
   sample.memoryStore = new MemoryStore();
   sample.InitializeStore(sample.memoryStore, function (err) {
     if (err) {
-      var con = about.get('contents');
+      var con = aboutPresentation.get('contents');
       con.unshift('-');
-      con.unshift('####' + err)
+      con.unshift('####' + err);
       con.unshift('#**ERROR**');
-      about.set('contents', con);
+      aboutPresentation.set('contents', con);
     }
     app.start(function (stuff) {
       console.log('app got stuff: ' + JSON.stringify(stuff));
