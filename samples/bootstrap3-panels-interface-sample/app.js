@@ -62,6 +62,10 @@ pres.set('contents', [
   new Attribute({name: 'city', label: 'City', type: 'String(35)'}),
   new Attribute({name: 'state', label: 'State', type: 'String(2)'}),
   new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)', placeHolder: '#####-####'}),
+  new Attribute({name: 'birthDate', label: 'Birth Date', type: 'Date', value: new Date()}),
+  new Attribute({name: 'drink', type: 'String(25)', quickPick:['Water','Coke','Coffee']}),
+  new Attribute({name: 'sex', type: 'Boolean', value: true}),
+  new Attribute({name: 'drugs', type: 'Boolean', value: false}),
   '-',
   funcCommand,
   procCommand,
@@ -131,7 +135,8 @@ publicMenu.set('contents', [
   loginCommand
 ]);
 
-app.setPresentation(publicMenu);
+//app.setPresentation(publicMenu);
+app.setPresentation(privateMenu);
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();
@@ -146,6 +151,7 @@ $(document).ready(function () {
     app.start(function (stuff) {
       console.log('app got stuff: ' + JSON.stringify(stuff));
     });
-    b3p.mockRequest(new Request({type: 'Command', command: aboutCommand}));
+//    b3p.mockRequest(new Request({type: 'Command', command: aboutCommand}));
+    b3p.mockRequest(new Request({type: 'Command', command: presCommand}));
   });
 });
