@@ -66,6 +66,7 @@ pres.set('contents', [
   new Attribute({name: 'drink', type: 'String(25)', quickPick:['Water','Coke','Coffee']}),
   new Attribute({name: 'sex', type: 'Boolean', value: true}),
   new Attribute({name: 'drugs', type: 'Boolean', value: false}),
+  new Attribute({name: 'IQ', type: 'Number', value: 100}),
   '-',
   funcCommand,
   procCommand,
