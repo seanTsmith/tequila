@@ -11,10 +11,10 @@ hr {
     margin-bottom: 15px;
 }
 
-input {
-    -webkit-appearance: none;
-    border-radius: 0;
-}
+/*input {*/
+    /*-webkit-appearance: none;*/
+    /*border-radius: 0;*/
+/*}*/
 
 .blue-badge {
     background-color: #428bca;
