@@ -4,17 +4,16 @@
 
 body {
     padding-top: 0px;
-    /*background-color: #ffffff;*/
-    /*background-color: #e0e0e0;*/
-    /*background-image: url('img/blue_agave.png');*/
-    /*background-repeat: no-repeat;*/
-    /*background-attachment: fixed;*/
-    /*background-position: center;*/
 }
 
 hr {
     margin-top: 15px;
     margin-bottom: 15px;
+}
+
+input {
+    -webkit-appearance: none;
+    border-radius: 0;
 }
 
 .blue-badge {
@@ -32,36 +31,6 @@ hr {
     padding: 0px;
 }
 
-/*.navbar-menu {*/
-/*padding-right: 4px !important;*/
-/*padding-left: 6px !important;*/
-/*}*/
-
-/*.navbar-icons {*/
-/*padding-right: 0px !important;*/
-/*padding-left: 4px !important;*/
-/*margin: 0;*/
-/*}*/
-
-/*.navbar-icon-gap {*/
-/*padding-left: 16px !important;*/
-/*}*/
-
-/*.navbar-brand {*/
-/*max-width: 164px;*/
-/*white-space: nowrap;*/
-/*overflow: hidden;*/
-/*text-overflow: ellipsis*/
-/*}*/
-
-/*.navbar-user-name {*/
-/*margin: 0;*/
-/*padding: 0;*/
-/*max-width: 164px;*/
-/*white-space: nowrap;*/
-/*overflow: hidden;*/
-/*text-overflow: ellipsis*/
-/*}*/
 
 @media (min-width: 1024px) {
     .navbar-menu {
