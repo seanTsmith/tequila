@@ -77,6 +77,8 @@ pres.set('contents', [
 ]);
 var presCommand = new Command({name: 'Presentation', type: 'Presentation', contents: pres});
 
+// System Info 
+
 // App menu
 var privateMenu = new Presentation();
 privateMenu.set('name', 'Private Menu');
@@ -103,7 +105,8 @@ var aboutPresentation = new Presentation();
 aboutPresentation.set('contents', [
     '####ABOUT TEQUILA\n\n' +
     'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
-    'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.'
+    'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.\n\n' +
+      JSON.stringify(bowser,null, '\t')
 ]);
 var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: aboutPresentation});
 
@@ -136,8 +139,8 @@ publicMenu.set('contents', [
   loginCommand
 ]);
 
-//app.setPresentation(publicMenu);
-app.setPresentation(privateMenu);
+app.setPresentation(publicMenu);
+//app.setPresentation(privateMenu);
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();
@@ -152,7 +155,7 @@ $(document).ready(function () {
     app.start(function (stuff) {
       console.log('app got stuff: ' + JSON.stringify(stuff));
     });
-//    b3p.mockRequest(new Request({type: 'Command', command: aboutCommand}));
-    b3p.mockRequest(new Request({type: 'Command', command: presCommand}));
+    b3p.mockRequest(new Request({type: 'Command', command: aboutCommand}));
+//    b3p.mockRequest(new Request({type: 'Command', command: presCommand}));
   });
 });
