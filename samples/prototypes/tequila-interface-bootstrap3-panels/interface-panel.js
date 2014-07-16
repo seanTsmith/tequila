@@ -1,35 +1,35 @@
 /**
  * tequila
- * bootstrap3-panels-interface-panel
+ * interface-panel.js
  */
 
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Initialization
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.lazyInitPanel = function () {
+myInterface.lazyInitPanel = function () {
+  console.log('myInterface.lazyInitPanel()');
+
   // Container so bootstrap centers
-  if (!this.panelContainer) {
-    this.panelContainer = document.createElement("div");
-    this.panelContainer.id = "panelContainer";
-    this.panelContainer.className = "container panel-container";
-    document.body.appendChild(this.panelContainer);
+  if (!myInterface.panelContainer) {
+    myInterface.panelContainer = document.createElement("div");
+    myInterface.panelContainer.id = "panelContainer";
+    myInterface.panelContainer.className = "container panel-container";
+    document.body.appendChild(myInterface.panelContainer);
   }
 
   // Keep track of panels by label#
-  this.panels = {};
+  myInterface.panels = {};
 
   // Init is done so remember that
-  this.lazyInitPanelDone = true;
+  myInterface.lazyInitPanelDone = true;
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Render Panel
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
+myInterface.renderPanel = function (action) {
 
-  var self = this;
-
-  self.lazyInitPanelDone || self.lazyInitPanel();
+  myInterface.lazyInitPanelDone || myInterface.lazyInitPanel();
 
   action = action || {};
   var label = action.label || 'Panel';
@@ -37,15 +37,14 @@ Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
   var type = action.type || 'unknown';
   var icon = action.icon || 'fa-question-circle';
 
-  // self will be the panel DOM element
+  // This will be the panel DOM element
   var newPanel = document.createElement("div");
 
   // Bump element count and add panel to list
-  self.eleCount++;
-  var panelID = "panel" + self.eleCount;
-  self.panels[panelID] = {
-    eleCount: self.eleCount,
-    label: label,
+  myInterface.eleCount++;
+  var panelID = "panel" + myInterface.eleCount;
+  myInterface.panels[panelID] = {
+    eleCount: myInterface.eleCount,
     panel: newPanel,
     expanded: true
   };
@@ -59,22 +58,22 @@ Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
 
     newPanel.addEventListener('dragstart', function (e) {
       this.style.opacity = '0.4';
-      self.dragSrcEl = this;
+      myInterface.dragSrcEl = this;
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', this.id); // todo self needs to move entire element!
+      e.dataTransfer.setData('text/html', this.id); // todo this needs to move entire element!
       e.dataTransfer.clearData();
     }, false);
 
     newPanel.addEventListener('drop', function (e) {
-      // self/e.target is current target element.
+      // this/e.target is current target element.
       if (e.stopPropagation) {
         e.stopPropagation(); // Stops some browsers from redirecting.
       }
       // Only drag if got one and not same is original
-      if (self.dragSrcEl && self.dragSrcEl != this) {
-        console.log('moving ' + self.dragSrcEl.id + ' to ' + this.id);
-        self.dragSrcEl.parentNode.insertBefore(self.dragSrcEl, this);
-        self.dragSrcEl = false;
+      if (myInterface.dragSrcEl && myInterface.dragSrcEl != this) {
+        console.log('moving ' + myInterface.dragSrcEl.id + ' to ' + this.id);
+        myInterface.dragSrcEl.parentNode.insertBefore(myInterface.dragSrcEl, this);
+        myInterface.dragSrcEl = false;
       }
       return false;
     }, false);
@@ -95,25 +94,25 @@ Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
 
     newPanel.addEventListener('dragend', function (e) {
       // Clean up
-      self.dragSrcEl = false;
-      for (var p in self.panels) {
-        if (self.panels.hasOwnProperty(p)) {
-          self.panels[p].panel.style.opacity = '1';
+      myInterface.dragSrcEl = false;
+      for (var p in myInterface.panels) {
+        if (myInterface.panels.hasOwnProperty(p)) {
+          myInterface.panels[p].panel.style.opacity = '1';
         }
       }
     }, false);
 
   }
   newPanel.id = panelID;
-  if (self.panelContainer.hasChildNodes()) {
-    var firstBorn = self.panelContainer.firstChild;
+  if (myInterface.panelContainer.hasChildNodes()) {
+    var firstBorn = myInterface.panelContainer.firstChild;
     var lastBorn = firstBorn.nextSibling;
     if (lastBorn)
-      self.panelContainer.insertBefore(newPanel, lastBorn);
+      myInterface.panelContainer.insertBefore(newPanel, lastBorn);
     else
-      self.panelContainer.appendChild(newPanel);
+      myInterface.panelContainer.appendChild(newPanel);
   } else {
-    self.panelContainer.appendChild(newPanel);
+    myInterface.panelContainer.appendChild(newPanel);
   }
 
   var panelHeading = document.createElement("div");
@@ -121,7 +120,7 @@ Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
   newPanel.appendChild(panelHeading);
 
   // Title and icon for heading on panel
-  var txtTitle = '<a href="javascript:b3p.panelClicked(' + self.eleCount + ')"><i class="fa ' + icon + '"></i> ' + label + '</a>';
+  var txtTitle = '<a href="javascript:myInterface.panelClicked(' + myInterface.eleCount + ')"><i class="fa ' + icon + '"></i> ' + label + '</a>';
   var panelContractButton = document.createElement("a");
   var panelExpandButton = document.createElement("a");
   var panelTitle = document.createElement("h3");
@@ -137,28 +136,27 @@ Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
     panelTitle.innerHTML = txtTitle;
 
     // Contract Button
-    panelContractButton.id = "panelContractButton" + self.eleCount;
-    panelContractButton.setAttribute('href', "javascript:b3p.panelContract(" + self.eleCount + ")");
+    panelContractButton.id = "panelContractButton" + myInterface.eleCount;
+    panelContractButton.setAttribute('href', "javascript:myInterface.panelContract(" + myInterface.eleCount + ")");
     panelContractButton.setAttribute('data-toggle', 'tooltip');
     panelContractButton.setAttribute('title', 'Contract Panel');
     panelTitle.appendChild(panelContractButton);
 
     // Expand Button
-    panelExpandButton.id = "panelExpandButton" + self.eleCount;
-    panelExpandButton.setAttribute('href', "javascript:b3p.panelExpand(" + self.eleCount + ")");
+    panelExpandButton.id = "panelExpandButton" + myInterface.eleCount;
+    panelExpandButton.setAttribute('href', "javascript:myInterface.panelExpand(" + myInterface.eleCount + ")");
     panelExpandButton.setAttribute('data-toggle', 'tooltip');
     panelExpandButton.setAttribute('title', 'Expand Panel');
     panelTitle.appendChild(panelExpandButton);
 
     // Contract Button
     panelCloseButton.innerHTML = '<span class="glyphicon glyphicon-remove panel-glyphs pull-right text-muted"></span>';
-    panelCloseButton.setAttribute('href', "javascript:b3p.panelClose(" + self.eleCount + ")");
+    panelCloseButton.setAttribute('href', "javascript:myInterface.panelClose(" + myInterface.eleCount + ")");
     panelCloseButton.setAttribute('data-toggle', 'tooltip');
     panelCloseButton.setAttribute('title', 'Close Panel');
     panelTitle.appendChild(panelCloseButton);
 
-    // var theStatus = 0; // TODO uncomment to see labels (self.eleCount - 2) % 6;
-    var theStatus = (self.eleCount - 2) % 6;
+    var theStatus = (myInterface.eleCount - 2) % 6;
     if (theStatus > 0) {
       var panelLabel = document.createElement("span");
       switch (theStatus) {
@@ -190,18 +188,16 @@ Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
   // Panel Body is rendered by handler for type
   var panelBody = document.createElement("div");
   panelBody.className = "panel-body panel-body-" + style;
-  panelBody.id = "panelBody" + self.eleCount;
+  panelBody.id = "panelBody" + myInterface.eleCount;
   newPanel.appendChild(panelBody);
-  self.panels[panelID].panelBody = panelBody;
-  self.panels[panelID].panelTitle = panelTitle;
-  if (!self.invokePanelHandler(type, self.panels[panelID], action)) {
-    panelBody.innerHTML = '<div class="well-panel"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
-      '<p>self is a panel with no handler for type "' + type + '".</p>' +
+  if (!myInterface.invokePanelHandler(type, panelBody, panelTitle)) {
+    panelBody.innerHTML = '<div class="well-fucking-well"><h1>The <strong>"' + label + '"</strong> Panel</h1>' +
+      '<p>This is a panel with no handler for type "' + type + '".</p>' +
       '<p>Since you are seeing it it means that there is code to write.  So stop staring at the screen and write' +
       ' some awesome code.</p></div>';
   }
-  $('#panelExpandButton' + self.eleCount).hide();
-  self.closeHome();
+  $('#panelExpandButton' + myInterface.eleCount).hide();
+  myInterface.closeHome();
 
   // Scroll to top
   window.scrollTo(0, 0);
@@ -213,17 +209,17 @@ Bootstrap3PanelInterface.prototype.renderPanel = function (action) {
 // -------------------------------------------------------------------------------------------------------------------
 // Add Panel Handler
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.addPanelHandler = function (type, callback) {
-  this.panelHandlers.push({type: type, callback: callback});
+myInterface.addPanelHandler = function (type, callback) {
+  myInterface.panelHandlers.push({type: type, callback: callback});
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Invoke Panel Handler
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.invokePanelHandler = function (type, panel, action) {
-  for (p in this.panelHandlers) {
-    if (this.panelHandlers[p].type == type) {
-      return this.panelHandlers[p].callback(this, panel, action);
+myInterface.invokePanelHandler = function (type, panelBody, panelTitle) {
+  for (p in myInterface.panelHandlers) {
+    if (myInterface.panelHandlers[p].type == type) {
+      return myInterface.panelHandlers[p].callback(panelBody, panelTitle);
     }
   }
   return false;
@@ -232,62 +228,64 @@ Bootstrap3PanelInterface.prototype.invokePanelHandler = function (type, panel, a
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Close
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.panelClose = function (num) {
+myInterface.panelClose = function (num) {
   var panelID = 'panel' + num;
   var panel = document.getElementById(panelID);
+
   try {
-    delete this.panels[panelID];
+    delete myInterface.panels[panelID];
   } catch (e) {
     console.log('error deleting panel:' + panel);
   }
-  this.panelContainer.removeChild(panel);
+
+  myInterface.panelContainer.removeChild(panel);
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Clicked
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.panelClicked = function (num) {
+myInterface.panelClicked = function (num) {
   // This panel
   var panelID = "panel" + num;
-  var wasExpanded = this.panels[panelID].expanded;
+  var wasExpanded = myInterface.panels[panelID].expanded;
   var expandedCount = 0;
 
   // Contract all panels
-  for (var p in this.panels) {
-    if (this.panels.hasOwnProperty(p)) {
-      if (this.panels[p].expanded && p != panelID) {
+  for (var p in myInterface.panels) {
+    if (myInterface.panels.hasOwnProperty(p)) {
+      if (myInterface.panels[p].expanded && p != panelID) {
         expandedCount++;
-        this.panelContract(this.panels[p].eleCount);
+        myInterface.panelContract(myInterface.panels[p].eleCount);
       }
     }
   }
-  this.closeHome();
+  myInterface.closeHome();
 
   // Now show if need
   if (!wasExpanded || expandedCount != 1)
-    this.panelExpand(num);
+    myInterface.panelExpand(num);
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Expand
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.panelExpand = function (num) {
+myInterface.panelExpand = function (num) {
   $('#panelBody' + num).show(250, 'swing');
   $('#panelExpandButton' + num).hide();
   $('#panelContractButton' + num).show();
 
   var panelID = "panel" + num;
-  this.panels[panelID].expanded = true;
+  myInterface.panels[panelID].expanded = true;
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 // Panel Contract
 // -------------------------------------------------------------------------------------------------------------------
-Bootstrap3PanelInterface.prototype.panelContract = function (num) {
+myInterface.panelContract = function (num) {
   $('#panelBody' + num).hide(150, 'swing');
   $('#panelExpandButton' + num).show();
   $('#panelContractButton' + num).hide();
 
   var panelID = "panel" + num;
-  this.panels[panelID].expanded = false;
+  myInterface.panels[panelID].expanded = false;
 };
