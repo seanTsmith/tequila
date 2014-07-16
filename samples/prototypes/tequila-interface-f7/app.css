@@ -1,3 +1,14 @@
+.button.button-tall {
+    line-height: 97px;
+    height: 99px;
+    padding: 0 10px;
+    margin-top: 0px;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 10px;
+
+}
+
 .panel {
     background: #222;
     color: #dddddd;
