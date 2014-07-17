@@ -18,6 +18,19 @@ app.onPageInit('about', function (page) {
   });
 });
 
+// <div data-page="index" class="page">
+app.onPageInit('index', function (page) {
+  console.log('onPageInit');
+});
+app.onPageBeforeAnimation('index', function (page) {
+  console.log('onPageBeforeAnimation');
+  mainView.showToolbar();
+});
+app.onPageAfterAnimation('index', function (page) {
+  console.log('onPageAfterAnimation');
+});
+
+
 // Generate dynamic page
 function createContentPage() {
   mainView.loadContent(
@@ -115,13 +128,19 @@ $$(document).on('click', '.app-form', function () {
   }, 250);
 });
 
-$$(document).on('click', '.app-about', function () {
+
+
+$$(document).on('click', '.app-cheers', function () {
+
+//  $$('.tabbar').hide();
+
+  mainView.hideToolbar();
+
   mainView.loadContent(
       '<div class="navbar">' +
       '  <div class="navbar-inner">' +
       '    <div class="left"><a href="#" class="back link"><i class="icon icon-back-blue"></i><span>Back</span></a></div>' +
-      '    <div class="center sliding">About TEQUILA</div>' +
-      '    <div class="right"><a href="#" class="link icon-only open-panel"><i class="icon icon-bars-blue"></i></a></div>' +
+      '    <div class="center sliding">Cheers Mate!</div>' +
       '  </div>' +
       '</div>' +
       '<div class="pages">' +
