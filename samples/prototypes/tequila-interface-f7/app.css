@@ -1,6 +1,6 @@
 .button.button-tall {
-    line-height: 18px;
-    height: 90px;
+    line-height: 16px;
+    height: 96px;
     padding: 0 2px;
     margin-top: 0px;
     margin-right: 0;
@@ -8,7 +8,7 @@
     margin-left: 0;
     margin-bottom: 10px;
     border-radius: 12px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
     font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
 
@@ -19,6 +19,21 @@
     font-size: 1.5em; /* was 1.3333333333333333em; */
     line-height: 0.75em;
     vertical-align: -15%;
+}
+.row .col-33 {
+    margin-right: 4px;
+    margin-left: 4px;
+}
+.content-block-menu {
+    margin-top: 16px;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 12px;
+
+    padding-top: 0;
+    padding-right: 0;
+    padding-left: 12px;
+    padding-bottom: 0;
 }
 
 .panel {
