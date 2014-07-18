@@ -10,10 +10,16 @@
     border-radius: 12px;
     font-size: 12px;
     font-weight: normal;
-    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
-
 }
 
+.button-red {
+    border: 1px solid #af0000;
+    color: #af0000;
+}
+.button-red.active {
+    background: #af0000;
+    color: #fff;
+}
 /* makes the font 33% larger relative to the icon container */
 .fa-lg {
     font-size: 1.5em; /* was 1.3333333333333333em; */
