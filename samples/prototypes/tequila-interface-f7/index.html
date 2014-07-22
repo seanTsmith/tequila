@@ -72,7 +72,8 @@
     <div class="navbar">
       <div class="navbar-inner">
         <!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
-        <div class="center sliding">Tequila</div>
+        <div class="left sliding">Tequila.js</div>
+        <div class="right"><a href="#" class="link icon-only app-login"><i class="fa fa-sign-in fa-lg"></i></a></div>
       </div>
     </div>
 
@@ -84,7 +85,7 @@
         <div class="page-content">
           <div class="tabs">
             <div id="tab-1" class="tab">
-              <div class="content-block-title">WORKSPACE</div>
+              <div class="content-block-title">ACTIVE WORKSPACE <a href="#" class="link icon-only app-cheers"><i class="fa fa-info-circle"></i></a></div>
               <div class="list-block media-list">
                 <ul>
                   <li class="swipeout">
@@ -145,45 +146,278 @@
                   </li>
                 </ul>
               </div>
-
+              <div class="content-block"><a href="#" class="button app-cheers">Show Recently Closed</a></div>
             </div>
             <div id="tab-2" class="tab active">
-              <div class="content-block-inner content-block-menu">
+              <div class="content-block content-block-menu">
                 <!--<div class="content-block-inner">-->
                   <div class="row">
                     <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>Cheers Mate!</a></div>
-                    <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-clock-o fa-2x"></i><br>Wakey Wakey</a></div>
-                    <div class="col-33"><a href="#" class="button button-red button-round button-tall"><i class="fa fa-coffee fa-2x"></i><br>Eggs Sausage Rye Toast & Coffee Black</a></div>
+                    <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-clock-o fa-2x"></i><br>Wakey Wakey</a></div>
+                    <div class="col-33"><a href="#" class="button button-red button-round button-tall app-cheers"><i class="fa fa-coffee fa-2x"></i><br>Eggs Sausage Rye Toast & Coffee Black</a></div>
                   </div>
                   <div class="row">
-                    <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>Antidistablishmentariianism</a></div>
-                    <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>I code therefore I am!</a></div>
-                    <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>Think before you jump I think!</a></div>
+                    <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>Antidistablishmentariianism</a></div>
+                    <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>I code therefore I am!</a></div>
+                    <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>Think before you jump I think!</a></div>
                   </div>
                 <div class="row">
-                  <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>Now is the time</a></div>
-                  <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>For all good men</a></div>
-                  <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>To help fight the man</a></div>
+                  <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>Now is the time</a></div>
+                  <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>For all good men</a></div>
+                  <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>To help fight the man</a></div>
                 </div>
                   <div class="row">
-                    <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>Point being make up stuff to take up space and see what happens</a></div>
-                    <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>Cheers Mate!</a></div>
-                    <div class="col-33"><a href="#" class="button button-round button-tall"><i class="fa fa-beer fa-2x"></i><br>Cheers Mate!</a></div>
+                    <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>Point being make up stuff to take up space and see what happens</a></div>
+                    <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>Cheers Mate!</a></div>
+                    <div class="col-33"><a href="#" class="button button-round button-tall app-cheers"><i class="fa fa-beer fa-2x"></i><br>Cheers Mate!</a></div>
                   </div>
                 </div>
               <!--</div>-->
             </div>
             <div id="tab-3" class="tab">
 
+              <div class="list-block list-block-top-search">
+                <ul>
+                  <li><a href="#" class="item-link smart-select">
+                    <select name="fruits" multiple="multiple">
+                      <option value="customer" selected="selected">Customer</option>
+                      <option value="vendor">Vendor</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <div class="item-content">
+                      <div class="item-inner">
+                        <div class="item-title">Search For</div>
+                      </div>
+                    </div></a></li>
+                </ul>
+              </div>
+
               <form data-search-list=".search-here" data-search-in=".item-title" class="searchbar">
+
                 <div class="searchbar-input">
                   <input type="search" placeholder="Search"/><a href="#" class="searchbar-clear"></a>
                 </div><a href="#" class="searchbar-cancel">Cancel</a>
               </form>
+
               <!--<div class="searchbar-overlay"></div>-->
 
-
+              <div class="page-content" style="margin: 0; padding: 0;">
+                <div class="list-block searchbar-not-found">
+                  <ul>
+                    <li class="item-content">
+                      <div class="item-inner">
+                        <div class="item-title">Nothing found</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="list-block search-here searchbar-found">
+                <ul>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Acura </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Audi</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">BMW</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Cadillac </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Chevrolet </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Chrysler </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Dodge </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Ferrari </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Ford </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">GMC </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Honda</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Hummer</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Hyundai</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Infiniti </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Isuzu </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Jaguar </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Jeep </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Kia</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Lamborghini </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Land Rover</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Lexus </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Lincoln </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Lotus </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Mazda</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Mercedes-Benz</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Mercury </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Mitsubishi</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Nissan </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Oldsmobile </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Peugeot </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Pontiac </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Porsche</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Regal</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Saab </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Saturn </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Subaru </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Suzuki </div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Toyota</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Volkswagen</div>
+                  </div>
+                </li>
+                <li class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Volvo</div>
+                  </div>
+                </li>
+                </ul>
+                </div>
+              </div>
             </div>
+
             <div id="tab-4" class="tab">
               <div class="content-block">
                 <p>This is tab 3 content</p>

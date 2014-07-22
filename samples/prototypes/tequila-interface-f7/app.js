@@ -34,7 +34,6 @@ app.onPageAfterAnimation('index', function (page) {
 // Generate dynamic page
 function createContentPage() {
   mainView.loadContent(
-
       '<div class="pages navbar-through">' +
       '  <div data-page="no-navbar-toolbar" class="page no-navbar no-toolbar">' +
       '    <div class="page-content">' +
@@ -50,7 +49,6 @@ function createContentPage() {
   setTimeout(function () {
     mainView.goBack();
   }, 1000);
-
 
 
 }
@@ -82,12 +80,12 @@ $$(document).on('click', '.app-form', function () {
       '        <a href="#tab3" class="button tab-link">Tab 4</a>' +
       '        <a href="#tab3" class="button tab-link">Tab 5</a>' +
       '        <a href="#tab3" class="button tab-link">Tab 6</a>' +
-        '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
-        '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
-        '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
-        '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
-        '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
-        '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
+      '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
+      '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
+      '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
+      '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
+      '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
+      '        <a href="#tab3" class="button tab-link">Tab 7</a>' +
       '      </div>' +
       '    </div>' +
       '    <div class="right"><a href="#" class="link open-panel icon-only"><i class="icon icon-bars-blue"></i></a></div>' +
@@ -128,14 +126,8 @@ $$(document).on('click', '.app-form', function () {
   }, 250);
 });
 
-
-
 $$(document).on('click', '.app-cheers', function () {
-
-//  $$('.tabbar').hide();
-
   mainView.hideToolbar();
-
   mainView.loadContent(
       '<div class="navbar">' +
       '  <div class="navbar-inner">' +
@@ -152,6 +144,53 @@ $$(document).on('click', '.app-cheers', function () {
       '        </div>' +
       '      </div>' +
       '    </div>' +
+      '  </div>' +
+      '</div>'
+  );
+});
+
+$$(document).on('click', '.app-login', function () {
+  mainView.hideToolbar();
+  mainView.loadContent(
+      '<div class="navbar">' +
+      '  <div class="navbar-inner">' +
+      '    <div class="left"><a href="#" class="back link"><i class="icon icon-back-blue"></i><span>Back</span></a></div>' +
+      '    <div class="center sliding">Tequila.js</div>' +
+      '  </div>' +
+      '</div>' +
+      '<div class="pages">' +
+      '  <div data-page="dynamic-pages" class="page">' +
+      '<div class="page-content login-screen-content">' +
+      '  <div class="login-screen-title">Sign In</div>' +
+      '  <form>' +
+      '    <div class="list-block">' +
+      '      <ul>' +
+      '        <li class="item-content">' +
+      '          <div class="item-inner">' +
+      '            <div class="item-title label">Username</div>' +
+      '            <div class="item-input">' +
+      '              <input type="text" name="username" placeholder="Your username">' +
+      '            </div>' +
+      '          </div>' +
+      '        </li>' +
+      '        <li class="item-content">' +
+      '          <div class="item-inner">' +
+      '            <div class="item-title label">Password</div>' +
+      '            <div class="item-input">' +
+      '              <input type="password" name="password" placeholder="Your password">' +
+      '            </div>' +
+      '          </div>' +
+      '        </li>' +
+      '      </ul>' +
+      '    </div>' +
+      '    <div class="list-block">' +
+      '      <ul>' +
+      '        <li><a href="#" class="item-link list-button">Sign In</a></li>' +
+      '      </ul>' +
+      '      <div class="list-block-label">Some text about login information.<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>' +
+      '    </div>' +
+      '  </form>' +
+      '</div>' +
       '  </div>' +
       '</div>'
   );
