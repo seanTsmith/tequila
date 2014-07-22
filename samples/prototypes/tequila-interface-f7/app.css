@@ -25,7 +25,9 @@
 .tabbar-label-fix2 {
     height: 80px;
 }
-
+.fa-stack-lg {
+    font-size: 1.5em;
+}
 .button.button-tall {
     border: none;
     line-height: 15px;
@@ -53,6 +55,11 @@
     color: #fff;
 }
 /* makes the font 33% larger relative to the icon container */
+.fa-inline {
+    font-size: 1.5em;
+    vertical-align: -5%;
+}
+
 .fa-lg {
     font-size: 1.5em; /* was 1.3333333333333333em; */
     line-height: 1.5em;
