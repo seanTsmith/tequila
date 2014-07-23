@@ -2,7 +2,23 @@
     margin: 0;
     /*font-size: 17px;*/
 }
+.content-block-title-short {
+    /*position: relative;*/
+    /*overflow: hidden;*/
+    /*margin: 0;*/
+    /*white-space: nowrap;*/
+    /*text-overflow: ellipsis;*/
+    /*font-size: 14px;*/
+    /*text-transform: uppercase;*/
+    /*line-height: 1;*/
+    /*color: #6d6d72;*/
+    box-sizing: border-box;
 
+    margin-top: 10px;
+    margin-right: 15px;
+    margin-left: 15px;
+    margin-bottom: 10px;
+}
 
 .fa-badge-fix {
     /* Hacked i.ks-tabbar-icon-4 to work with fontawesome*/
@@ -56,8 +72,9 @@
 }
 /* makes the font 33% larger relative to the icon container */
 .fa-inline {
-    font-size: 1.5em;
-    vertical-align: -5%;
+    font-size: 2.0em;
+    vertical-align: -15%;
+    text-align: right;
 }
 
 .fa-lg {
