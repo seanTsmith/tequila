@@ -12,7 +12,6 @@
     /*text-transform: uppercase;*/
     /*line-height: 1;*/
     /*color: #6d6d72;*/
-    box-sizing: border-box;
 
     margin-top: 10px;
     margin-right: 15px;
@@ -77,6 +76,13 @@
     vertical-align: -15%;
     text-align: right;
 }
+
+.fa-2xx {
+    font-size: 2em;
+    text-shadow: 2px 2px 5px rgba(64,64,64, 0.90);
+
+}
+
 
 .fa-lg {
     font-size: 1.5em; /* was 1.3333333333333333em; */
