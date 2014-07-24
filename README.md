@@ -22,10 +22,11 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 #### To do now
 - Finish Login in interface sample can use the attribute exception handling now
 - Code F7 interface
-- Enhancements to Models:
-    - getModelName
-    - getModelID
-    - getModel
+- new methods for Models:
+    - getModelName() - Primary description for model
+    - getModelID() - optional small indentifying info
+    - getModelSummary() - summary info for model
+    - getModelDetails() - additional details for model
 
 #### To do later
 - Workspace Integration

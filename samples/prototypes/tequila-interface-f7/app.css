@@ -46,6 +46,7 @@
 }
 .button.button-tall {
     border: none;
+    color: #001a35;
     line-height: 15px;
     height: 96px;
     padding-top: 6px;
@@ -59,7 +60,7 @@
     white-space: normal;
     border-radius: 12px;
     font-size: 15px;
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 .button-red {
