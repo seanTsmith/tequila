@@ -24,6 +24,7 @@ test.heading('Interfaces', function () {
   test.paragraph('These core interfaces are included in the library.');
   test.runnerMockInterface();
   test.runnerBootstrap3Interface();
+  test.runnerFramework7Interface();
   test.runnerCommandLineInterface();
 });
 test.heading('Models', function () {

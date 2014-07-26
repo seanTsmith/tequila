@@ -3518,6 +3518,41 @@ Bootstrap3PanelInterface.prototype.start = function (application, presentation, 
 };;
 /**
  * tequila
+ * framework7-interface
+ */
+function Framework7Interface(args) {
+  if (false === (this instanceof Framework7Interface)) throw new Error('new operator required');
+  args = args || {};
+  args.name = args.name || '(unnamed)';
+  args.description = args.description || 'a Interface';
+  var i;
+  var unusedProperties = T.getInvalidProperties(args, ['name', 'description']);
+  var errorList = [];
+  for (i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
+  if (errorList.length > 1)
+    throw new Error('error creating Procedure: multiple errors');
+  if (errorList.length) throw new Error('error creating Procedure: ' + errorList[0]);
+  // default state
+  this.startCallback = null;
+  this.stopCallback = null;
+  this.mocks = [];
+  this.mockPending = false;
+  // args ok, now copy to object
+  for (i in args) this[i] = args[i];
+}
+Framework7Interface.prototype = T.inheritPrototype(Interface.prototype);
+/*
+ * Methods
+ */
+// See bootstrap3-panels-interface-client... stub for server here
+Framework7Interface.prototype.start = function (application, presentation, callBack) {
+  if (!(application instanceof Application)) throw new Error('Application required');
+  if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
+  if (typeof callBack != 'function') throw new Error('callBack required');
+  throw new Error('Framework7Interface unavailable in server');
+};;
+/**
+ * tequila
  * command-line-interface
  */
 ;
@@ -7044,6 +7079,19 @@ test.runnerBootstrap3Interface = function () {
 ;
 /**
  * tequila
+ * framework7-interface-test
+ */
+test.runnerFramework7Interface = function () {
+  test.heading('Framework7Interface', function () {
+    test.paragraph('Framework7Interface Interface is a ios7 like UI.');
+    test.heading('Interface tests are applied.', function () {
+      test.runnerInterfaceMethodsTest(Framework7Interface,true);
+    });
+  });
+};
+;
+/**
+ * tequila
  * command-line-test
  */
 test.runnerCommandLineInterface = function () {
@@ -8088,6 +8136,7 @@ test.heading('Interfaces', function () {
   test.paragraph('These core interfaces are included in the library.');
   test.runnerMockInterface();
   test.runnerBootstrap3Interface();
+  test.runnerFramework7Interface();
   test.runnerCommandLineInterface();
 });
 test.heading('Models', function () {
