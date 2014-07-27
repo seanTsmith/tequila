@@ -109,9 +109,7 @@ aboutPresentation.set('contents', [
       JSON.stringify(bowser,null, '\t')
 ]);
 var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: aboutPresentation});
-
 var storePicks = ['MemoryStore', 'LocalStore', 'HostStore'];
-
 var loginPresentation = new Presentation();
 loginPresentation.set('contents', [
   'Please login to see the fun stuff.',
