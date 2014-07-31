@@ -8,8 +8,9 @@ Tequila is a javascript application framework.  It runs on node server and html5
 * Utilize 3rd party libraries but provide facades and adapters to keep the app simple, flexible and extensible
 
 ####Sample app
-- bootstrap: http://dremoor.github.io/tequila/samples/bootstrap3-panels-interface-sample/
-- framework7: http://dremoor.github.io/tequila/samples/prototypes/tequila-interface-f7/index.html
+- bootstrap:  http://dremoor.github.io/tequila/samples/bootstrap3-panels-interface-sample/
+- framework7: http://dremoor.github.io/tequila/samples/framework7-interface-sample
+- framework7 prototype: http://dremoor.github.io/tequila/samples/prototypes/tequila-interface-f7/index.html
 
 ####Specs, Docs, & Tests
 http://dremoor.github.io/tequila/test-spec/test-runner
