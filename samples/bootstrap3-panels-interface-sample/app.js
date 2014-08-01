@@ -137,8 +137,9 @@ publicMenu.set('contents', [
   loginCommand
 ]);
 
-app.setPresentation(publicMenu);
-//app.setPresentation(privateMenu);
+//app.setPresentation(publicMenu);
+$("#panel1").show(); // todo don't hard code ?
+app.setPresentation(privateMenu);
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();

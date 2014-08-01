@@ -54,14 +54,34 @@
     /*font-weight: bold;*/
 }
 
-.button-red {
-    border: 1px solid #af0000;
-    color: #af0000;
+.button-default {
+    color: #ffffff;
 }
-.button-red.active {
-    background: #af0000;
-    color: #fff;
+.button-primary {
+    color: #428bca;
 }
+.button-warning {
+    color: #f0ad4e;
+}
+.button-danger {
+    color: #d9534f;
+}
+.button-success {
+    color: #47a447;
+}
+.button-info {
+    color: #39b3d7;
+}
+.button-dude {
+    color: #d7d739;
+}
+.button-dude {
+    color: #d7d739;
+}
+.button-sweet {
+    color: #c05bde;
+}
+
 /* makes the font 33% larger relative to the icon container */
 .fa-inline {
     font-size: 2.0em;
