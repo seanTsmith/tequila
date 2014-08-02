@@ -35,7 +35,7 @@
 .fa-stack-lg {
     font-size: 1.5em;
 }
-.button.button-tall {
+.button.tq-app-button {
     border: none;
     color: #001a35;
     line-height: 15px;
@@ -89,7 +89,7 @@
     text-align: right;
 }
 
-.fa-2xx {
+.tq-app-icon {
     font-size: 2em;
     text-shadow: 2px 2px 5px rgba(64,64,64, 0.90);
 
