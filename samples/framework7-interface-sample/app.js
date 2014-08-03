@@ -37,7 +37,6 @@ sample.InitializeStore = function (store, callback) {
 var f7 = new Framework7Interface();
 app.setInterface(f7);
 
-
 // Stub commands
 var stubMoe = new Command({name: 'Moe', description: 'Moses Horwitz', theme: 'primary', icon: 'fa-coffee'});
 var stubLarry = new Command({name: 'Larry', description: 'Louis Fienberg', theme: 'info', icon: 'fa-beer'});
@@ -92,6 +91,7 @@ var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: a
 var privateMenu = new Presentation();
 privateMenu.set('name', 'Private Menu');
 privateMenu.set('contents', [
+  stubMoe,
   new Command({name: 'Stooges', type: 'Menu', contents: [
     'The Three Stooges',
     '-',
@@ -103,19 +103,14 @@ privateMenu.set('contents', [
     'Command Types',
     '-',
     new Command({name: 'Stub', type: 'Stub'}),
+    new Command({name: 'Menu', type: 'Menu', contents: [
+      'Soup du jour'
+    ]}),
     presCommand,
     funcCommand,
     procCommand
   ]}),
-  funcCommand,
-  procCommand,
-  stubMoe,
-  stubLarry,
-  stubCurly,
-  aboutCommand,
-  new Command({name: 'Eat'}),
-  new Command({name: 'More'}),
-  new Command({name: 'Chiken'})
+  aboutCommand
 ]);
 
 var storePicks = ['MemoryStore', 'LocalStore', 'HostStore'];
@@ -147,8 +142,6 @@ publicMenu.set('contents', [
 ]);
 
 app.setPresentation(privateMenu);
-
-
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();
