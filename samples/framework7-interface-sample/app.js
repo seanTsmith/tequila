@@ -8,7 +8,6 @@ var app = new Application();
 app.set('brand', 'tequila');
 
 sample.InitializeStore = function (store, callback) {
-  console.log('InitializeStore...');
   var cmd = new Command({name: 'cmdInitializeStore', type: 'Procedure', contents: new Procedure({tasks: [
     function () {
       var self = this;
@@ -37,7 +36,58 @@ sample.InitializeStore = function (store, callback) {
 var f7 = new Framework7Interface();
 app.setInterface(f7);
 
+
+// Quickbooks Menu for kicks
+/***
+ *  Company
+ *    Customer Center
+ *    Create Invoices
+ *    Enter Sales Receipts
+ *    Create Estimates
+ *    Create Credit Memos/Refunds
+ *    Enter Statement Charges
+ *    Create Statements
+ *    Assess Finance Charges
+ *    Receive Payments
+ *    Item List
+ *  Customers
+ *  Vendors
+ *  Employees
+ *  Banking
+***/
+var quickBooks =  new Command({name: 'QuickBooks', type: 'Menu', contents: [
+  new Command({name: 'Company', type: 'Menu', contents: [
+    new Command({name: 'xxxx'}),
+    new Command({name: 'xxxx'})
+  ]}),
+  new Command({name: 'Customers', type: 'Menu', contents: [
+    new Command({name: 'Customer Center'}),
+    new Command({name: 'Create Invoices'}),
+    new Command({name: 'Enter Sales Receipts'}),
+    new Command({name: 'Create Estimates'}),
+    new Command({name: 'Create Credit Memos/Refunds'}),
+    new Command({name: 'Enter Statement Charges'}),
+    new Command({name: 'Create Statements'}),
+    new Command({name: 'Assess Finance Charges'}),
+    new Command({name: 'Receive Payments'}),
+    new Command({name: 'Item List'})
+  ]}),
+  new Command({name: 'Vendors', type: 'Menu', contents: [
+    new Command({name: 'xxxx'}),
+    new Command({name: 'xxxx'})
+  ]}),
+  new Command({name: 'Employees', type: 'Menu', contents: [
+    new Command({name: 'xxxx'}),
+    new Command({name: 'xxxx'})
+  ]}),
+  new Command({name: 'Banking', type: 'Menu', contents: [
+    new Command({name: 'xxxx'}),
+    new Command({name: 'xxxx'})
+  ]})
+]});
+
 // Stub commands
+var stubVerbose = new Command({name: 'Verbose Name here is it man! Like you wanted!!!', description: 'Moses Horwitz', theme: 'warning', icon: 'fa-coffee'});
 var stubMoe = new Command({name: 'Moe', description: 'Moses Horwitz', theme: 'primary', icon: 'fa-coffee'});
 var stubLarry = new Command({name: 'Larry', description: 'Louis Fienberg', theme: 'info', icon: 'fa-beer'});
 var stubCurly = new Command({name: 'Curly', description: 'Jerome Lester Horwitz', theme: 'warning', icon: 'fa-glass'});
@@ -91,7 +141,8 @@ var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: a
 var privateMenu = new Presentation();
 privateMenu.set('name', 'Private Menu');
 privateMenu.set('contents', [
-  stubMoe,
+//  stubVerbose,
+  quickBooks,
   new Command({name: 'Stooges', type: 'Menu', contents: [
     'The Three Stooges',
     '-',
