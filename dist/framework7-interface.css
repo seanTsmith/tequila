@@ -40,18 +40,11 @@
     color: #001a35;
     line-height: 15px;
     height: 96px;
-    padding-top: 6px;
-    padding-right: 2px;
-    padding-left: 2px;
-    padding-bottom: 0;
-    margin-top: 0px;
-    margin-right: 0;
-    margin-left: 0;
-    margin-bottom: 5px;
+    padding: 6px 2px 0;
+    margin: 0px 0 2px;
     white-space: normal;
     border-radius: 12px;
-    font-size: 15px;
-    /*font-weight: bold;*/
+    font-size: 14px;
 }
 
 .button-default {
@@ -90,11 +83,11 @@
 }
 
 .tq-app-icon {
+    margin: 0;
+    padding-bottom: 3px;
     font-size: 2em;
     text-shadow: 2px 2px 5px rgba(64,64,64, 0.90);
-
 }
-
 
 .fa-lg {
     font-size: 1.5em; /* was 1.3333333333333333em; */
