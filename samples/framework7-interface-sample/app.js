@@ -54,8 +54,8 @@ app.setInterface(f7);
  *  Vendors
  *  Employees
  *  Banking
-***/
-var quickBooks =  new Command({name: 'QuickBooks', type: 'Menu', contents: [
+ ***/
+var quickBooks = new Command({name: 'QuickBooks', type: 'Menu', contents: [
   new Command({name: 'Company', type: 'Menu', contents: [
     new Command({name: 'xxxx'}),
     new Command({name: 'xxxx'})
@@ -103,8 +103,7 @@ var procCommand = new Command({name: 'Procedure', type: 'Procedure', contents: n
 // Create sample presentation
 var pres = new Presentation();
 pres.set('contents', [
-    '####INSTRUCTIONS\n\n' +
-    'Enter some stuff then push some buttons.',
+  '###INSTRUCTIONS\nEnter some stuff then push some buttons.',
   '-',
   new Attribute({name: 'firstName', label: 'First Name', type: 'String(20)', value: 'John'}),
   new Attribute({name: 'lastName', label: 'Last Name', type: 'String(25)', value: 'Doe'}),
@@ -112,8 +111,9 @@ pres.set('contents', [
   new Attribute({name: 'city', label: 'City', type: 'String(35)'}),
   new Attribute({name: 'state', label: 'State', type: 'String(2)'}),
   new Attribute({name: 'zip', label: 'Zip Code', type: 'String(10)', placeHolder: '#####-####'}),
+  '###More stuff',
   new Attribute({name: 'birthDate', label: 'Birth Date', type: 'Date', value: new Date()}),
-  new Attribute({name: 'drink', type: 'String(25)', quickPick:['Water','Coke','Coffee']}),
+  new Attribute({name: 'drink', type: 'String(25)', quickPick: ['Water', 'Coke', 'Coffee']}),
   new Attribute({name: 'sex', type: 'Boolean', value: true}),
   new Attribute({name: 'drugs', type: 'Boolean', value: false}),
   new Attribute({name: 'IQ', type: 'Number', value: 100}),
@@ -133,7 +133,7 @@ aboutPresentation.set('contents', [
     '####ABOUT TEQUILA\n\n' +
     'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
     'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.\n\n' +
-    JSON.stringify(bowser,null, '\t')
+    JSON.stringify(bowser, null, '\t')
 ]);
 var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: aboutPresentation});
 
