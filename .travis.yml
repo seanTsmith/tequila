@@ -5,4 +5,4 @@ before_script:
   - npm install -g grunt-cli
 after_script:
   - npm install -g istanbul
-  - istanbul cover dist/node-test-cli.js --report lcovonly -- -R spec & cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+  - istanbul cover dist/node-test-cli.js --report lcovonly -- -R spec
