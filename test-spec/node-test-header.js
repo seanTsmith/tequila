@@ -4,6 +4,7 @@
  */
 
 // Lay down some shitty code to defend against
+/* istanbul ignore next */
 Object.prototype.badActor = function() {
   return "I'm just a cook.";
 };
@@ -11,3 +12,4 @@ Object.prototype.badActor = function() {
 var colors = require('colors');
 var mongo = require('mongodb');
 var fs = require('fs');
+/* istanbul ignore next */

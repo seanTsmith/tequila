@@ -1,5 +1,6 @@
+/* istanbul ignore next */
 var Markdown;
-
+/* istanbul ignore next */
 if (typeof exports === "object" && typeof require === "function") // we're in a CommonJS (e.g. Node.js) module
     Markdown = exports;
 else
@@ -49,7 +50,7 @@ else
 // Note: move the sample code to the bottom of this
 // file before uncommenting it.
 //
-
+/* istanbul ignore next */
 (function () {
 
     function identity(x) { return x; }

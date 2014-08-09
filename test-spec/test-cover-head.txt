@@ -1,0 +1,7 @@
+/**
+ * tequila
+ * test-cover-head
+ */
+/* istanbul ignore next */
+if (true)
+{

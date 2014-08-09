@@ -51,6 +51,8 @@ module.exports = function (grunt) {
           'test-spec/node-test-header.js',
           'test-spec/test-runner.js',
 
+          'test-spec/test-cover-head.txt',
+
           'lib/classes/attribute-test.js',
           'lib/classes/command-test.js',
           'lib/classes/delta-test.js',
@@ -71,6 +73,7 @@ module.exports = function (grunt) {
           'lib/models/session-test.js',
           'lib/models/workspace-test.js',
 
+
           'lib/stores/memory-test.js',
           'lib/stores/mongo-test.js',
           'lib/stores/json-file-test.js',
@@ -90,6 +93,9 @@ module.exports = function (grunt) {
           'test-spec/integration/test-procedure-integration.js',
           'test-spec/integration/test-application-integration.js',
           'test-spec/integration/test-request-dispatch-integration.js',
+
+          'test-spec/test-cover-tail.txt',
+
           'test-spec/tequila-spec.js',
           'test-spec/node-test-tail.js'
         ],
@@ -120,12 +126,12 @@ module.exports = function (grunt) {
   // node dist/node-test-cli.js
   grunt.registerTask('test', function () {
     var done = this.async();
-    doneFunction = function (error, result, code) {
-      grunt.log.write(error);
-      grunt.log.write(result);
-      grunt.log.write(code);
-      return done();
-    };
+//    doneFunction = function (error, result, code) {
+//      grunt.log.write(error);
+//      grunt.log.write(result);
+//      grunt.log.write(code);
+//      return done();
+//    };
     var child = grunt.util.spawn(
       {
         cmd: process.argv[0],
@@ -137,6 +143,18 @@ module.exports = function (grunt) {
   });
 
   // istanbul cover dist/node-test-cli.js
+  grunt.registerTask('coverme', function () {
+    var done = this.async();
+    var child = grunt.util.spawn(
+      {
+        cmd: 'istanbul',
+        args: ['cover','dist/node-test-cli.js']
+      }, done);
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
+    return child;
+  });
+
   grunt.registerTask('helpme', function () {
     grunt.log.subhead('GRUNT TASKS FOR TEQUILA\n');
     grunt.log.writeln('make\t(default) make library and run tests');
@@ -145,7 +163,7 @@ module.exports = function (grunt) {
 
   // tasks are ...
   grunt.log.write('Grunt ...\n');
-  grunt.log.muted = true; // too spammy
+//  grunt.log.muted = true; // too spammy
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
