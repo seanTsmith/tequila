@@ -4895,7 +4895,7 @@ if (true)
  * tequila
  * test-cover-head
  */
-/* istanbul ignore next */
+/* isxtanbul ignore next */
 if (true)
 {
 ;
