@@ -2,6 +2,6 @@
  * tequila
  * test-cover-head
  */
-/* isxtanbul ignore next */
+/* istanbul ignore next */
 if (true)
 {
