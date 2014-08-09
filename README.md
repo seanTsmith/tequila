@@ -1,4 +1,4 @@
-# tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila) 
+# tequila [![Build Status](https://secure.travis-ci.org/dremoor/tequila.png)](http://travis-ci.org/dremoor/tequila)[![Coverage Status](https://coveralls.io/repos/dremoor/tequila/badge.png?branch=master)](https://coveralls.io/r/dremoor/tequila?branch=master)
 Tequila is a javascript application framework.  It runs on node server and html5 capable interfaces.
 
 ## Project Goals:
