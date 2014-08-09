@@ -142,6 +142,7 @@ module.exports = function (grunt) {
     return child;
   });
 
+  //istanbul cover dist/node-test-cli.js --report lcovonly -- -R spec & cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
   // istanbul cover dist/node-test-cli.js
   grunt.registerTask('coverme', function () {
     var done = this.async();
