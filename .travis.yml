@@ -4,6 +4,8 @@ node_js:
 before_script:
   - npm install -g grunt-cli
 after_script:
+  - export COVERALLS_SERVICE_NAME=travis-ci
+  - export COVERALLS_REPO_TOKEN=YBBaL5pEkThRsHS4mS3R5gdDzkCLu5lIn
   - npm install -g istanbul
   - istanbul cover dist/node-test-cli.js --report lcovonly -- -R spec
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
