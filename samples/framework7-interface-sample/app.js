@@ -33,7 +33,7 @@ sample.InitializeStore = function (store, callback) {
   cmd.execute();
 };
 
-var f7 = new Framework7Interface();
+var f7 = new Framework7Interface({name:'Framework7Interface'});
 app.setInterface(f7);
 
 
@@ -208,6 +208,6 @@ $(document).ready(function () {
     app.start(function (stuff) {
       console.log('app got stuff: ' + JSON.stringify(stuff));
     });
-    f7.mockRequest(new Request({type: 'Command', command: presCommand}));
+//    f7.mockRequest(new Request({type: 'Command', command: presCommand}));
   });
 });
