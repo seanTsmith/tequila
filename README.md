@@ -21,8 +21,11 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 
 #### To do now
 - Attribute validation
+- Make validation for model in conjunction with attributes - extend current validation to code and rule based
 
 #### To do later
+- set up automated client / server tests automated with node.js + phantom.js
+- rewrite test fixture using library / interface
 - Finish Login in interface sample can use the attribute exception handling now
 - new methods for Models:
     - getModelName() - Primary description for model example
@@ -35,7 +38,6 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - tequilaStore needs to be set not hard coded (mongo)
 - Improve Session to handle server side auth on store
 - Add authentication to Store via sessions
-- Make validation for model in conjunction with attributes - extend current validation to code and rule based
 - Attribute visible property
 - Attribute image type
 - has emitEvent bypassed the spec?
