@@ -23,6 +23,14 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - Attribute validation
 - Make validation for model in conjunction with attributes - extend current validation to code and rule based
 
+Property                    Value
+--------
+validationRule.required     bool - (default when not specified for Number and Boolean is true / others false) 
+validationRule.range        array 1st el is lower bound, 2nd is upper ex: [1,2] 1 >= x && x <= 2   
+validationRule.isOneOf      array of allowed values
+validationRule.isValidModel model ID exists ??? needs thought
+validationRule.callBack     function to callback return error object or array of error objects or null for OK!
+
 #### To do later
 - set up automated client / server tests automated with node.js + phantom.js
 - rewrite test fixture using library / interface
