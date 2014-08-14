@@ -1524,14 +1524,16 @@ function Attribute(args, arg2) {
   }(this.type);
   this.type = splitTypes[0];
   this.hint = args.hint || {};
+  this.validationRule = args.validationRule || {};
   var unusedProperties = [];
+  var standardProperties = ['name', 'type', 'label', 'hint', 'value', 'validationRule'];
   switch (this.type) {
     case 'ID':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       break;
     case 'String':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'quickPick', 'value', 'size']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat(['placeHolder', 'quickPick', 'size']));
       this.size = splitTypes[1] ? splitTypes[1] : typeof args.size == 'number' ? args.size : args.size || 50;
       this.value = args.value || null;
       if (args.quickPick)
@@ -1539,39 +1541,44 @@ function Attribute(args, arg2) {
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Date':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat('placeHolder'));
       this.value = args.value || null;
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Boolean':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
-      this.value = args.value || null;
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
+      if (args.value === false)
+        this.value = false;
+      else
+        this.value = args.value || null;
       break;
     case 'Number':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'value']);
-      this.value = args.value || null;
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat('placeHolder'));
+      if (args.value === 0)
+        this.value = 0;
+      else
+        this.value = args.value || null;
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Model':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       if (this.value instanceof Attribute.ModelID)
         this.modelType = this.value.modelType;
       break;
     case 'Group':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       break;
     case 'Table':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value', 'group']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat('group'));
       this.value = args.value || null;
       this.group = args.group || null;
       break;
     case 'Object':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       break;
-
     default:
       break;
   }
@@ -1645,7 +1652,6 @@ Attribute.prototype.coerce = function (value) {
       newValue = value.toString();
       if (newValue.length > this.size) return newValue.substring(0, this.size);
       return newValue;
-      break;
     case 'Number':
       if (typeof newValue == 'undefined') return 0;
       if (!newValue) return 0;
@@ -1659,7 +1665,6 @@ Attribute.prototype.coerce = function (value) {
       }
       if (!newValue) return 0;
       return newValue;
-      break;
     case 'Boolean':
       if (typeof newValue == 'undefined') return false;
       if (typeof newValue == 'string') {
@@ -1669,15 +1674,13 @@ Attribute.prototype.coerce = function (value) {
         return false;
       }
       return (newValue == true);
-      break;
     case 'Date':
       if (typeof newValue == 'string') {
-        if (newValue.split('/').length==2)
+        if (newValue.split('/').length == 2)
           newValue = newValue + '/' + new Date().getFullYear();
 
       }
       return new Date(newValue);
-      break;
   }
   throw(Error('coerce cannot determine appropriate value'))
 };
@@ -1741,6 +1744,9 @@ Attribute.prototype.getObjectStateErrors = function () {
     default:
       break;
   }
+  var validationRuleBadProps = T.getInvalidProperties(this.validationRule, ['required', 'range', 'isOneOf', 'isValidModel']);
+  if (validationRuleBadProps.length)
+    this.validationErrors.push('invalid validationRule: ' + validationRuleBadProps);
   this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
   return this.validationErrors;
 };
@@ -1754,8 +1760,37 @@ Attribute.prototype.validate = function (callBack) {
       this.validationErrors.push(this._errorConditions[e]);
     }
   }
-  if (this.hint.required && !this.value)
-    this.validationErrors.push(this.label + ' required');
+  if (this.validationRule.required && !this.value) {
+    if (this.type == 'Number') {
+      if (this.value !== 0)
+        this.validationErrors.push(this.label + ' required');
+    } else if (this.type == 'Boolean') {
+      if (this.value !== false)
+        this.validationErrors.push(this.label + ' required');
+    } else {
+      this.validationErrors.push(this.label + ' required');
+    }
+  }
+  if (this.validationRule.range) {
+    if (!(this.validationRule.range instanceof Array)) {
+      this.validationRule.range = [this.validationRule.range]; // coerce to array
+    }
+    if (this.validationRule.range[0] || this.validationRule.range[0] === 0) {
+      if (this.value < this.validationRule.range[0])
+        this.validationErrors.push(this.label + ' must be at least ' + this.validationRule.range[0]);
+    }
+    if (this.validationRule.range[1] || this.validationRule.range[1] === 0) {
+      if (this.value > this.validationRule.range[1])
+        this.validationErrors.push(this.label + ' must be no more than ' + this.validationRule.range[1]);
+    }
+  }
+  if (this.validationRule.isOneOf) {
+    if (!(this.validationRule.isOneOf instanceof Array)) {
+      this.validationRule.isOneOf = [this.validationRule.isOneOf]; // coerce to array
+    }
+    if (this.validationRule.isOneOf.indexOf(this.value) == -1)
+      this.validationErrors.push(this.label + ' invalid' );
+  }
 
   this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
   this._emitEvent('StateChange');
@@ -2486,6 +2521,7 @@ Store.prototype.getList = function () {
  * tequila
  * transport-class
  */
+/* istanbul ignore next */
 function Transport(location, callBack) {
   if (false === (this instanceof Transport)) throw new Error('new operator required');
   if (typeof location != 'string') throw new Error('argument must a url string');
@@ -2534,6 +2570,7 @@ function Transport(location, callBack) {
 /*
  * Methods
  */
+/* istanbul ignore next */
 Transport.prototype.send = function (message, callBack) {
   var self = this;
   if (typeof message == 'undefined') throw new Error('message required');
@@ -2551,6 +2588,7 @@ Transport.prototype.send = function (message, callBack) {
     self.socket.send(message);
   }
 };
+/* istanbul ignore next */
 Transport.prototype.close = function () {
   if (!this.connected)
     throw new Error('not connected');
@@ -3184,8 +3222,10 @@ var RemoteStore = function (args) {
   if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
   if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
+/* istanbul ignore next */
 RemoteStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
+/* istanbul ignore next */
 RemoteStore.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
@@ -3211,6 +3251,7 @@ RemoteStore.prototype.onConnect = function (location, callBack) {
     callBack(undefined, err);
   }
 };
+/* istanbul ignore next */
 RemoteStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3237,6 +3278,7 @@ RemoteStore.prototype.putModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 RemoteStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3264,6 +3306,7 @@ RemoteStore.prototype.getModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 RemoteStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3290,6 +3333,7 @@ RemoteStore.prototype.deleteModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 RemoteStore.prototype.getList = function (list, filter, arg3, arg4) {
   var callBack, order;
   if (typeof(arg4) == 'function') {
@@ -3315,6 +3359,7 @@ RemoteStore.prototype.getList = function (list, filter, arg3, arg4) {
 
 };
 // Message Handlers
+/* istanbul ignore next */
 T.setMessageHandler('PutModel', function putModelMessageHandler(messageContents, fn) {
   // create proxy for client model
   var ProxyPutModel = function (args) {
@@ -3345,6 +3390,7 @@ T.setMessageHandler('PutModel', function putModelMessageHandler(messageContents,
     fn(msg);
   }, this);
 });
+/* istanbul ignore next */
 T.setMessageHandler('GetModel', function getModelMessageHandler(messageContents, fn) {
   // create proxy for client model
   var ProxyGetModel = function (args) {
@@ -3373,6 +3419,7 @@ T.setMessageHandler('GetModel', function getModelMessageHandler(messageContents,
     fn(msg);
   }, this);
 });
+/* istanbul ignore next */
 T.setMessageHandler('DeleteModel', function deleteModelMessageHandler(messageContents, fn) {
   // create proxy for client model
   var ProxyDeleteModel = function (args) {
@@ -3400,6 +3447,7 @@ T.setMessageHandler('DeleteModel', function deleteModelMessageHandler(messageCon
     fn(msg);
   }, this);
 });
+/* istanbul ignore next */
 T.setMessageHandler('GetList', function getListMessageHandler(messageContents, fn) {
   var proxyList = new List(new Model());
   proxyList.model.modelType = messageContents.list.model.modelType;
@@ -3604,6 +3652,7 @@ MockInterface.prototype.canMock = function () {
  */
 
 // Methods (Server Side Only)
+/* istanbul ignore next */
 MongoStore.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
@@ -3638,6 +3687,7 @@ MongoStore.prototype.onConnect = function (location, callBack) {
   }
 
 };
+/* istanbul ignore next */
 MongoStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3709,6 +3759,7 @@ MongoStore.prototype.putModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 MongoStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3753,6 +3804,7 @@ MongoStore.prototype.getModel = function (model, callBack) {
     });
   });
 };
+/* istanbul ignore next */
 MongoStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3784,6 +3836,7 @@ MongoStore.prototype.deleteModel = function (model, callBack) {
     });
   });
 };
+/* istanbul ignore next */
 MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
   var callBack, order;
   if (typeof(arg4) == 'function') {
@@ -3855,11 +3908,13 @@ MongoStore.prototype.getList = function (list, filter, arg3, arg4) {
  * tequila
  * json-file-server
  */
+/* istanbul ignore next */
 JSONFileStore.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
   callBack(this, undefined);
 };
+/* istanbul ignore next */
 JSONFileStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3887,6 +3942,7 @@ JSONFileStore.prototype.getModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 JSONFileStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3944,6 +4000,7 @@ JSONFileStore.prototype.putModel = function (model, callBack) {
     });
   }
 };
+/* istanbul ignore next */
 JSONFileStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -3966,6 +4023,7 @@ JSONFileStore.prototype.deleteModel = function (model, callBack) {
   });
 
 };
+/* istanbul ignore next */
 JSONFileStore.prototype.getList = function (list, filter, arg3, arg4) {
   var callBack, order;
   if (typeof(arg4) == 'function') {
@@ -4895,7 +4953,7 @@ if (true)
  * tequila
  * test-cover-head
  */
-/* isxtanbul ignore next */
+/* istanbul ignore next */
 if (true)
 {
 ;
@@ -4992,7 +5050,6 @@ test.runnerAttribute = function () {
         test.example('initialized to empty object', 'object', function () {
           return typeof new Attribute({name: 'name', label: 'Name'}).hint;
         });
-
       });
       test.heading('quickPick', function () {
         test.example('list of values to pick from typically invoked from dropdown', 3, function () {
@@ -5010,11 +5067,89 @@ test.runnerAttribute = function () {
           return new Attribute({name: 'name'}).validationMessage;
         });
       });
+      test.heading('validationRule', function () {
+        test.paragraph('The validationRule property provides validation rules for attribute.' +
+          '  For additional validation see the *Validate* event in onEvent method.');
+        test.example('initialized to empty object', 'object', function () {
+          return typeof new Attribute({name: 'name'}).validationRule;
+        });
+        test.example('can be passed to constructor', undefined, function () {
+          new Attribute({name: 'name', validationRule: {}});
+        });
+        test.example('validation rule is validated', Error('error creating Attribute: invalid validationRule: age'), function () {
+          new Attribute({name: 'name', validationRule: {age: 18, required: true}});
+        });
+        test.heading('validationRule.required', function () {
+          test.paragraph('validationRule.required is used when a value is required for attribute');
+          test.example('validationRule.required', test.asyncResponse('Name required'), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'name', validationRule: {required: true}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors);
+            });
+          });
+          test.example('validationRule.required for Number allows 0', test.asyncResponse(0), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'balance', type: 'Number', value: 0, validationRule: {required: true}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors.length);
+            });
+          });
+          test.example('validationRule.required for Boolean allows false', test.asyncResponse(0), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'active', type: 'Boolean', value: false, validationRule: {required: true}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors.length);
+            });
+          });
+        });
+        test.heading('validationRule.range', function () {
+          test.paragraph('validationRule.range is used when value must fall within a range of values- use null to omit bound');
+          test.example('validationRule.range lower bound only', test.asyncResponse('Age must be at least 18'), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'age', type: 'Number', value: 17, validationRule: {range: [18, null]}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors[0]);
+            });
+          });
+          test.example('validationRule.range upper bound only', test.asyncResponse('Age must be no more than 65'), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'age', type: 'Number', value: 77, validationRule: {range: [null, 65]}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors[0]);
+            });
+          });
+          test.example('validationRule.range pass', test.asyncResponse(0), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'age', type: 'Number', value: 53, validationRule: {range: [18, 65]}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors.length);
+            });
+          });
+          test.example('validationRule.range forced to array', test.asyncResponse('Age must be at least 100'), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'age', type: 'Number', value: 53, validationRule: {range: 100}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors);
+            });
+          });
+        });
+        test.heading('validationRule.isOneOf', function () {
+          test.paragraph('validationRule.isOneOf is used when a value is must be on of items in array');
+
+          test.example('validationRule.isOneOf fail', test.asyncResponse('Age invalid'), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'age', type: 'Number', value: 2, validationRule: {isOneOf: [1, 3]}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors[0]);
+            });
+          });
+          test.example('validationRule.isOneOf pass', test.asyncResponse(0), function (testNode, returnResponse) {
+            var a = new Attribute({name: 'age', type: 'Number', value: 1, validationRule: {isOneOf: [1, 3]}});
+            a.validate(function () {
+              returnResponse(testNode, a.validationErrors.length);
+            });
+          });
+        });
+
+      });
       test.heading('value', function () {
         test.example('should accept null assignment', undefined, function () {
           var myTypes = T.getAttributeTypes();
           var record = '';
-          for (var i in myTypes) {
+          for (var i = 0; i < myTypes.length; i++) {
             record += myTypes[i] + ':' + new Attribute({name: 'my' + myTypes[i]}).value + ' ';
           }
           test.show(record);
@@ -5292,6 +5427,7 @@ test.runnerAttribute = function () {
 
         // Monitor state changes
         attribute.onEvent('StateChange', function () {
+          // When the error is got milk then test is done
           if (attribute.validationMessage == 'got milk')
             returnResponse(testNode, 'got milk');
         });
@@ -8189,6 +8325,7 @@ test.stop();
  * node-test-tail
  */
 test.runner(false);
+/* istanbul ignore next */
 process.on('exit', function () {
   process.exit(test.countFail || test.criticalFail ? 1 : 0);
 });

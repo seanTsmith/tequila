@@ -122,14 +122,16 @@ function Attribute(args, arg2) {
   }(this.type);
   this.type = splitTypes[0];
   this.hint = args.hint || {};
+  this.validationRule = args.validationRule || {};
   var unusedProperties = [];
+  var standardProperties = ['name', 'type', 'label', 'hint', 'value', 'validationRule'];
   switch (this.type) {
     case 'ID':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       break;
     case 'String':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'quickPick', 'value', 'size']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat(['placeHolder', 'quickPick', 'size']));
       this.size = splitTypes[1] ? splitTypes[1] : typeof args.size == 'number' ? args.size : args.size || 50;
       this.value = args.value || null;
       if (args.quickPick)
@@ -137,39 +139,44 @@ function Attribute(args, arg2) {
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Date':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat('placeHolder'));
       this.value = args.value || null;
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Boolean':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
-      this.value = args.value || null;
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
+      if (args.value === false)
+        this.value = false;
+      else
+        this.value = args.value || null;
       break;
     case 'Number':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'placeHolder', 'value']);
-      this.value = args.value || null;
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat('placeHolder'));
+      if (args.value === 0)
+        this.value = 0;
+      else
+        this.value = args.value || null;
       this.placeHolder = args.placeHolder || null;
       break;
     case 'Model':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       if (this.value instanceof Attribute.ModelID)
         this.modelType = this.value.modelType;
       break;
     case 'Group':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       break;
     case 'Table':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value', 'group']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties.concat('group'));
       this.value = args.value || null;
       this.group = args.group || null;
       break;
     case 'Object':
-      unusedProperties = T.getInvalidProperties(args, ['name', 'type', 'label', 'hint', 'value']);
+      unusedProperties = T.getInvalidProperties(args, standardProperties);
       this.value = args.value || null;
       break;
-
     default:
       break;
   }
@@ -243,7 +250,6 @@ Attribute.prototype.coerce = function (value) {
       newValue = value.toString();
       if (newValue.length > this.size) return newValue.substring(0, this.size);
       return newValue;
-      break;
     case 'Number':
       if (typeof newValue == 'undefined') return 0;
       if (!newValue) return 0;
@@ -257,7 +263,6 @@ Attribute.prototype.coerce = function (value) {
       }
       if (!newValue) return 0;
       return newValue;
-      break;
     case 'Boolean':
       if (typeof newValue == 'undefined') return false;
       if (typeof newValue == 'string') {
@@ -267,15 +272,13 @@ Attribute.prototype.coerce = function (value) {
         return false;
       }
       return (newValue == true);
-      break;
     case 'Date':
       if (typeof newValue == 'string') {
-        if (newValue.split('/').length==2)
+        if (newValue.split('/').length == 2)
           newValue = newValue + '/' + new Date().getFullYear();
 
       }
       return new Date(newValue);
-      break;
   }
   throw(Error('coerce cannot determine appropriate value'))
 };
@@ -339,6 +342,9 @@ Attribute.prototype.getObjectStateErrors = function () {
     default:
       break;
   }
+  var validationRuleBadProps = T.getInvalidProperties(this.validationRule, ['required', 'range', 'isOneOf', 'isValidModel']);
+  if (validationRuleBadProps.length)
+    this.validationErrors.push('invalid validationRule: ' + validationRuleBadProps);
   this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
   return this.validationErrors;
 };
@@ -352,8 +358,37 @@ Attribute.prototype.validate = function (callBack) {
       this.validationErrors.push(this._errorConditions[e]);
     }
   }
-  if (this.hint.required && !this.value)
-    this.validationErrors.push(this.label + ' required');
+  if (this.validationRule.required && !this.value) {
+    if (this.type == 'Number') {
+      if (this.value !== 0)
+        this.validationErrors.push(this.label + ' required');
+    } else if (this.type == 'Boolean') {
+      if (this.value !== false)
+        this.validationErrors.push(this.label + ' required');
+    } else {
+      this.validationErrors.push(this.label + ' required');
+    }
+  }
+  if (this.validationRule.range) {
+    if (!(this.validationRule.range instanceof Array)) {
+      this.validationRule.range = [this.validationRule.range]; // coerce to array
+    }
+    if (this.validationRule.range[0] || this.validationRule.range[0] === 0) {
+      if (this.value < this.validationRule.range[0])
+        this.validationErrors.push(this.label + ' must be at least ' + this.validationRule.range[0]);
+    }
+    if (this.validationRule.range[1] || this.validationRule.range[1] === 0) {
+      if (this.value > this.validationRule.range[1])
+        this.validationErrors.push(this.label + ' must be no more than ' + this.validationRule.range[1]);
+    }
+  }
+  if (this.validationRule.isOneOf) {
+    if (!(this.validationRule.isOneOf instanceof Array)) {
+      this.validationRule.isOneOf = [this.validationRule.isOneOf]; // coerce to array
+    }
+    if (this.validationRule.isOneOf.indexOf(this.value) == -1)
+      this.validationErrors.push(this.label + ' invalid' );
+  }
 
   this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
   this._emitEvent('StateChange');
@@ -1084,6 +1119,7 @@ Store.prototype.getList = function () {
  * tequila
  * transport-class
  */
+/* istanbul ignore next */
 function Transport(location, callBack) {
   if (false === (this instanceof Transport)) throw new Error('new operator required');
   if (typeof location != 'string') throw new Error('argument must a url string');
@@ -1132,6 +1168,7 @@ function Transport(location, callBack) {
 /*
  * Methods
  */
+/* istanbul ignore next */
 Transport.prototype.send = function (message, callBack) {
   var self = this;
   if (typeof message == 'undefined') throw new Error('message required');
@@ -1149,6 +1186,7 @@ Transport.prototype.send = function (message, callBack) {
     self.socket.send(message);
   }
 };
+/* istanbul ignore next */
 Transport.prototype.close = function () {
   if (!this.connected)
     throw new Error('not connected');
@@ -1782,8 +1820,10 @@ var RemoteStore = function (args) {
   if (errorList.length > 1) throw new Error('error creating Store: multiple errors');
   if (errorList.length) throw new Error('error creating Store: ' + errorList[0]);
 };
+/* istanbul ignore next */
 RemoteStore.prototype = T.inheritPrototype(Store.prototype);
 // Methods
+/* istanbul ignore next */
 RemoteStore.prototype.onConnect = function (location, callBack) {
   if (typeof location != 'string') throw new Error('argument must a url string');
   if (typeof callBack != 'function') throw new Error('argument must a callback');
@@ -1809,6 +1849,7 @@ RemoteStore.prototype.onConnect = function (location, callBack) {
     callBack(undefined, err);
   }
 };
+/* istanbul ignore next */
 RemoteStore.prototype.putModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -1835,6 +1876,7 @@ RemoteStore.prototype.putModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 RemoteStore.prototype.getModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -1862,6 +1904,7 @@ RemoteStore.prototype.getModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 RemoteStore.prototype.deleteModel = function (model, callBack) {
   if (!(model instanceof Model)) throw new Error('argument must be a Model');
   if (model.getObjectStateErrors().length) throw new Error('model has validation errors');
@@ -1888,6 +1931,7 @@ RemoteStore.prototype.deleteModel = function (model, callBack) {
     }
   });
 };
+/* istanbul ignore next */
 RemoteStore.prototype.getList = function (list, filter, arg3, arg4) {
   var callBack, order;
   if (typeof(arg4) == 'function') {
@@ -1913,6 +1957,7 @@ RemoteStore.prototype.getList = function (list, filter, arg3, arg4) {
 
 };
 // Message Handlers
+/* istanbul ignore next */
 T.setMessageHandler('PutModel', function putModelMessageHandler(messageContents, fn) {
   // create proxy for client model
   var ProxyPutModel = function (args) {
@@ -1943,6 +1988,7 @@ T.setMessageHandler('PutModel', function putModelMessageHandler(messageContents,
     fn(msg);
   }, this);
 });
+/* istanbul ignore next */
 T.setMessageHandler('GetModel', function getModelMessageHandler(messageContents, fn) {
   // create proxy for client model
   var ProxyGetModel = function (args) {
@@ -1971,6 +2017,7 @@ T.setMessageHandler('GetModel', function getModelMessageHandler(messageContents,
     fn(msg);
   }, this);
 });
+/* istanbul ignore next */
 T.setMessageHandler('DeleteModel', function deleteModelMessageHandler(messageContents, fn) {
   // create proxy for client model
   var ProxyDeleteModel = function (args) {
@@ -1998,6 +2045,7 @@ T.setMessageHandler('DeleteModel', function deleteModelMessageHandler(messageCon
     fn(msg);
   }, this);
 });
+/* istanbul ignore next */
 T.setMessageHandler('GetList', function getListMessageHandler(messageContents, fn) {
   var proxyList = new List(new Model());
   proxyList.model.modelType = messageContents.list.model.modelType;
