@@ -341,6 +341,7 @@ if (true)
             }
             break;
           case 'e':
+            var offsetWas = document.documentElement.offsetHeight;
             var testPassed = false;
             var ranTest = false;
             var caption = document.createElement("caption");
@@ -442,7 +443,8 @@ if (true)
             }
             test.updateStats();
             if (ranTest && !testPassed && test.scrollFirstError < 1) {
-              test.scrollFirstError = document.height - document.documentElement.clientHeight;
+              test.scrollFirstError = offsetWas - test.headerDiv.clientHeight - caption.clientHeight;
+              // test.scrollFirstError = offsetWas - test.headerDiv.clientHeight; // document.documentElement.offsetHeight; // document.height - document.documentElement.clientHeight;
             }
             if (test.nodes[i].asyncTest) {
               test.nodes[i].errorThrown = false;
@@ -469,8 +471,8 @@ if (true)
   test.renderCloser = function (isBrowser) {
     if (isBrowser) {
       test.updateStats();
-//    if (test.scrollFirstError > 0)
-//      window.scroll(0, test.scrollFirstError);
+    if (test.scrollFirstError > 0)
+      window.scrollTo(0, test.scrollFirstError);
     } else {
       test.closerCalled = false;
       test.cliCloser();
