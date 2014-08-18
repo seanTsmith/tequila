@@ -460,6 +460,10 @@ if (true)
                 test.nodes[i].exampleCaption.style.display = "";
                 test.nodes[i].examplePre.style.background = "#fcc"; // red
                 test.updateStats();
+                if (test.scrollFirstError < 1) {
+                  test.scrollFirstError = offsetWas - test.headerDiv.clientHeight - caption.clientHeight;
+                  // test.scrollFirstError = offsetWas - test.headerDiv.clientHeight; // document.documentElement.offsetHeight; // document.height - document.documentElement.clientHeight;
+                }
               }
             }
             break;
@@ -519,6 +523,7 @@ if (true)
     this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
   };
   test.assertion = function (truDat, description) {
+    test.lastAssertion = truDat;
     test.assertions.push(truDat);
     test.assertionsDescription.push(description);
   };
@@ -562,6 +567,8 @@ if (true)
   };
   test.asyncCallback = function (node, test_Results) {
     // function to evaluate results of async
+    if (!node || typeof node == 'TestNode')
+    throw new Error('callback (returnResponse) first param must be TestNode')
     if (node.errorThrown) return;
     var testPassed = false;
     test.wasThrown = false;
@@ -615,7 +622,18 @@ if (true)
         }
       }
       node.examplePre.innerHTML = '<code>' + exampleCode + '</code>';
+      if (!testPassed || gotFailedAssertions) {
+        // var offsetWas = document.documentElement.offsetHeight;
+        // test.scrollFirstError = offsetWas - test.headerDiv.clientHeight - caption.clientHeight;
+        // document.documentElement.offsetHeight;
+        if (test.scrollFirstError == 0) {
+          test.scrollFirstError = node.examplePre.offsetTop - test.headerDiv.clientHeight - node.examplePre.previousSibling.clientHeight;
+          if (test.scrollFirstError > 0)
+            window.scrollTo(0, test.scrollFirstError);
+        }
+      }
       test.updateStats();
+
     } else {
       if (testPassed && !gotFailedAssertions) {
         test.countPass++;
