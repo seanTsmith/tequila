@@ -20,9 +20,9 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it (grunt)
 
 #### To do now
-- Validate model extending attribute validation
 
 #### To do later
+- make abstraction for toolbar vs app then have interface render toolbar accordingly
 - set up automated client / server tests automated with node.js + phantom.js
 - rewrite test fixture using library / interface
 - Finish Login in interface sample can use the attribute exception handling now
@@ -39,7 +39,7 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - Add authentication to Store via sessions
 - Attribute visible property
 - Attribute image type
-- has emitEvent bypassed the spec?
+- Incorporate onEvent and _emitEvent as mixins to Attribute and Model (so far)
 
 #### To do even later
 - Why is Travis breaking JSONfilestore ?

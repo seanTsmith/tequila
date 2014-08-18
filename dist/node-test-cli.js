@@ -1413,6 +1413,7 @@ var Tequila = (function () {
     var version = '0.1.5';
     var attributeTypes = ['ID', 'String', 'Date', 'Boolean', 'Number', 'Model', 'Group', 'Table', 'Object'];
     var AttributeEvents = ['StateChange', 'Validate'];
+    var ModelEvents = ['StateChange', 'Validate'];
     var messageTypes = ['Null', 'Connected', 'Error', 'Sent', 'Ping', 'PutModel', 'PutModelAck', 'GetModel', 'GetModelAck', 'DeleteModel', 'DeleteModelAck', 'GetList', 'GetListAck'];
     var commandTypes = ['Stub', 'Menu', 'Presentation', 'Function', 'Procedure'];
     var commandEvents = ['BeforeExecute', 'AfterExecute', 'Error', 'Aborted', 'Completed'];
@@ -1458,6 +1459,9 @@ var Tequila = (function () {
       },
       getAttributeEvents: function () {
         return AttributeEvents.slice(0); // copy array
+      },
+      getModelEvents: function () {
+        return ModelEvents.slice(0); // copy array
       },
       getMessageTypes: function () {
         return messageTypes.slice(0); // copy array
@@ -1752,6 +1756,7 @@ Attribute.prototype.getObjectStateErrors = function () {
 };
 Attribute.prototype.validate = function (callBack) {
   if (typeof callBack != 'function') throw new Error('callback is required');
+  // First check object state
   this.getObjectStateErrors();
   this._emitEvent('Validate');
   var e;
@@ -1760,6 +1765,7 @@ Attribute.prototype.validate = function (callBack) {
       this.validationErrors.push(this._errorConditions[e]);
     }
   }
+  // Check validation rules for attribute
   if (this.validationRule.required && !this.value) {
     if (this.type == 'Number') {
       if (this.value !== 0)
@@ -1792,6 +1798,7 @@ Attribute.prototype.validate = function (callBack) {
       this.validationErrors.push(this.label + ' invalid' );
   }
 
+  // All done...
   this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
   this._emitEvent('StateChange');
   callBack.call(this);
@@ -2292,7 +2299,7 @@ Message.prototype.toString = function () {
 var Model = function (args) {
   if (false === (this instanceof Model)) throw new Error('new operator required');
   this.modelType = "Model";
-  this.attributes = [new Attribute('id','ID')];
+  this.attributes = [new Attribute('id', 'ID')];
   args = args || {};
   if (args.attributes) {
     for (var i in args.attributes) {
@@ -2303,53 +2310,56 @@ var Model = function (args) {
   var unusedProperties = T.getInvalidProperties(args, ['attributes']);
   var errorList = this.getObjectStateErrors(); // before leaving make sure valid Model
   for (var i = 0; i < unusedProperties.length; i++) errorList.push('invalid property: ' + unusedProperties[i]);
-  if (errorList.length > 1) throw new Error('error creating Attribute: multiple errors');
-  if (errorList.length) throw new Error('error creating Attribute: ' + errorList[0]);
+  if (errorList.length > 1) throw new Error('error creating Model: multiple errors');
+  if (errorList.length) throw new Error('error creating Model: ' + errorList[0]);
+  // Validations done
+  this._eventListeners = [];
+  this._errorConditions = {};
 };
 // Methods
 Model.prototype.toString = function () {
   return "a " + this.modelType;
 };
 Model.prototype.copy = function (sourceModel) {
-  for (var i=0; i<this.attributes.length; i++) {
+  for (var i = 0; i < this.attributes.length; i++) {
     //if (args.attributes.hasOwnProperty(i))
-      this.attributes[i].value = sourceModel.attributes[i].value;
+    this.attributes[i].value = sourceModel.attributes[i].value;
   }
 };
 Model.prototype.getObjectStateErrors = function () {
-  var errors = [];
+  this.validationErrors = [];
   // check attributes
   if (!(this.attributes instanceof Array)) {
-    errors.push('attributes must be Array');
+    this.validationErrors.push('attributes must be Array');
   } else {
-    if (this.attributes.length<1) {
-      errors.push('attributes must not be empty');
+    if (this.attributes.length < 1) {
+      this.validationErrors.push('attributes must not be empty');
     } else {
       for (var i = 0; i < this.attributes.length; i++) {
-        if (i == 0 && (!(this.attributes[i] instanceof Attribute) || this.attributes[i].type != "ID")) errors.push('first attribute must be ID');
-        if (!(this.attributes[i] instanceof Attribute)) errors.push('attribute must be Attribute');
+        if (i == 0 && (!(this.attributes[i] instanceof Attribute) || this.attributes[i].type != "ID")) this.validationErrors.push('first attribute must be ID');
+        if (!(this.attributes[i] instanceof Attribute)) this.validationErrors.push('attribute must be Attribute');
       }
     }
   }
   // check tags
   if (this.tags !== undefined && !(this.tags instanceof Array)) {
-    errors.push('tags must be Array or null');
+    this.validationErrors.push('tags must be Array or null');
   }
-  return errors;
+  return this.validationErrors;
 };
-Model.prototype.get = function(attribute) {
+Model.prototype.get = function (attribute) {
   for (var i = 0; i < this.attributes.length; i++) {
     if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase())
       return this.attributes[i].value;
   }
 };
-Model.prototype.getAttributeType = function(attribute) {
+Model.prototype.getAttributeType = function (attribute) {
   for (var i = 0; i < this.attributes.length; i++) {
     if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase())
       return this.attributes[i].type;
   }
 };
-Model.prototype.set = function(attribute,value) {
+Model.prototype.set = function (attribute, value) {
   for (var i = 0; i < this.attributes.length; i++) {
     if (this.attributes[i].name.toUpperCase() == attribute.toUpperCase()) {
       this.attributes[i].value = value;
@@ -2357,6 +2367,97 @@ Model.prototype.set = function(attribute,value) {
     }
   }
   throw new Error('attribute not valid for model');
+};
+Model.prototype.validate = function (callBack) {
+  var model = this;
+  var i, e;
+  var validationsPending = 0; // track callbacks sent
+  if (typeof callBack != 'function') throw new Error('callback is required');
+  // First check object state
+  model.getObjectStateErrors();
+  for (e in model._errorConditions) {
+    if (model._errorConditions.hasOwnProperty(e)) {
+      model.validationErrors.push(model._errorConditions[e]);
+    }
+  }
+  // If model wrong here abort attribute tests
+  if (model.validationErrors.length) {
+    model.validationMessage = model.validationErrors.length > 0 ? model.validationErrors[0] : '';
+    model._emitEvent('StateChange');
+    callBack.call(model);
+    return;
+  }
+
+  // Now check each attribute
+  for (i = 0; i < model.attributes.length; i++) {
+    validationsPending++;
+    (function (curAttribute) {
+      setTimeout(function () {
+        curAttribute.validate(function () {
+          if (curAttribute.validationErrors.length) {
+            model.validationErrors.push('bush');
+          }
+          // done with this one - see if done with all
+          if (--validationsPending == 0) {
+            /** Final test is here ... **/
+            // If no errors in attributes validate model
+            if (!model.validationErrors.length)
+              model._emitEvent('Validate');
+            // Finally done here!
+            model.validationMessage = model.validationErrors.length > 0 ? model.validationErrors[0] : '';
+            model._emitEvent('StateChange');
+            callBack.call(model);
+          }
+        });
+      }, 0);
+    }(model.attributes[i]))
+  }
+
+//  // All done...
+//  this.validationMessage = this.validationErrors.length > 0 ? this.validationErrors[0] : '';
+//  this._emitEvent('StateChange');
+//  callBack.call(this);
+
+};
+Model.prototype.onEvent = function (events, callback) {
+  if (!(events instanceof Array)) {
+    if (typeof events != 'string') throw new Error('subscription string or array required');
+    events = [events]; // coerce to array
+  }
+  if (typeof callback != 'function') throw new Error('callback is required');
+  // Check known Events
+  for (var i in events) {
+    if (events.hasOwnProperty(i))
+      if (events[i] != '*')
+        if (!T.contains(T.getModelEvents(), events[i]))
+          throw new Error('Unknown command event: ' + events[i]);
+  }
+  // All good add to chain
+  this._eventListeners.push({events: events, callback: callback});
+  return this;
+};
+Model.prototype._emitEvent = function (event) {
+  var i;
+  for (i in this._eventListeners) {
+    if (this._eventListeners.hasOwnProperty(i)) {
+      var subscriber = this._eventListeners[i];
+      if ((subscriber.events.length && subscriber.events[0] === '*') || T.contains(subscriber.events, event)) {
+        subscriber.callback.call(this, event);
+      }
+    }
+  }
+};
+Model.prototype.setError = function (condition, description) {
+  condition = condition || '';
+  description = description || '';
+  if (!condition) throw new Error('condition required');
+  if (!description) throw new Error('description required');
+  this._errorConditions[condition] = description;
+};
+Model.prototype.clearError = function (condition) {
+  condition = condition || '';
+  if (!condition) throw new Error('condition required');
+  delete this._errorConditions[condition];
 };;
 /**
  * tequila
@@ -4479,6 +4580,7 @@ if (true)
             }
             break;
           case 'e':
+            var offsetWas = document.documentElement.offsetHeight;
             var testPassed = false;
             var ranTest = false;
             var caption = document.createElement("caption");
@@ -4580,7 +4682,8 @@ if (true)
             }
             test.updateStats();
             if (ranTest && !testPassed && test.scrollFirstError < 1) {
-              test.scrollFirstError = document.height - document.documentElement.clientHeight;
+              test.scrollFirstError = offsetWas - test.headerDiv.clientHeight - caption.clientHeight;
+              // test.scrollFirstError = offsetWas - test.headerDiv.clientHeight; // document.documentElement.offsetHeight; // document.height - document.documentElement.clientHeight;
             }
             if (test.nodes[i].asyncTest) {
               test.nodes[i].errorThrown = false;
@@ -4596,6 +4699,10 @@ if (true)
                 test.nodes[i].exampleCaption.style.display = "";
                 test.nodes[i].examplePre.style.background = "#fcc"; // red
                 test.updateStats();
+                if (test.scrollFirstError < 1) {
+                  test.scrollFirstError = offsetWas - test.headerDiv.clientHeight - caption.clientHeight;
+                  // test.scrollFirstError = offsetWas - test.headerDiv.clientHeight; // document.documentElement.offsetHeight; // document.height - document.documentElement.clientHeight;
+                }
               }
             }
             break;
@@ -4607,8 +4714,8 @@ if (true)
   test.renderCloser = function (isBrowser) {
     if (isBrowser) {
       test.updateStats();
-//    if (test.scrollFirstError > 0)
-//      window.scroll(0, test.scrollFirstError);
+    if (test.scrollFirstError > 0)
+      window.scrollTo(0, test.scrollFirstError);
     } else {
       test.closerCalled = false;
       test.cliCloser();
@@ -4655,6 +4762,7 @@ if (true)
     this.nodes.push(new TestNode(T.inheritanceTest, 'e', this.headingLevel + 1, this.outlineLabel, text, func, this.exampleNumber, true, expect));
   };
   test.assertion = function (truDat, description) {
+    test.lastAssertion = truDat;
     test.assertions.push(truDat);
     test.assertionsDescription.push(description);
   };
@@ -4698,6 +4806,8 @@ if (true)
   };
   test.asyncCallback = function (node, test_Results) {
     // function to evaluate results of async
+    if (!node || typeof node == 'TestNode')
+    throw new Error('callback (returnResponse) first param must be TestNode')
     if (node.errorThrown) return;
     var testPassed = false;
     test.wasThrown = false;
@@ -4751,7 +4861,18 @@ if (true)
         }
       }
       node.examplePre.innerHTML = '<code>' + exampleCode + '</code>';
+      if (!testPassed || gotFailedAssertions) {
+        // var offsetWas = document.documentElement.offsetHeight;
+        // test.scrollFirstError = offsetWas - test.headerDiv.clientHeight - caption.clientHeight;
+        // document.documentElement.offsetHeight;
+        if (test.scrollFirstError == 0) {
+          test.scrollFirstError = node.examplePre.offsetTop - test.headerDiv.clientHeight - node.examplePre.previousSibling.clientHeight;
+          if (test.scrollFirstError > 0)
+            window.scrollTo(0, test.scrollFirstError);
+        }
+      }
       test.updateStats();
+
     } else {
       if (testPassed && !gotFailedAssertions) {
         test.countPass++;
@@ -5457,7 +5578,6 @@ test.runnerAttribute = function () {
         // Now validation function error is shown
         function test3() {
           test.assertion(attribute.validationMessage == 'Incorrect answer');
-
           // Fix everything
           attribute.value = 42;
           attribute.validate(test4);
@@ -6038,7 +6158,7 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
       test.example('should make sure new operator used', Error('new operator required'), function () {
         SurrogateModelClass();
       });
-      test.example('should make sure properties are valid', Error('error creating Attribute: invalid property: sup'), function () {
+      test.example('should make sure properties are valid', Error('error creating Model: invalid property: sup'), function () {
         new SurrogateModelClass({sup: 'yo'});
       });
       test.example('can supply attributes in constructor in addition to ID default', 'scrabble', function () {
@@ -6077,14 +6197,12 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
         });
       });
       test.heading('value', function () {
-
       });
-
     });
     test.heading('METHODS', function () {
       test.heading('toString()', function () {
         test.example('should return a description of the model', true, function () {
-          return new SurrogateModelClass().toString().length>0;
+          return new SurrogateModelClass().toString().length > 0;
         });
       });
       test.heading('copy(sourceModel)', function () {
@@ -6100,7 +6218,7 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           var m3 = m1;
           m1.set('name', 'Bar');
           m2.set('name', 'Bar');
-          // First demonstrate instance ref versus anothel model with equal attributes
+          // First demonstrate instance ref versus another model with equal attributes
           test.assertion(m1 === m3); // assigning one model to variable references same instance
           test.assertion(m3.get('name') === 'Bar'); // m3 changed when m1 changed
           test.assertion(m1 !== m2); // 2 models are not the same instance
@@ -6122,6 +6240,26 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           return m.getObjectStateErrors();
         });
       });
+      test.heading('onEvent', function () {
+        test.paragraph('Use onEvent(events,callback)');
+        test.example('first parameter is a string or array of event subscriptions', Error('subscription string or array required'), function () {
+          new SurrogateModelClass().onEvent();
+        });
+        test.example('callback is required', Error('callback is required'), function () {
+          new SurrogateModelClass().onEvent([]);
+        });
+        test.example('events are checked against known types', Error('Unknown command event: onDrunk'), function () {
+          new SurrogateModelClass().onEvent(['onDrunk'], function () {
+          });
+        });
+        test.example('here is a working version', undefined, function () {
+          test.show(T.getAttributeEvents());
+          // Validate - callback when attribute needs to be validated
+          // StateChange -- callback when state of object (value or validation state) has changed
+          new Model().onEvent(['Validate'], function () {
+          });
+        });
+      });
       test.heading('get(attributeName)', function () {
         test.example('returns undefined if the attribute does not exist', undefined, function () {
           test.assertion(new SurrogateModelClass().get('whatever') === undefined)
@@ -6134,7 +6272,7 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
       });
       test.heading('getAttributeType(attributeName)', function () {
         test.example('returns attribute type for given attribute name', 'Date', function () {
-          return new Model({attributes: [new Attribute('born','Date')]}).getAttributeType('born');
+          return new Model({attributes: [new Attribute('born', 'Date')]}).getAttributeType('born');
         });
       });
       test.heading('set(attributeName,value)', function () {
@@ -6146,6 +6284,72 @@ test.runnerModel = function (SurrogateModelClass, inheritanceTest) {
           question.set('answer', 42);
           return question.attributes[1].value;
         });
+      });
+      test.heading('validate', function () {
+        test.paragraph('check valid object state and value for attribute - invoke callback for results');
+        test.example('callback is required', Error('callback is required'), function () {
+          new Model().validate();
+        });
+      });
+
+      test.heading('setError', function () {
+        test.paragraph('Set a error condition and descriptive message');
+        test.example('first argument condition required', Error('condition required'), function () {
+          new Model().setError();
+        });
+        test.example('second argument description required', Error('description required'), function () {
+          new Model().setError('login');
+        });
+      });
+      test.heading('clearError', function () {
+        test.paragraph('Clear a error condition');
+        test.example('first argument condition required', Error('condition required'), function () {
+          new Model().clearError();
+        });
+      });
+
+    });
+    test.heading('INTEGRATION', function () {
+      test.example('model validation usage demonstrated', test.asyncResponse('test3: 0'), function (testNode, returnResponse) {
+        // Create a model with each attribute having and error
+        var model = new Model({attributes: [
+          new Attribute({name: 'Name', validationRule: {required: true}}),
+          new Attribute({name: 'Age', type: 'Number', validationRule: {range: [18, null]}}),
+          new Attribute({name: 'Sex', validationRule: {required: true}})
+        ]});
+        // Create a model validation where males have to be 21
+        model.onEvent('Validate', function () {
+          var name = model.get('name');
+          var age = model.get('age');
+          var sex = model.get('sex');
+          if (sex != 'F' && age < 21)
+            model.validationErrors.push('Males must be 21 or over');
+        });
+        model.validate(test1);
+        // Expect 3 errors for each attribute
+        function test1() {
+          if (model.validationErrors.length == 3) {
+            model.set('name','John Doe');
+            model.set('age',18);
+            model.set('sex','M');
+            model.validate(test2);
+          } else {
+            returnResponse(testNode, 'test1: ' + model.validationErrors.length);
+          }
+        }
+        // Expect 1 errors since all attributes fixed but model will fail
+        function test2() {
+          if (model.validationErrors.length == 1 && model.validationMessage == 'Males must be 21 or over') {
+            model.set('age',21);
+            model.validate(test3);
+          } else {
+            returnResponse(testNode, 'test2: ' + model.validationErrors.length);
+          }
+        }
+        // Test done should be no errors (to pass final test)
+        function test3() {
+          returnResponse(testNode, 'test3: ' + model.validationErrors.length);
+        }
       });
     });
   });
