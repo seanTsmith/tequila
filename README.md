@@ -20,28 +20,29 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it (grunt)
 
 #### To do now
+- make abstraction for toolbar vs app then have interface render toolbar accordingly
+- unify sample for both interfaces
 
 #### To do later
-- make abstraction for toolbar vs app then have interface render toolbar accordingly
-- set up automated client / server tests automated with node.js + phantom.js
-- rewrite test fixture using library / interface
-- Finish Login in interface sample can use the attribute exception handling now
+- Attribute visible property
+- Attribute image type
+
+#### To do even later
 - new methods for Models:
     - getModelName() - Primary description for model example
     - getModelType() - optional small identifying info
     - getModelPrimaryInfo() - summary info for model
     - getModelSecondaryInfo() - additional details for model
+- Finish Login in interface sample can use the attribute exception handling now
+- Improve Session to handle server side auth on store
+- Add authentication to Store via sessions
 - Workspace Integration
+- rewrite test fixture using library / interface
 - add get and put methods to Model
 - Review callback for consistency.  err, xxx like node?
 - tequilaStore needs to be set not hard coded (mongo)
-- Improve Session to handle server side auth on store
-- Add authentication to Store via sessions
-- Attribute visible property
-- Attribute image type
 - Incorporate onEvent and _emitEvent as mixins to Attribute and Model (so far)
-
-#### To do even later
+- set up automated client / server tests automated with node.js + phantom.js
 - Why is Travis breaking JSONfilestore ?
 - Fix test rig async assertions getting intermixed need state per node instead of global
 - figure out wtf above means
