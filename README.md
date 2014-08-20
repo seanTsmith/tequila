@@ -27,7 +27,7 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - Attribute visible property
 - Attribute image type
 
-#### To do even later
+#### To do even laterz
 - new methods for Models:
     - getModelName() - Primary description for model example
     - getModelType() - optional small identifying info
