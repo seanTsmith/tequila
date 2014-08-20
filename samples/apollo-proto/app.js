@@ -64,8 +64,8 @@ $(document).ready(function () {
       console.log('app got stuff: ' + JSON.stringify(stuff));
       if (stuff == 'loadPages') {
         f7.addPageHandler('Sites', 'fa-building-o', app.registerSitesPage);
-        f7.addPageHandler('I/Os', 'fa-tasks', app.registerProtoPage);
-        f7.addPageHandler('Details', 'fa-tachometer', app.registerProtoPage);
+        f7.addPageHandler('I/Os', 'fa-tasks', app.registerIOPage);
+        f7.addPageHandler('Details', 'fa-tachometer', app.registerDetailPage);
         f7.addPageHandler('Alarms', 'fa-bell-o', app.registerProtoPage);
         f7.addPageHandler('Manual Read', 'fa-pencil-square-o', app.registerProtoPage);
         f7.addPageHandler('Configure', 'fa-cog', app.registerProtoPage);
@@ -76,7 +76,7 @@ $(document).ready(function () {
         f7.addPageHandler('Configure', 'fa-cog', app.registerProtoPage);
       }
     });
-    f7.selectPage('Sites');
+    f7.selectPage('Details');
   });
 });
 
@@ -88,21 +88,63 @@ app.registerProtoPage = function (self, tab, action) {
 };
 
 app.registerSitesPage = function (self, tab, action) {
-
+  console.log('registerSitesPage');
   var topPart = '<div class="content-block-title">Site List</div><div class="list-block"><ul>';
   var midPart = ''; // set by setInnerHTML
   var botPart = '</ul></div>';
-
   for (var i = 0; i < MODEL.sites.length; i++) {
     var site = MODEL.sites[i];
-    midPart += '<ul><li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">' + MODEL.sites[i].name + '</div></div></a></li></ul>'
+    midPart += '<li><a href="#" class="item-link item-content"><div class="item-inner"><div class="item-title">' + site.name + '</div></div></a></li>';
   }
-
   tab.innerHTML = topPart + midPart + botPart;
-
 };
 
+app.registerIOPage = function (self, tab, action) {
+  console.log('registerIOPage');
+  var topPart = '<div class="content-block-title">I/O XXXXX</div><div class="list-block"><ul>';
+  var midPart = ''; // set by setInnerHTML
+  var botPart = '</ul></div>';
+  for (var i = 0; i < MODEL.sites[0].ioList.length; i++) {
+    var io = MODEL.sites[0].ioList[i];
+    midPart += '<li><a href="#" class="item-link item-content"><div class="item-inner">' +
+      '<div class="item-title">' + io.label + '</div>' +
+      '<div class="item-after">' + io.reading + '</div>' +
+      '</div></a></li>';
+  }
+  tab.innerHTML = topPart + midPart + botPart;
+};
 
+app.registerDetailPage = function (self, tab, action) {
+  console.log('registerDetailPage');
+  var topPart = '<div class="content-block-title">DETAILSZZZZ</div><div class="list-block"><ul>';
+  var midPart = ''; // set by setInnerHTML
+  var botPart = '</ul></div>';
+  var fields = [
+    ['Site', 'SITEID', 'text'],
+    ['IO Location', 'label', 'text'],
+    ['Reading', 'reading', 'text'],
+    ['Warn Low', 'loWarn', 'text'],
+    ['Fail Low', 'loFail', 'text'],
+    ['Warn High', 'hiWarn', 'text'],
+    ['Fail High', 'hiFail', 'text'],
+    ['Status', 'STATUS', 'text'],
+    ['Work Order #', 'WONUM', 'text'],
+    ['Owner', 'OWNER', 'text'],
+    ['Meter', 'METER', 'text'],
+    ['Asset #', 'ASSETNUM', 'text'],
+    ['Work Type', 'WORKTYPE', 'text'],
+    ['P.M. #', 'PMNUM', 'text'],
+    ['J.P. #', 'JPNUM', 'text'],
+    ['Parent WO#', 'PARENT_WONUM', 'text']
+  ];
+  var io = MODEL.sites[0].ioList[0];
+  for (var i = 0; i < fields.length; i++) {
+    var field = fields[i];
+    midPart += '<li><div class="item-content"><div class="item-inner">' +
+      '<div class="item-title label">' + field[0] + '</div>' +
+      '<div class="item-input"><input readonly type="text" value="' + io[field[1]] + '"></div>' +
+      '</div></div></li>';
 
-
-
+  }
+  tab.innerHTML = topPart + midPart + botPart;
+};
