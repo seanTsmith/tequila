@@ -5,7 +5,7 @@
 
 var sample = {};
 var app = new Application();
-app.set('brand', 'Apollo Prototype');
+app.set('brand', 'SPL Client');
 
 sample.InitializeStore = function (store, callback) {
   var cmd = new Command({name: 'cmdInitializeStore', type: 'Procedure', contents: new Procedure({tasks: [
@@ -66,24 +66,42 @@ $(document).ready(function () {
         f7.addPageHandler('Sites', 'fa-building-o', app.registerSitesPage);
         f7.addPageHandler('I/Os', 'fa-tasks', app.registerIOPage);
         f7.addPageHandler('Details', 'fa-tachometer', app.registerDetailPage);
-        f7.addPageHandler('Alarms', 'fa-bell-o', app.registerProtoPage);
-        f7.addPageHandler('Manual Read', 'fa-pencil-square-o', app.registerProtoPage);
-        f7.addPageHandler('Configure', 'fa-cog', app.registerProtoPage);
-        f7.addPageHandler('Account', 'fa-user', app.registerProtoPage);
-        f7.addPageHandler('Configure', 'fa-cog', app.registerProtoPage);
-        f7.addPageHandler('Configure', 'fa-cog', app.registerProtoPage);
-        f7.addPageHandler('Configure', 'fa-cog', app.registerProtoPage);
+        f7.addPageHandler('Alarms', 'fa-bell-o', app.registerAlarmPage);
+        f7.addPageHandler('Manual Entry', 'fa-keyboard-o', app.registerProtoPage);
+        f7.addPageHandler('Share', 'fa-share-alt-square', app.registerProtoPage);
+        f7.addPageHandler('Historical', 'fa-calendar-o', app.registerProtoPage);
+        f7.addPageHandler('Upload', 'fa-cloud', app.registerProtoPage);
+        f7.addPageHandler('Background', 'fa-briefcase', app.registerProtoPage);
         f7.addPageHandler('Configure', 'fa-cog', app.registerProtoPage);
       }
     });
-    f7.selectPage('Details');
+    f7.selectPage('More');
   });
 });
+
+/*
+*
+*
+ Manual Entry http://fortawesome.github.io/Font-Awesome/icon/keyboard-o
+ Share http://fortawesome.github.io/Font-Awesome/icon/share-alt-square
+ Historical (Readings)  http://fortawesome.github.io/Font-Awesome/icon/calendar-o
+ Upload (All Readings) http://fortawesome.github.io/Font-Awesome/icon/cloud
+ Background (of part or plant) http://fortawesome.github.io/Font-Awesome/icon/briefcase
+
+ *
+* */
 
 app.registerProtoPage = function (self, tab, action) {
   tab.innerHTML = '<div class="content-block-title">Placeholder</div>' +
     '<div class="content-block">' +
     '<p>This page is a placeholder...</p>' +
+    '</div>';
+};
+
+app.registerAlarmPage = function (self, tab, action) {
+  tab.innerHTML = '<div class="content-block-title">Alarms</div>' +
+    '<div class="content-block">' +
+    '<p>No Active Alarms</p>' +
     '</div>';
 };
 
@@ -101,7 +119,7 @@ app.registerSitesPage = function (self, tab, action) {
 
 app.registerIOPage = function (self, tab, action) {
   console.log('registerIOPage');
-  var topPart = '<div class="content-block-title">I/O XXXXX</div><div class="list-block"><ul>';
+  var topPart = '<div class="content-block-title">ETX-3010 I/O List</div><div class="list-block"><ul>';
   var midPart = ''; // set by setInnerHTML
   var botPart = '</ul></div>';
   for (var i = 0; i < MODEL.sites[0].ioList.length; i++) {
@@ -116,7 +134,7 @@ app.registerIOPage = function (self, tab, action) {
 
 app.registerDetailPage = function (self, tab, action) {
   console.log('registerDetailPage');
-  var topPart = '<div class="content-block-title">DETAILSZZZZ</div><div class="list-block"><ul>';
+  var topPart = '<div class="content-block-title">PSV-1-MAB-1-GARRETT DETAILS</div><div class="list-block"><ul>';
   var midPart = ''; // set by setInnerHTML
   var botPart = '</ul></div>';
   var fields = [
