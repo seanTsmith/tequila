@@ -42,6 +42,16 @@ module.exports = function (grunt) {
         ],
         dest: 'dist/tequila.js'
       },
+      tequilaInterfaceF7: {
+        src: [
+          'lib/interfaces/framework7-interface-client.js',
+          'lib/interfaces/framework7-interface-navbar.js',
+          'lib/interfaces/framework7-interface-page.js',
+          'lib/interfaces/framework7-interface-presentation.js',
+          'lib/interfaces/framework7-interface-toolbar.js'
+        ],
+        dest: 'dist/tequila-interface-f7.js'
+      },
       nodeTestCli: {
         src: [
           'test-spec/Markdown.Converter.js',
@@ -111,7 +121,7 @@ module.exports = function (grunt) {
         dest: 'dist/node-test-host.js'
       }
     },
-    uglify:{
+    uglify: {
       options: {
         mangle: false
       },
@@ -149,7 +159,7 @@ module.exports = function (grunt) {
     var child = grunt.util.spawn(
       {
         cmd: 'istanbul',
-        args: ['cover','dist/node-test-cli.js']
+        args: ['cover', 'dist/node-test-cli.js']
       }, done);
     child.stdout.pipe(process.stdout);
     child.stderr.pipe(process.stderr);
