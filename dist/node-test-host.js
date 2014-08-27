@@ -727,12 +727,14 @@ Interface.prototype.mockRequest = function (args) {
     this.doMock();
   }
 };
-Interface.prototype.start = function (application, presentation, callBack) {
+Interface.prototype.start = function (application, presentation, toolbarPresentation, callBack) {
   if (!(application instanceof Application)) throw new Error('Application required');
-  if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
+  if (!(presentation instanceof Presentation)) throw new Error('AppPresentation required');
+  if (!(toolbarPresentation instanceof Presentation)) throw new Error('toolbarPresentation required');
   if (typeof callBack != 'function') throw new Error('callBack required');
   this.application = application;
   this.presentation = presentation;
+  this.toolbarPresentation = toolbarPresentation;
   this.startCallback = callBack;
 };
 Interface.prototype.stop = function (callBack) {
@@ -1319,11 +1321,12 @@ Application.prototype = T.inheritPrototype(Model.prototype);
  */
 Application.prototype.start = function (callBack) {
   if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
-  if (false === (this.primaryPresentation instanceof Presentation)) throw new Error('error starting application: presentation not set');
+  if (false === (this.appPresentation instanceof Presentation)) throw new Error('error starting application: appPresentation not set');
+  if (false === (this.toolbarPresentation instanceof Presentation)) throw new Error('error starting application: toolbarPresentation not set');
   if (typeof callBack != 'function') throw new Error('callBack required');
   var self = this;
   this.startCallback = callBack;
-  this.primaryInterface.start(self, this.primaryPresentation, function (request) {
+  this.primaryInterface.start(self, this.appPresentation, this.toolbarPresentation, function (request) {
     if (request.type=='Command') {
       request.command.execute();
     } else {
@@ -1349,16 +1352,27 @@ Application.prototype.setInterface = function (primaryInterface) {
 Application.prototype.getInterface = function () {
   return this.primaryInterface;
 };
-Application.prototype.setPresentation = function (primaryPresentation) {
-  if (false === (primaryPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
-  this.primaryPresentation = primaryPresentation;
+Application.prototype.setAppPresentation = function (appPresentation) {
+  if (false === (appPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
+  this.appPresentation = appPresentation;
   if (this.startCallback) {
     // Interface started so reload
-    this.primaryInterface.setPresentation(this.primaryPresentation);
+    this.primaryInterface.setAppPresentation(this.appPresentation);
   }
 };
-Application.prototype.getPresentation = function () {
-  return this.primaryPresentation;
+Application.prototype.getAppPresentation = function () {
+  return this.appPresentation;
+};
+Application.prototype.setToolbarPresentation = function (toolbarPresentation) {
+  if (false === (toolbarPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
+  this.toolbarPresentation = toolbarPresentation;
+  if (this.startCallback) {
+    // Interface started so reload
+    this.primaryInterface.setToolbarPresentation(this.toolbarPresentation);
+  }
+};
+Application.prototype.getToolbarPresentation = function () {
+  return this.toolbarPresentation;
 };
 ;
 /**
@@ -2258,9 +2272,10 @@ Bootstrap3PanelInterface.prototype = T.inheritPrototype(Interface.prototype);
 * Methods
 */
 // See bootstrap3-panels-interface-client... stub for server here
-Bootstrap3PanelInterface.prototype.start = function (application, presentation, callBack) {
+Bootstrap3PanelInterface.prototype.start = function (application, presentation, toolbarPresentation, callBack) {
   if (!(application instanceof Application)) throw new Error('Application required');
-  if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
+  if (!(presentation instanceof Presentation)) throw new Error('AppPresentation required');
+  if (!(toolbarPresentation instanceof Presentation)) throw new Error('toolbarPresentation required');
   if (typeof callBack != 'function') throw new Error('callBack required');
   throw new Error('Bootstrap3PanelInterface unavailable in server');
 };;
@@ -2293,9 +2308,10 @@ Framework7Interface.prototype = T.inheritPrototype(Interface.prototype);
  * Methods
  */
 // See bootstrap3-panels-interface-client... stub for server here
-Framework7Interface.prototype.start = function (application, presentation, callBack) {
+Framework7Interface.prototype.start = function (application, presentation, toolbarPresentation, callBack) {
   if (!(application instanceof Application)) throw new Error('Application required');
-  if (!(presentation instanceof Presentation)) throw new Error('Presentation required');
+  if (!(presentation instanceof Presentation)) throw new Error('AppPresentation required');
+  if (!(toolbarPresentation instanceof Presentation)) throw new Error('toolbarPresentation required');
   if (typeof callBack != 'function') throw new Error('callBack required');
   throw new Error('Framework7Interface unavailable in server');
 };;

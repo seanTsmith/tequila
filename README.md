@@ -20,10 +20,13 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 - make it (grunt)
 
 #### To do now
-- make abstraction for toolbar vs app then have interface render toolbar accordingly
+- make abstraction for toolbar vs app (DONE) 
+- have interface render toolbar accordingly
+    get/setPresentation becomes.... get/setAppPresentation get/setToolbarPresentation
 - unify sample for both interfaces
 
 #### To do later
+- make model attribute state: New, Loaded, Error, Changed, Saved to be reflected in interface 
 - Attribute visible property
 - Attribute image type
 

@@ -1349,15 +1349,15 @@ Application.prototype.setInterface = function (primaryInterface) {
 Application.prototype.getInterface = function () {
   return this.primaryInterface;
 };
-Application.prototype.setPresentation = function (primaryPresentation) {
+Application.prototype.setAppPresentation = function (primaryPresentation) {
   if (false === (primaryPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
   this.primaryPresentation = primaryPresentation;
   if (this.startCallback) {
     // Interface started so reload
-    this.primaryInterface.setPresentation(this.primaryPresentation);
+    this.primaryInterface.setAppPresentation(this.primaryPresentation);
   }
 };
-Application.prototype.getPresentation = function () {
+Application.prototype.getAppPresentation = function () {
   return this.primaryPresentation;
 };
 ;

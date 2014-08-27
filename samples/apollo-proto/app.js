@@ -53,7 +53,7 @@ privateMenu.set('contents', [
   aboutCommand
 ]);
 
-app.setPresentation(privateMenu);
+app.setAppPresentation(privateMenu);
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();
