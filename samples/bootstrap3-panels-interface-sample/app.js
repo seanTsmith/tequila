@@ -122,7 +122,7 @@ loginPresentation.set('contents', [
     loginPresentation.validate(function () {
       if (!loginPresentation.validationMessage) {
         $("#panel1").show(); // todo don't hard code ?
-        app.setAppPresentation(privateMenu);
+        app.setPresentation(privateMenu);
       }
     });
   }})
@@ -137,10 +137,10 @@ publicMenu.set('contents', [
   loginCommand
 ]);
 
-//app.setAppPresentation(publicMenu);
+//app.setPresentation(publicMenu);
 $("#panel1").show(); // todo don't hard code ?
-app.setAppPresentation(privateMenu);
-app.setToolbarPresentation(privateMenu); // TODO just to fix start error
+app.setPresentation(privateMenu);
+app.setSystemPresentation(privateMenu); // TODO just to fix start error
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();

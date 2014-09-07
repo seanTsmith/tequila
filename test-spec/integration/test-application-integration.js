@@ -15,7 +15,7 @@ test.runnerApplicationIntegration = function () {
       var testPresentation = new Presentation();
 
       app.setInterface(testInterface);
-      app.setAppPresentation(testPresentation);
+      app.setPresentation(testPresentation);
 
       app.start(function (request) {
         if (request.type == 'mock count')

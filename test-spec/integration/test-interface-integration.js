@@ -9,7 +9,7 @@ test.runnerInterfaceIntegration = function () {
       var self = this;
       self.callbackCount = 0;
       testInterface = new MockInterface();
-      testInterface.start(new Application(), new Presentation(), new Presentation(), function (request) {
+      testInterface.start(new Application(), new Presentation(), function (request) {
         if (request.type == 'mock count')
           self.callbackCount++;
         if (self.callbackCount > 3)

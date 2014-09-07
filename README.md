@@ -22,15 +22,24 @@ http://dremoor.github.io/tequila/test-spec/test-runner
 #### To do now
 - make abstraction for toolbar vs app (DONE) 
 - have interface render toolbar accordingly
-    get/setPresentation becomes.... get/setAppPresentation get/setToolbarPresentation
+    get/setPresentation becomes.... get/setAppPresentation get/setSystemPresentation
 - unify sample for both interfaces
 
 #### To do later
+- Make a REPL interface that can be used by node or html cli
+- check out dust.js for use with html-interface (that I need to code :P);
+
+- have build create node 'tequilaApp' that launches node and manages node with features:
+    - routing and services handled with fallback options to static server or other express options
+    - config server with plug ins for routing and services (ie port # bound)
+
+- fix submenus in bp3 top nav
 - make model attribute state: New, Loaded, Error, Changed, Saved to be reflected in interface 
 - Attribute visible property
 - Attribute image type
 
 #### To do even later
+- think about abstraction for App Authoring (inside app itself)
 - new methods for Models:
     - getModelName() - Primary description for model example
     - getModelType() - optional small identifying info

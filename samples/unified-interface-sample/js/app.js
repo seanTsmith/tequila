@@ -32,11 +32,11 @@ sample.InitializeStore = function (store, callback) {
   });
   cmd.execute();
 };
-
-//var io = new Framework7Interface({name:'Framework7Interface'});
-//app.setInterface(io);
-
-var io = new Bootstrap3PanelInterface({name:'Bootstrap3PanelInterface'});
+var io;
+if (Framework7Interface.prototype.renderFramework)
+  io = new Framework7Interface({name:'Framework7Interface'});
+else
+  io = new Bootstrap3PanelInterface({name:'Bootstrap3PanelInterface'});
 app.setInterface(io);
 
 // Quickbooks Menu for kicks
@@ -180,7 +180,7 @@ loginPresentation.set('contents', [
     loginPresentation.validate(function () {
       if (!loginPresentation.validationMessage) {
         $("#panel1").show(); // todo don't hard code ?
-        app.setAppPresentation(privateMenu);
+        app.setPresentation(privateMenu);
       }
     });
   }})
@@ -195,8 +195,8 @@ publicMenu.set('contents', [
   loginCommand
 ]);
 
-app.setAppPresentation(privateMenu);
-app.setToolbarPresentation(privateMenu); // TODO just to fix start error
+app.setPresentation(privateMenu);
+app.setSystemPresentation(privateMenu); // TODO just to fix start error
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();

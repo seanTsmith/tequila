@@ -43,7 +43,7 @@ test.runnerRequestDispatchIntegration = function () {
       var mock = new MockInterface();
       var menu = new Presentation();
       app.setInterface(mock);
-      app.setAppPresentation(menu);
+      app.setPresentation(menu);
       app.start(function (request) {
 //        console.log(JSON.stringify(request));
       });
