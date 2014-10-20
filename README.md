@@ -1,6 +1,8 @@
 # tequila [![Build Status](https://secure.travis-ci.org/cloud-coder/tequila.png)](http://travis-ci.org/cloud-coder/tequila)[![Coverage Status](https://img.shields.io/coveralls/cloud-coder/tequila.svg)](https://coveralls.io/r/cloud-coder/tequila?branch=master)
 Tequila is a javascript application framework.  It runs on node server and html5 capable interfaces.
 
+Travis?
+
 ## Project Goals:
 * Provide high level abstractions to simplify application development
 * Facilitate design pattern practices
