@@ -1319,10 +1319,12 @@ Application.prototype = T.inheritPrototype(Model.prototype);
  */
 Application.prototype.start = function (callBack) {
   if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
+  if (false === (this.appPresentation instanceof Presentation)) throw new Error('error starting application: appPresentation not set');
+  if (false === (this.toolbarPresentation instanceof Presentation)) throw new Error('error starting application: toolbarPresentation not set');
   if (typeof callBack != 'function') throw new Error('callBack required');
   var self = this;
   this.startCallback = callBack;
-  this.primaryInterface.start(self, this.presentation, this.sysPresentation, function (request) {
+  this.primaryInterface.start(self, this.appPresentation, this.toolbarPresentation, function (request) {
     if (request.type=='Command') {
       request.command.execute();
     } else {
@@ -1348,17 +1350,29 @@ Application.prototype.setInterface = function (primaryInterface) {
 Application.prototype.getInterface = function () {
   return this.primaryInterface;
 };
-Application.prototype.setPresentation = function (presentation) {
-  if (false === (presentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
-  this.presentation = presentation;
+Application.prototype.setAppPresentation = function (appPresentation) {
+  if (false === (appPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
+  this.appPresentation = appPresentation;
   if (this.startCallback) {
     // Interface started so reload
-    this.primaryInterface.setPresentation(this.presentation);
+    this.primaryInterface.setAppPresentation(this.appPresentation);
   }
 };
-Application.prototype.getPresentation = function () {
-  return this.presentation;
-};;
+Application.prototype.getAppPresentation = function () {
+  return this.appPresentation;
+};
+Application.prototype.setToolbarPresentation = function (toolbarPresentation) {
+  if (false === (toolbarPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
+  this.toolbarPresentation = toolbarPresentation;
+  if (this.startCallback) {
+    // Interface started so reload
+    this.primaryInterface.setToolbarPresentation(this.toolbarPresentation);
+  }
+};
+Application.prototype.getToolbarPresentation = function () {
+  return this.toolbarPresentation;
+};
+;
 /**
  * tequila
  * log-model

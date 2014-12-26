@@ -131,10 +131,10 @@ var presCommand = new Command({name: 'Presentation', type: 'Presentation', conte
 // About App
 var aboutPresentation = new Presentation();
 aboutPresentation.set('contents', [
-    '####ABOUT TEQUILA\n\n' +
-    'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
-    'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.\n\n' +
-    JSON.stringify(bowser, null, '\t')
+  '####ABOUT TEQUILA\n\n' +
+  'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
+  'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.\n\n' +
+  JSON.stringify(bowser, null, '\t')
 ]);
 var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: aboutPresentation});
 
@@ -178,7 +178,7 @@ loginPresentation.set('contents', [
     loginPresentation.validate(function () {
       if (!loginPresentation.validationMessage) {
         $("#panel1").show(); // todo don't hard code ?
-        app.setPresentation(privateMenu);
+        app.setAppPresentation(privateMenu);
       }
     });
   }})
@@ -193,8 +193,8 @@ publicMenu.set('contents', [
   loginCommand
 ]);
 
-app.setPresentation(privateMenu);
-//app.setSystemPresentation(privateMenu); // TODO just to fix start error
+app.setAppPresentation(privateMenu);
+app.setToolbarPresentation(privateMenu); // TODO just to fix start error
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();

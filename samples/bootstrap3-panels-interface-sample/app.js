@@ -53,8 +53,8 @@ var procCommand = new Command({name: 'Procedure', type: 'Procedure', contents: n
 // Create sample presentation
 var pres = new Presentation();
 pres.set('contents', [
-    '####INSTRUCTIONS\n\n' +
-    'Enter some stuff then push some buttons.',
+  '####INSTRUCTIONS\n\n' +
+  'Enter some stuff then push some buttons.',
   '-',
   new Attribute({name: 'firstName', label: 'First Name', type: 'String(20)', value: 'John'}),
   new Attribute({name: 'lastName', label: 'Last Name', type: 'String(25)', value: 'Doe'}),
@@ -103,10 +103,10 @@ privateMenu.set('contents', [
 // Here is App when not logged in
 var aboutPresentation = new Presentation();
 aboutPresentation.set('contents', [
-    '####ABOUT TEQUILA\n\n' +
-    'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
-    'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.\n\n' +
-      JSON.stringify(bowser,null, '\t')
+  '####ABOUT TEQUILA\n\n' +
+  'Tequila is a distilled beverage made from the blue agave plant, primarily in the area surrounding the city of ' +
+  'Tequila, 65 km northwest of Guadalajara, and in the highlands of the north western Mexican state of Jalisco.\n\n' +
+  JSON.stringify(bowser,null, '\t')
 ]);
 var aboutCommand = new Command({name: 'About', type: 'Presentation', contents: aboutPresentation});
 var storePicks = ['MemoryStore', 'LocalStore', 'HostStore'];
@@ -122,7 +122,7 @@ loginPresentation.set('contents', [
     loginPresentation.validate(function () {
       if (!loginPresentation.validationMessage) {
         $("#panel1").show(); // todo don't hard code ?
-        app.setPresentation(privateMenu);
+        app.setAppPresentation(privateMenu);
       }
     });
   }})
@@ -137,10 +137,10 @@ publicMenu.set('contents', [
   loginCommand
 ]);
 
-//app.setPresentation(publicMenu);
+//app.setAppPresentation(publicMenu);
 $("#panel1").show(); // todo don't hard code ?
-app.setPresentation(privateMenu);
-app.setSystemPresentation(privateMenu); // TODO just to fix start error
+app.setAppPresentation(privateMenu);
+app.setToolbarPresentation(privateMenu); // TODO just to fix start error
 
 $(document).ready(function () {
   sample.memoryStore = new MemoryStore();

@@ -2721,10 +2721,12 @@ Application.prototype = T.inheritPrototype(Model.prototype);
  */
 Application.prototype.start = function (callBack) {
   if (false === (this.primaryInterface instanceof Interface)) throw new Error('error starting application: interface not set');
+  if (false === (this.appPresentation instanceof Presentation)) throw new Error('error starting application: appPresentation not set');
+  if (false === (this.toolbarPresentation instanceof Presentation)) throw new Error('error starting application: toolbarPresentation not set');
   if (typeof callBack != 'function') throw new Error('callBack required');
   var self = this;
   this.startCallback = callBack;
-  this.primaryInterface.start(self, this.presentation, this.sysPresentation, function (request) {
+  this.primaryInterface.start(self, this.appPresentation, this.toolbarPresentation, function (request) {
     if (request.type=='Command') {
       request.command.execute();
     } else {
@@ -2750,17 +2752,29 @@ Application.prototype.setInterface = function (primaryInterface) {
 Application.prototype.getInterface = function () {
   return this.primaryInterface;
 };
-Application.prototype.setPresentation = function (presentation) {
-  if (false === (presentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
-  this.presentation = presentation;
+Application.prototype.setAppPresentation = function (appPresentation) {
+  if (false === (appPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
+  this.appPresentation = appPresentation;
   if (this.startCallback) {
     // Interface started so reload
-    this.primaryInterface.setPresentation(this.presentation);
+    this.primaryInterface.setAppPresentation(this.appPresentation);
   }
 };
-Application.prototype.getPresentation = function () {
-  return this.presentation;
-};;
+Application.prototype.getAppPresentation = function () {
+  return this.appPresentation;
+};
+Application.prototype.setToolbarPresentation = function (toolbarPresentation) {
+  if (false === (toolbarPresentation instanceof Presentation)) throw new Error('instance of Presentation a required parameter');
+  this.toolbarPresentation = toolbarPresentation;
+  if (this.startCallback) {
+    // Interface started so reload
+    this.primaryInterface.setToolbarPresentation(this.toolbarPresentation);
+  }
+};
+Application.prototype.getToolbarPresentation = function () {
+  return this.toolbarPresentation;
+};
+;
 /**
  * tequila
  * log-model
@@ -6921,7 +6935,7 @@ test.runnerApplicationModel = function () {
     });
     test.heading('ATTRIBUTES', function () {
       test.paragraph('Application extends model and inherits the attributes property.  All Presentation objects ' +
-        'have the following attributes:');
+      'have the following attributes:');
       test.example('following attributes are defined:', undefined, function () {
         var presentation = new Application(); // default attributes and values
         test.assertion(presentation.get('name') === 'newApp');
@@ -6948,22 +6962,40 @@ test.runnerApplicationModel = function () {
           return (myApplication.getInterface() === myInterface);
         });
       });
-      test.heading('setPresentation(presentation)', function () {
+      test.heading('setAppPresentation(presentation)', function () {
         test.paragraph('Setting the presentation for the application determines the primary commands available to the user.');
         test.example('must supply Presentation object', Error('instance of Presentation a required parameter'), function () {
-          new Application().setPresentation();
+          new Application().setAppPresentation();
         });
       });
-      test.heading('getPresentation()', function () {
+      test.heading('getAppPresentation()', function () {
         test.paragraph('returns primary user presentation for application');
         test.example('default is undefined', true, function () {
-          return new Application().getPresentation() == undefined;
+          return new Application().getAppPresentation() == undefined;
         });
         test.example('returns value set by set Presentation', true, function () {
           var myPresentation = new Presentation();
           var myApplication = new Application();
-          myApplication.setPresentation(myPresentation);
-          return (myApplication.getPresentation() === myPresentation);
+          myApplication.setAppPresentation(myPresentation);
+          return (myApplication.getAppPresentation() === myPresentation);
+        });
+      });
+      test.heading('setToolbarPresentation(presentation)', function () {
+        test.paragraph('Setting the presentation for the application determines the primary commands available to the user.');
+        test.example('must supply Presentation object', Error('instance of Presentation a required parameter'), function () {
+          new Application().setToolbarPresentation();
+        });
+      });
+      test.heading('getToolbarPresentation()', function () {
+        test.paragraph('returns primary user presentation for application');
+        test.example('default is undefined', true, function () {
+          return new Application().getToolbarPresentation() == undefined;
+        });
+        test.example('returns value set by set Presentation', true, function () {
+          var myPresentation = new Presentation();
+          var myApplication = new Application();
+          myApplication.setToolbarPresentation(myPresentation);
+          return (myApplication.getToolbarPresentation() === myPresentation);
         });
       });
       test.heading('start()', function () {
@@ -6971,10 +7003,29 @@ test.runnerApplicationModel = function () {
         test.example('must set interface before starting', Error('error starting application: interface not set'), function () {
           new Application().start();
         });
+        test.example('must set appPresentation before starting', Error('error starting application: appPresentation not set'), function () {
+          var i = new Interface();
+          var a = new Application();
+          a.setInterface(i);
+          a.start();
+        });
+        test.example('must set toolbarPresentation before starting', Error('error starting application: toolbarPresentation not set'), function () {
+          var i = new Interface();
+          var p = new Presentation();
+          var a = new Application();
+          a.setInterface(i);
+          a.setAppPresentation(p);
+          a.start();
+        });
         test.example('callback parameter required', Error('callBack required'), function () {
-          var app = new Application();
-          app.setInterface(new Interface());
-          app.start();
+          var i = new Interface();
+          var p = new Presentation();
+          var p2 = new Presentation();
+          var a = new Application();
+          a.setInterface(i);
+          a.setAppPresentation(p);
+          a.setToolbarPresentation(p2);
+          a.start();
         });
       });
       test.heading('dispatch()', function () {
